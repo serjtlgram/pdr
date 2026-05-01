@@ -322,14 +322,15 @@ body {
       font-size: 1.2rem;
       margin-bottom: 12px;
   }
+  
+  /* ИЗМЕНЕНИЕ СЕТКИ КАРТОЧЕК ДЛЯ МОБИЛЬНОЙ ВЕРСИИ */
   .cards-grid {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr; /* Одна колонка вместо 1fr 1fr */
       gap: 10px;
   }
+  
   .feature-card {
-      padding: 12px;
-      /* На мобилках выравнивание сохраняется горизонтальным, 
-         но отступы внутри карточки уменьшены для компактности */
+      padding: 16px; /* Чуть увеличил отступ для карточек во всю ширину */
   }
 
   /* Перестроение нижнего баннера */
@@ -344,7 +345,7 @@ body {
   }
 
   .banner-image {
-      align-self: center; /* Центрируем машинку под текстом */
+      align-self: center; 
       margin-top: 0; 
       max-width: 60px;
   }
