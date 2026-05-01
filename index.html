@@ -3,99 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ПДР України</title>
+    <title>ПДР України 2026</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="pdr-theme">
+<body>
     <div id="app-container">
         
-        <header class="app-header">
-            <div class="header-left">
-                <div class="logo-badge placeholder-img"></div>
-            </div>
-            <div class="header-right">
-                <div class="badge lang-badge">
-                    <span class="active-lang">ua</span> / <span>en</span>
-                </div>
-                <div class="profile-badge placeholder-img">
-                    <span class="badge-count">1</span>
-                </div>
+        <header class="top-bar">
+            <div class="logo-icon placeholder-badge">
+                <img src="img/logo.png" alt="UA" onerror="this.style.display='none'">
             </div>
         </header>
 
         <main>
-            <section id="title-area">
-                <h1 class="main-heading">
-                    Правила<br>
-                    дорожнього <span class="accent-color">руху</span><br>
-                    України
-                </h1>
-                <p class="tagline">Твоя безпека та впевненість на дорозі</p>
+            <section class="hero-section">
+                <div class="hero-blend-mask"></div>
+
+                <div class="hero-overlay-content">
+                    <h1 class="hero-title">
+                        Правила<br>
+                        дорожнього руху<br>
+                        <span class="text-accent">України</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Офіційні правила для безпечного<br>
+                        руху та впевненості на дорозі
+                    </p>
+                    <button class="btn-primary">
+                        Розпочати навчання
+                        <span class="btn-arrow">→</span>
+                    </button>
+                </div>
             </section>
 
-            <div id="main-content-split">
+            <section class="content-section">
+                <h2 class="section-title">Що всередині?</h2>
                 
-                <section id="action-buttons-area">
-                    <div class="buttons-grid">
-                        <div class="card button-card" data-section="themes">
-                            <div class="card-icon placeholder-img">📚</div>
-                            <div class="card-details">
-                                <h3 class="card-title">Теми</h3>
-                                <p class="card-sub">Вивчено <span class="accent-color">12</span> тем з <span class="accent-color">34</span></p>
-                            </div>
+                <div class="cards-grid">
+                    <div class="feature-card">
+                        <div class="card-icon placeholder-box">📖</div>
+                        <div class="card-text">
+                            <h3>Правила ПДР</h3>
+                            <p>Повний текст правил дорожнього руху</p>
                         </div>
-                        <div class="card button-card" data-section="exam">
-                            <div class="card-icon placeholder-img">⏱️</div>
-                            <div class="card-details">
-                                <h3 class="card-title">Іспит</h3>
-                                <p class="card-sub">Готовність <span class="accent-color">75%</span></p>
-                            </div>
-                        </div>
-                        <div class="card button-card" data-section="signs">
-                            <div class="card-icon placeholder-img">🛑</div>
-                            <div class="card-details">
-                                <h3 class="card-title">Знаки</h3>
-                                <p class="card-sub">Вивчено <span class="accent-color">80</span> з <span class="accent-color">250</span></p>
-                            </div>
-                        </div>
-                        <div class="card button-card" data-section="fines">
-                            <div class="card-icon placeholder-img">💰</div>
-                            <div class="card-details">
-                                <h3 class="card-title">Штрафи</h3>
-                                <p class="card-sub">Перевірка наявності</p>
-                            </div>
-                        </div>
+                        <div class="card-arrow">›</div>
                     </div>
-                </section>
-                
-                <section id="hero-image-area">
-                    <div class="hero-image-frame">
-                        <img src="img/img1.webp" alt="Ілюстрація ПДР України" class="hero-image" loading="eager">
-                    </div>
-                </section>
-            </div>
 
-            <section id="cta-area">
-                <div class="card cta-card">
-                    <div class="cta-text">
-                        <h2 class="cta-title">Вчитись легко з нами</h2>
-                        <p class="cta-sub">Перевір свої знання, пройди тести</p>
+                    <div class="feature-card">
+                        <div class="card-icon placeholder-box">❓</div>
+                        <div class="card-text">
+                            <h3>Тести</h3>
+                            <p>Підготовка до офіційного іспиту</p>
+                        </div>
+                        <div class="card-arrow">›</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="card-icon placeholder-box">⚠️</div>
+                        <div class="card-text">
+                            <h3>Дорожні знаки</h3>
+                            <p>Каталог з детальними поясненнями</p>
+                        </div>
+                        <div class="card-arrow">›</div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="card-icon placeholder-box">🛣️</div>
+                        <div class="card-text">
+                            <h3>Розмітка</h3>
+                            <p>Види розмітки та правила її застосування</p>
+                        </div>
+                        <div class="card-arrow">›</div>
                     </div>
                 </div>
-                <button class="main-cta-button">
-                    <span class="btn-text">Продовжити навчання</span>
-                    <span class="btn-icon">→</span>
-                </button>
-                
-                <div class="placeholder-img bottom-image-placeholder"></div>
+
+                <div class="bottom-banner">
+                    <div class="banner-icon placeholder-box">🛡️</div>
+                    <div class="banner-text">
+                        <h3>Вчіть правила та будьте в безпеці</h3>
+                        <p>Знання ПДР — це ваша впевненість на кожному перехресті.</p>
+                    </div>
+                </div>
             </section>
+
+            <footer class="app-footer">
+                <p>💙💛 Зроблено в Україні</p>
+                <p class="footer-sub">Дані актуальні на 2026 рік</p>
+            </footer>
         </main>
     </div>
-
     <script src="app.js"></script>
 </body>
 </html>
