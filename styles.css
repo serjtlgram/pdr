@@ -16,8 +16,8 @@ body {
 #app-container {
   max-width: 1200px;
   margin: 0 auto;
-  /* Умный отступ от Телеграма, чтобы крестик не перекрывал герб */
-  padding: calc(var(--tg-content-safe-area-inset-top, 24px) + 40px) 16px 16px 16px;
+  /* Добавили calc() и прибавили 60px сверху */
+  padding: calc(var(--tg-content-safe-area-inset-top, 24px) + 60px) 16px 16px 16px;
 }
 
 /* Шапка */
