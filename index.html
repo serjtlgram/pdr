@@ -3,26 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ПДД України 2026</title>
+    <title>ПДР України</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="pdr-design-theme">
+<body class="pdr-theme">
     <div id="app-container">
+        
         <header class="app-header">
             <div class="header-left">
-                <div class="logo-trident-badge">
-                    <span class="trident-placeholder"></span>
-                </div>
+                <div class="logo-badge placeholder-img"></div>
             </div>
             <div class="header-right">
-                <div class="language-badge">ua</div>
-                <div class="profiles-badge">
-                    <span id="profile-initials"></span>
-                    <span id="profile-count" class="badge-count">1</span>
+                <div class="badge lang-badge">
+                    <span class="active-lang">ua</span> / <span>en</span>
+                </div>
+                <div class="profile-badge placeholder-img">
+                    <span class="badge-count">1</span>
                 </div>
             </div>
         </header>
@@ -31,64 +31,65 @@
             <section id="title-area">
                 <h1 class="main-heading">
                     Правила<br>
-                    <span class="color-pop">дорожнього рух</span><br>
+                    дорожнього <span class="accent-color">руху</span><br>
                     України
                 </h1>
-                <p class="main-sub">Офіційні правила для безпечного руху та впевненості на дорозі</p>
+                <p class="tagline">Твоя безпека та впевненість на дорозі</p>
             </section>
-            
-            <div id="main-content-flow">
-                <section id="hero-progress-section">
-                    <div class="card hero-progress-card glow-cyan">
-                        <div class="progress-chart-container">
-                            <div class="circular-chart-canvas">
-                                <svg class="chart-svg" viewBox="0 0 100 100">
-                                    <circle class="chart-bg" cx="50" cy="50" r="45"></circle>
-                                    <circle class="chart-value" cx="50" cy="50" r="45" stroke-dasharray="141.37 282.74"></circle>
-                                </svg>
-                                <span id="progress-percent" class="chart-value-text">45%</span>
+
+            <div id="main-content-split">
+                
+                <section id="action-buttons-area">
+                    <div class="buttons-grid">
+                        <div class="card button-card" data-section="themes">
+                            <div class="card-icon placeholder-img">📚</div>
+                            <div class="card-details">
+                                <h3 class="card-title">Теми</h3>
+                                <p class="card-sub">Вивчено <span class="accent-color">12</span> тем з <span class="accent-color">34</span></p>
                             </div>
                         </div>
-                        <div class="progress-details">
-                            <h2 class="card-title">Прогрес вивчення</h2>
-                            <p class="progress-desc">Вивчено 12 тем з 34. Залишилось 22</p>
+                        <div class="card button-card" data-section="exam">
+                            <div class="card-icon placeholder-img">⏱️</div>
+                            <div class="card-details">
+                                <h3 class="card-title">Іспит</h3>
+                                <p class="card-sub">Готовність <span class="accent-color">75%</span></p>
+                            </div>
+                        </div>
+                        <div class="card button-card" data-section="signs">
+                            <div class="card-icon placeholder-img">🛑</div>
+                            <div class="card-details">
+                                <h3 class="card-title">Знаки</h3>
+                                <p class="card-sub">Вивчено <span class="accent-color">80</span> з <span class="accent-color">250</span></p>
+                            </div>
+                        </div>
+                        <div class="card button-card" data-section="fines">
+                            <div class="card-icon placeholder-img">💰</div>
+                            <div class="card-details">
+                                <h3 class="card-title">Штрафи</h3>
+                                <p class="card-sub">Перевірка наявності</p>
+                            </div>
                         </div>
                     </div>
                 </section>
                 
-                <section id="options-grid-section">
-                    <div class="menu-grid">
-                        <div class="grid-item glass-block glow-blue" data-section="themes">
-                            <div class="item-icon-wrapper">📚</div>
-                            <h3 class="item-title">Теми</h3>
-                        </div>
-                        <div class="grid-item glass-block glow-cyan" data-section="exam">
-                            <div class="item-icon-wrapper">⏱️</div>
-                            <h3 class="item-title">Іспит</h3>
-                        </div>
-                        <div class="grid-item glass-block glow-blue" data-section="signs">
-                            <div class="item-icon-wrapper">🛑</div>
-                            <h3 class="item-title">Знаки</h3>
-                        </div>
-                        <div class="grid-item glass-block glow-cyan" data-section="fines">
-                            <div class="item-icon-wrapper">💰</div>
-                            <h3 class="item-title">Штрафи</h3>
-                        </div>
-                    </div>
+                <section id="hero-image-area">
+                    <div class="placeholder-img large-hero-placeholder"></div>
                 </section>
             </div>
-            
-            <section id="cta-section">
-                <div class="card cta-main-card glow-magenta">
-                    <div class="cta-content">
-                        <h2 class="cta-title">Вчитись легко</h2>
-                        <p class="cta-text">Перевір свої знання з нашими тестами</p>
+
+            <section id="cta-area">
+                <div class="card cta-card">
+                    <div class="cta-text">
+                        <h2 class="cta-title">Вчитись легко з нами</h2>
+                        <p class="cta-sub">Перевір свої знання, пройди тести</p>
                     </div>
-                    <button class="main-cta-button gradient-button">
-                        <span class="btn-text">Продовжити навчання</span>
-                        <span class="btn-icon">→</span>
-                    </button>
                 </div>
+                <button class="main-cta-button">
+                    <span class="btn-text">Продовжити навчання</span>
+                    <span class="btn-icon">→</span>
+                </button>
+                
+                <div class="placeholder-img bottom-image-placeholder"></div>
             </section>
         </main>
     </div>
