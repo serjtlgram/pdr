@@ -7,7 +7,7 @@
 }
 
 body {
-  background-color: #080B12; /* Глубокий темный фон */
+  background-color: #080B12;
   color: #ffffff;
   line-height: 1.4;
   overflow-x: hidden;
@@ -38,13 +38,18 @@ body {
   overflow: hidden;
 }
 
+/* УТИЛИТЫ ДЛЯ РАЗДЕЛЕНИЯ ПК И МОБИЛКИ */
+.mobile-only {
+  display: none;
+}
+
 /* ==================================================== */
 /* ИДЕАЛЬНОЕ СЛИЯНИЕ (Desktop-first) */
 /* ==================================================== */
 .hero-section {
   position: relative;
   width: 100%;
-  min-height: 520px; /* Высота блока */
+  min-height: 520px;
   display: flex;
   align-items: center;
   margin-bottom: 40px;
@@ -55,13 +60,12 @@ body {
   top: 0;
   bottom: 0;
   right: 0;
-  width: 75%; /* На ПК картинка занимает правую часть */
+  width: 75%;
   background-image: url('img/img1.webp');
   background-size: cover;
   background-position: center right;
   z-index: 0;
   
-  /* Размывается левый край + слегка верх и низ */
   -webkit-mask-image: 
       linear-gradient(to right, transparent 0%, black 25%),
       linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);
@@ -229,19 +233,27 @@ body {
 /* ПОЛНОСТЬЮ ОБНОВЛЕННАЯ МОБИЛЬНАЯ ВЕРСИЯ */
 /* ==================================================== */
 @media (max-width: 768px) {
+  /* Скрываем десктопные элементы */
+  .desktop-only {
+      display: none !important;
+  }
+  /* Показываем новые мобильные элементы с переносами */
+  .mobile-only {
+      display: block;
+  }
+
   .hero-section {
-      min-height: 300px; /* Уменьшили высоту блока, так как текста стало меньше */
+      min-height: 300px;
       align-items: center; 
       
-      /* Магия отступа: растягиваем блок на всю ширину экрана сквозь рамки контейнера */
       margin-left: -16px;
       margin-right: -16px;
       width: calc(100% + 32px);
-      border-radius: 0; /* Убрали скругления, чтобы было от края до края */
+      border-radius: 0; 
       
-      margin-top: -10px; /* Подтянули выше к логотипу */
-      margin-bottom: 20px; /* Подтянули нижнюю сетку */
-      padding: 20px 16px; /* Вернули внутренний отступ для текста */
+      margin-top: -10px; 
+      margin-bottom: 20px; 
+      padding: 20px 16px; 
   }
 
   .hero-image {
@@ -251,10 +263,9 @@ body {
       left: 0;
       bottom: 0;
       right: 0;
-      background-position: right center; /* Сюжет справа */
+      background-position: right center; 
       background-size: cover; 
       
-      /* Растворяем слева + слегка размываем верх и низ */
       -webkit-mask-image: 
           linear-gradient(to right, transparent 0%, black 55%),
           linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%);
@@ -267,33 +278,31 @@ body {
 
   .hero-overlay-content {
       padding-left: 0;
-      width: 65%; /* Ограничили ширину текста, чтобы не лез на светофор */
+      width: 65%;
+      margin-top: -30px; /* ПОДТЯНУЛИ ВЕСЬ ТЕКСТ ВВЕРХ */
   }
 
   .hero-title {
-      font-size: 1.6rem; 
-      line-height: 1.2;
-      margin-bottom: 16px; /* Отступ сразу до кнопки */
+      font-size: 1.5rem; /* Оставил тот самый уменьшенный размер */
+      line-height: 1.1;
+      margin-bottom: 16px;
   }
 
-  /* СКРЫВАЕМ ЛИШНИЙ ТЕКСТ НА МОБИЛКАХ */
   .hero-subtitle {
       display: none; 
   }
 
   .btn-primary {
       width: auto; 
-      padding: 12px 20px; 
-      font-size: 0.95rem; 
+      padding: 10px 16px; /* Подогнал отступы, чтобы кнопка стала компактнее */
+      font-size: 0.85rem; 
       border-radius: 10px;
   }
 
-  /* СКРЫВАЕМ СТРЕЛКУ НА МОБИЛКАХ */
   .btn-arrow {
       display: none; 
   }
 
-  /* Подтягиваем сетку к верху */
   .content-section {
       margin-top: 0;
   }
