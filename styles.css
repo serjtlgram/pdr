@@ -55,15 +55,23 @@ body {
   top: 0;
   bottom: 0;
   right: 0;
-  width: 75%; /* На ПК картинка занимает правую часть */
+  width: 75%; 
   background-image: url('img/img1.webp');
   background-size: cover;
   background-position: center right;
   z-index: 0;
   
-  /* МАГИЯ: Верх, низ и право четкие. Размывается ТОЛЬКО левый край (где текст) */
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 25%);
-  mask-image: linear-gradient(to right, transparent 0%, black 25%);
+  /* Сочетаем две маски: одна для левого края, вторая для верха и низа */
+  -webkit-mask-image: 
+      linear-gradient(to right, transparent 0%, black 25%),
+      linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);
+  mask-image: 
+      linear-gradient(to right, transparent 0%, black 25%),
+      linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);
+
+  /* Эта команда заставляет две маски пересекаться (оставляя только общую область) */
+  -webkit-mask-composite: destination-in;
+  mask-composite: intersect;
 }
 
 .hero-overlay-content {
@@ -229,17 +237,30 @@ body {
       padding: 0 0 20px 0;
   }
 
-  .hero-image {
-      width: 100%;
-      height: 80%; /* Картинка занимает верхние 80% */
-      top: 0;
-      bottom: auto;
-      background-position: center top;
-      
-      /* На телефоне размываем ТОЛЬКО низ, чтобы текст хорошо читался */
-      -webkit-mask-image: linear-gradient(to top, transparent 0%, black 40%);
-      mask-image: linear-gradient(to top, transparent 0%, black 40%);
-  }
+  @media (max-width: 768px) {
+    /* ... (другие стили) ... */
+
+    .hero-image {
+        width: 100%;
+        height: 80%;
+        top: 0;
+        bottom: auto;
+        background-position: center top;
+        
+        /* На мобилке размываем низ (для текста) и чуть-чуть верх/бока для мягкости */
+        -webkit-mask-image: 
+            linear-gradient(to top, transparent 0%, black 40%),
+            linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+        mask-image: 
+            linear-gradient(to top, transparent 0%, black 40%),
+            linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+        
+        -webkit-mask-composite: destination-in;
+        mask-composite: intersect;
+    }
+
+    /* ... (остальное) ... */
+}
 
   .hero-overlay-content {
       padding-left: 0;
