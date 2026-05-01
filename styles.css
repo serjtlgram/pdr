@@ -7,102 +7,85 @@
 }
 
 body {
-  background-color: #080B12; /* Базовый цвет сайта */
+  background-color: #080B12;
   color: #ffffff;
   line-height: 1.4;
-  overflow-x: hidden; /* Предотвращаем горизонтальный скролл */
+  overflow-x: hidden;
 }
 
 #app-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 16px;
-  display: flex;
-  flex-direction: column;
 }
 
 /* Шапка */
 .top-bar {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   display: flex;
   position: relative;
   z-index: 10;
 }
 
 .logo-icon {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   background: #1A1F2B;
   border-radius: 8px;
-  overflow: hidden;
-}
-
-.logo-icon img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* ==================================================== */
-/* ИДЕАЛЬНОЕ СЛИЯНИЕ КАРТИНКИ С ФОНОМ */
+/* HERO SECTION (Главная картинка и текст) */
 /* ==================================================== */
 .hero-section {
   position: relative;
   width: 100%;
-  min-height: 500px;
+  min-height: 520px;
   display: flex;
   align-items: center;
-  /* Убраны border-radius и overflow: hidden, чтобы не было "коробки" */
-  margin-bottom: 40px;
-  padding: 40px 0; /* Убраны боковые отступы */
+  margin-bottom: 30px;
 }
 
-/* Слой с самой картинкой */
 .hero-image {
   position: absolute;
-  top: -20px;
-  bottom: -20px;
-  right: -20px; /* Немного выводим за край */
-  width: 75%; /* Ширина картинки на ПК */
+  top: 0;
+  right: -16px;
+  width: 100%;
+  height: 100%;
   background-image: url('img/img1.webp');
   background-size: cover;
   background-position: center;
   z-index: 0;
 }
 
-/* Слой с градиентами, который "съедает" жесткие края картинки */
 .hero-vignette {
   position: absolute;
-  top: -25px;
-  bottom: -25px;
-  left: -20px;
-  right: -25px;
+  top: 0;
+  left: -16px;
+  right: -16px;
+  bottom: 0;
   z-index: 1;
-  /* Комбинация 4-х градиентов цвета фона сайта (#080B12) */
-  background:
-      /* 1. Плавный переход слева для текста */
-      linear-gradient(to right, #080B12 35%, rgba(8,11,18,0) 65%),
-      /* 2. Растворение верхнего края */
-      linear-gradient(to bottom, #080B12 5%, rgba(8,11,18,0) 25%),
-      /* 3. Растворение нижнего края */
-      linear-gradient(to top, #080B12 5%, rgba(8,11,18,0) 25%),
-      /* 4. Мягкое растворение правого края */
-      linear-gradient(to left, #080B12 0%, rgba(8,11,18,0) 15%);
+  /* Сложный градиент для мягкого растворения картинки */
+  background: 
+      linear-gradient(to right, #080B12 20%, rgba(8,11,18,0.7) 50%, rgba(8,11,18,0) 100%),
+      linear-gradient(to top, #080B12 10%, rgba(8,11,18,0) 40%),
+      linear-gradient(to bottom, #080B12 5%, rgba(8,11,18,0) 20%);
 }
 
 .hero-overlay-content {
   position: relative;
   z-index: 2;
-  max-width: 500px;
-  padding-left: 10px; /* Отступ текста от левого края */
+  width: 100%;
 }
 
 .hero-title {
-  font-size: 2.8rem;
+  font-size: 2.4rem;
   font-weight: 800;
   line-height: 1.1;
-  margin-bottom: 16px;
-  letter-spacing: -0.5px;
+  margin-bottom: 12px;
 }
 
 .text-accent {
@@ -110,9 +93,10 @@ body {
 }
 
 .hero-subtitle {
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #A0A5B1;
-  margin-bottom: 32px;
+  margin-bottom: 25px;
+  max-width: 280px;
 }
 
 /* Кнопка */
@@ -120,152 +104,135 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
   background: linear-gradient(90deg, #3B82F6 0%, #EAB308 100%);
   color: #000000;
   border: none;
-  border-radius: 14px;
-  padding: 18px 36px;
-  font-size: 1.1rem;
+  border-radius: 12px;
+  padding: 16px 24px;
+  font-size: 1.05rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
-  transition: transform 0.1s ease;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
 }
 
-.btn-primary:active {
-  transform: scale(0.97);
-}
-
-.btn-arrow {
-  font-size: 1.2rem;
-}
-
-/* КАРТОЧКИ И ОСТАЛЬНОЙ КОНТЕНТ */
+/* ==================================================== */
+/* СЕТКА 2х2 (Как на референсе) */
+/* ==================================================== */
 .section-title {
-  font-size: 1.5rem;
-  margin-bottom: 24px;
+  font-size: 1.3rem;
+  margin-bottom: 20px;
   font-weight: 700;
 }
 
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
+  grid-template-columns: 1fr 1fr; /* Ровно две колонки */
+  gap: 12px;
+  margin-bottom: 25px;
 }
 
 .feature-card {
   background-color: #121620;
   border-radius: 20px;
-  padding: 24px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
+  padding: 20px;
+  position: relative;
   border: 1px solid rgba(255, 255, 255, 0.03);
-  cursor: pointer;
 }
 
 .card-icon {
-  width: 52px;
-  height: 52px;
+  width: 44px;
+  height: 44px;
   background: #1A1F2B;
-  border-radius: 14px;
+  border-radius: 12px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
+  margin-bottom: 12px;
 }
 
-.card-text h3 {
-  font-size: 1.1rem;
+.feature-card h3 {
+  font-size: 1rem;
   font-weight: 600;
   margin-bottom: 4px;
 }
 
-.card-text p {
-  font-size: 0.9rem;
+.feature-card p {
+  font-size: 0.75rem;
   color: #8C93A1;
+  line-height: 1.2;
 }
 
 .card-arrow {
-  margin-left: auto;
+  position: absolute;
+  top: 20px;
+  right: 20px;
   color: #4A5568;
-  font-size: 1.6rem;
+  font-size: 1.2rem;
 }
 
+/* ==================================================== */
+/* НИЖНИЙ БАННЕР */
+/* ==================================================== */
 .bottom-banner {
   background-color: #121620;
   border-radius: 20px;
-  padding: 24px;
+  padding: 20px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
+  overflow: hidden;
 }
 
-.banner-icon {
-  width: 44px;
-  height: 44px;
+.banner-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.banner-badge {
+  width: 40px;
+  height: 40px;
   background: rgba(66, 133, 244, 0.1);
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #4285F4;
 }
 
 .banner-text h3 {
-  font-size: 1.1rem;
-  margin-bottom: 4px;
+  font-size: 0.95rem;
+  margin-bottom: 2px;
 }
 
 .banner-text p {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: #8C93A1;
 }
 
-/* ==================================================== */
-/* АДАПТИВ ДЛЯ МОБИЛЬНЫХ ТЕЛЕФОНОВ */
-/* ==================================================== */
-@media (max-width: 768px) {
-  .hero-section {
-      min-height: 520px;
-      align-items: flex-end; /* Текст опускается вниз */
-      padding: 0 0 30px 0;
-  }
+.banner-car {
+  width: 80px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-  .hero-image {
-      width: 100%;
-      top: -10px;
-      bottom: 20%; /* Поднимаем низ картинки, чтобы освободить место тексту */
-      background-position: center;
-  }
+.banner-car img {
+  width: 100%;
+  object-fit: contain;
+}
 
-  .hero-vignette {
-      /* На мобильном растворяем картинку снизу вверх */
-      background: 
-          linear-gradient(to top, #080B12 35%, rgba(8,11,18,0) 70%),
-          linear-gradient(to bottom, #080B12 2%, rgba(8,11,18,0) 15%),
-          linear-gradient(to left, #080B12 0%, rgba(8,11,18,0) 10%),
-          linear-gradient(to right, #080B12 0%, rgba(8,11,18,0) 10%);
-  }
-
-  .hero-overlay-content {
-      padding-left: 0;
-      width: 100%;
-  }
-
-  .hero-title {
-      font-size: 2.1rem;
-  }
-
-  .btn-primary {
-      width: 100%;
+/* Адаптив для ПК (чтобы на мониторе тоже было красиво) */
+@media (min-width: 768px) {
+  .cards-grid {
+      grid-template-columns: repeat(4, 1fr); /* На ПК в один ряд */
   }
   
-  .cards-grid {
-      grid-template-columns: 1fr;
+  .hero-title {
+      font-size: 3.5rem;
   }
 }
 
