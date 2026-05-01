@@ -187,6 +187,35 @@
             </footer>
         </main>
     </div>
+    
     <script src="app.js"></script>
+
+    <script>
+        Telegram.WebApp.ready();
+        
+        function applySmartPadding() {
+            // Работаем только на мобильных экранах
+            if (window.innerWidth <= 768) {
+                const appContainer = document.getElementById('app-container');
+                // Вычисляем разницу между физическим экраном и окном приложения
+                const screenDiff = window.screen.height - window.innerHeight;
+                
+                // Если разница небольшая (до 130px), значит родной шапки бота нет, 
+                // и приложение растянуто прямо под крестик "Закрыть".
+                if (screenDiff < 130) {
+                    appContainer.style.paddingTop = '75px'; // Опускаем герб ниже крестика (меняй тут, если надо)
+                } else {
+                    // Разница большая -> значит нас открыли из меню бота и там есть 
+                    // родная черная шапка. Дополнительный отступ не нужен!
+                    appContainer.style.paddingTop = '16px'; 
+                }
+            }
+        }
+        
+        // Запускаем при загрузке
+        applySmartPadding();
+        // На всякий случай запускаем при изменении размера экрана
+        window.addEventListener('resize', applySmartPadding);
+    </script>
 </body>
 </html>

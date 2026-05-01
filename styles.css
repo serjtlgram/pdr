@@ -16,8 +16,7 @@ body {
 #app-container {
   max-width: 1200px;
   margin: 0 auto;
-  /* Добавили calc() и прибавили 60px сверху */
-  padding: calc(var(--tg-content-safe-area-inset-top, 24px) + 60px) 16px 16px 16px;
+  padding: 16px; /* Чистый базовый отступ, остальное сделает скрипт */
 }
 
 /* Шапка */
@@ -28,7 +27,7 @@ body {
   z-index: 10;
 }
 
-/* --- Обновленный код для логотипа --- */
+/* --- Код для логотипа --- */
 .logo-icon {
   width: 64px; 
   height: 64px;
@@ -230,7 +229,6 @@ body {
   color: #8C93A1;
 }
 
-/* Стили для картинки в нижнем баннере */
 .banner-image {
   flex-shrink: 0;
   display: flex;
@@ -341,7 +339,6 @@ body {
       padding: 16px;
   }
 
-  /* Перестроение нижнего баннера */
   .bottom-banner {
       flex-direction: column;
       align-items: flex-start;
