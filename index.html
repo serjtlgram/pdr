@@ -1,27 +1,71 @@
 <!doctype html>
-<html lang="ru">
+<html lang="uk">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Telegram Mini App Starter</title>
+  <title>ПДД України 2026</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <main class="container">
-    <h1>Telegram Mini App</h1>
-    <p class="subtitle">Базовый шаблон с Telegram Web Apps SDK</p>
+  <main class="app">
+    <section class="hero">
+      <div class="hero-top">
+        <div class="logo-badge">UA</div>
+        <div class="lang-pill">UA</div>
+      </div>
 
-    <section class="card">
-      <h2>Информация о пользователе</h2>
-      <pre id="user-data">Загрузка...</pre>
+      <h1>ПДД України</h1>
+      <p class="hero-subtitle">Офіційні правила для безпечного руху та впевненості на дорозі</p>
+
+      <button id="start-btn" class="start-btn" type="button">Розпочати навчання</button>
+
+      <div class="hero-image-placeholder">img1</div>
     </section>
 
-    <section class="actions">
-      <button id="send-btn" type="button">Отправить данные в бота</button>
-      <button id="theme-btn" type="button">Показать тему Telegram</button>
+    <section class="section">
+      <h2>Що всередині?</h2>
+      <div class="grid">
+        <article class="feature-card">
+          <div class="icon-placeholder">img2</div>
+          <div>
+            <h3>Правила ПДР</h3>
+            <p>Повний текст правил дорожнього руху України</p>
+          </div>
+        </article>
+
+        <article class="feature-card">
+          <div class="icon-placeholder">img3</div>
+          <div>
+            <h3>Тести</h3>
+            <p>Перевірте свої знання та підготуйтесь до іспиту</p>
+          </div>
+        </article>
+
+        <article class="feature-card">
+          <div class="icon-placeholder">img4</div>
+          <div>
+            <h3>Дорожні знаки</h3>
+            <p>Усі дорожні знаки з поясненнями та прикладами</p>
+          </div>
+        </article>
+
+        <article class="feature-card">
+          <div class="icon-placeholder">img5</div>
+          <div>
+            <h3>Розмітка</h3>
+            <p>Види дорожньої розмітки та їх значення</p>
+          </div>
+        </article>
+      </div>
     </section>
 
-    <p id="status" class="status"></p>
+    <section class="bottom-banner">
+      <div>
+        <h3>Вчіть правила та будьте в безпеці</h3>
+        <p>Знання ПДР - це ваша безпека, безпека інших та впевненість на дорозі.</p>
+      </div>
+      <div class="banner-image-placeholder">img6</div>
+    </section>
   </main>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
