@@ -177,6 +177,24 @@ body {
   border-radius: 12px;
 }
 
+.hero-image-frame {
+  width: 100%;
+  height: 150px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #161b20;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
 /* --- CTA ЗОНА (Mobile-first) --- */
 #cta-area {
   margin-top: 20px;
@@ -301,8 +319,10 @@ body {
       flex: 1.5; /* Широкая */
   }
 
-  .large-hero-placeholder {
-      height: 100%; /* Занимает всю высоту левой колонки */
+  .hero-image-frame {
+      height: 100%; /* Занимает всю высоту колонки */
+      min-height: 280px;
+      border-radius: 14px;
   }
 
   /* Нижний блок на ПК */
