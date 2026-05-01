@@ -28,14 +28,20 @@ body {
 }
 
 .logo-icon {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   background: #1A1F2B;
   border-radius: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
+}
+
+.logo-icon img {
+  width: 170%;
+  height: 170%;
+  object-fit: contain;
 }
 
 /* УТИЛИТЫ ДЛЯ РАЗДЕЛЕНИЯ ПК И МОБИЛКИ */
@@ -323,14 +329,13 @@ body {
       margin-bottom: 12px;
   }
   
-  /* ИЗМЕНЕНИЕ СЕТКИ КАРТОЧЕК ДЛЯ МОБИЛЬНОЙ ВЕРСИИ */
   .cards-grid {
-      grid-template-columns: 1fr; /* Одна колонка вместо 1fr 1fr */
+      grid-template-columns: 1fr;
       gap: 10px;
   }
   
   .feature-card {
-      padding: 16px; /* Чуть увеличил отступ для карточек во всю ширину */
+      padding: 16px;
   }
 
   /* Перестроение нижнего баннера */
