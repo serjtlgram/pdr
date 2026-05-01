@@ -17,7 +17,7 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   /* Умный отступ от Телеграма, чтобы крестик не перекрывал герб */
-  padding: var(--tg-content-safe-area-inset-top, 24px) 16px 16px 16px;
+  padding: var(--tg-content-safe-area-inset-top, 34px) 16px 16px 16px;
 }
 
 /* Шапка */
