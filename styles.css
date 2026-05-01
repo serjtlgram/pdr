@@ -1,274 +1,429 @@
-:root {
-  font-family: Inter, Arial, sans-serif;
-}
-
+/* --- Глобальный сброс и Вайб --- */
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s ease, box-shadow 0.2s ease, opacity 0.2s ease;
 }
 
 body {
-  margin: 0;
-  min-height: 100vh;
-  color: #f3f8ff;
-  background:
-    radial-gradient(circle at 70% 15%, #1c4fc7 0%, rgba(28, 79, 199, 0) 34%),
-    radial-gradient(circle at 20% 0%, #0a2b7f 0%, rgba(10, 43, 127, 0) 38%),
-    linear-gradient(180deg, #040c1f 0%, #020818 55%, #020614 100%);
+  /* Цвета темной темы как на референсах */
+  background-color: var(--tg-theme-bg-color, #101214);
+  color: var(--tg-theme-text-color, #ffffff);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  line-height: 1.4;
+  overflow-x: hidden;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
 }
 
-.app {
-  width: min(1200px, 94vw);
-  margin: 18px auto 26px;
-  display: grid;
-  gap: 18px;
+/* Переменные для неона и градиентов */
+:root {
+  --primary-blue: #007BFF;
+  --primary-cyan: #08D9D6;
+  --primary-magenta: #FF00FF;
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
 }
 
-.hero {
+#app-container {
+  width: 100%;
+  max-width: 1200px; /* Ограничим для мониторов */
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Фон с футуристическим путем (как на референсе 10.png) */
+.pdr-design-theme {
   position: relative;
-  padding: 14px 14px 18px;
-  border-radius: 22px;
-  background: rgba(6, 15, 38, 0.62);
-  border: 1px solid rgba(96, 134, 255, 0.2);
-  backdrop-filter: blur(3px);
 }
 
-.hero-top {
+.pdr-design-theme::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Добавим стилизованные градиенты вместо сложной картинки */
+  background: radial-gradient(circle at 100% 40%, rgba(0, 123, 255, 0.08), transparent 40%),
+              radial-gradient(circle at 0% 80%, rgba(8, 217, 214, 0.05), transparent 40%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* --- Классы Вайба: Неон и Матовое стекло --- */
+.glass-block {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+}
+
+.glow-blue {
+  box-shadow: 0 0 12px rgba(0, 123, 255, 0.2);
+  border: 1px solid rgba(0, 123, 255, 0.4) !important;
+}
+
+.glow-cyan {
+  box-shadow: 0 0 12px rgba(8, 217, 214, 0.2);
+  border: 1px solid rgba(8, 217, 214, 0.4) !important;
+}
+
+.glow-magenta {
+  box-shadow: 0 0 12px rgba(255, 0, 255, 0.2);
+  border: 1px solid rgba(255, 0, 255, 0.4) !important;
+}
+
+/* --- Хедер с бейджами (Mobile-first) --- */
+.app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
-.logo-badge,
-.lang-pill {
-  display: inline-flex;
-  align-items: center;
+/* Стилизация Тридента UA */
+.logo-trident-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #007BFF 0%, #0056B3 100%);
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+  display: flex;
   justify-content: center;
-  font-size: 12px;
+  align-items: center;
+}
+
+.trident-placeholder {
+  width: 20px; height: 20px;
+  background-color: var(--primary-cyan); /* Пока заглушка */
+  clip-path: polygon(50% 0%, 83% 12%, 100% 43%, 94% 78%, 68% 100%, 32% 100%, 6% 78%, 0% 43%, 17% 12%);
+}
+
+.header-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.language-badge, .profiles-badge {
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
   font-weight: 700;
-  border: 1px solid rgba(151, 184, 255, 0.35);
-  background: rgba(18, 37, 87, 0.68);
+  color: var(--primary-cyan);
+  background-color: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
-.logo-badge {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+.profiles-badge {
+  position: relative;
+  width: 38px; height: 38px;
+  display: flex; justify-content: center; align-items: center;
+  color: var(--primary-magenta);
 }
 
-.lang-pill {
-  min-width: 52px;
-  height: 32px;
+.badge-count {
+  position: absolute;
+  top: -5px; right: -5px;
+  background-color: var(--primary-magenta);
+  color: #ffffff;
+  font-size: 0.7rem;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  display: flex; justify-content: center; align-items: center;
+}
+
+/* --- Заголовок (Mobile-first) --- */
+#title-area {
+  margin-bottom: 20px;
+}
+
+.main-heading {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.1;
+  margin-bottom: 10px;
+}
+
+.color-pop {
+  color: var(--primary-cyan); /* Акцент, как на референсах */
+}
+
+.main-sub {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 300;
+}
+
+/* --- Поток контента (Mobile-first) --- */
+#main-content-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Карточка Прогресса (Mobile) */
+.hero-progress-card {
+  background-color: #1a1f23;
   border-radius: 16px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
-h1 {
-  margin: 0;
-  font-size: 39px;
-  line-height: 1.04;
-  letter-spacing: -0.02em;
+.progress-chart-container {
+  width: 60px; height: 60px;
 }
 
-.hero-subtitle {
-  margin: 12px 0 18px;
-  max-width: 270px;
-  color: #b7c9ee;
-  line-height: 1.4;
+.circular-chart-canvas {
+  position: relative;
+  width: 100%; height: 100%;
 }
 
-.start-btn {
-  border: 0;
-  border-radius: 14px;
-  padding: 14px 20px;
-  color: #081735;
-  font-size: 17px;
+.chart-svg {
+  transform: rotate(-90deg);
+}
+
+.chart-bg {
+  fill: none;
+  stroke: var(--glass-border);
+  stroke-width: 8;
+}
+
+.chart-value {
+  fill: none;
+  stroke: var(--primary-cyan);
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+
+.chart-value-text {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
   font-weight: 700;
-  cursor: pointer;
-  background: linear-gradient(90deg, #1d8cff 0%, #ffd334 100%);
-  box-shadow: 0 8px 24px rgba(29, 140, 255, 0.35);
+  color: var(--primary-cyan);
+  font-size: 0.8rem;
 }
 
-.start-btn:active {
-  transform: translateY(1px);
+.card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 3px;
 }
 
-.hero-image-placeholder {
-  margin-top: 18px;
-  height: 176px;
-  border-radius: 16px;
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: #d6e4ff;
-  background: linear-gradient(145deg, #172e66, #0a1a42);
-  border: 1px dashed rgba(174, 202, 255, 0.4);
+.progress-desc {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
 }
 
-.section {
-  margin-top: 0;
-}
-
-h2 {
-  margin: 0 0 12px;
-  font-size: 30px;
-}
-
-.grid {
+/* Сетка (Mobile: 2х2) */
+.menu-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 15px;
 }
 
-.feature-card {
-  display: grid;
-  grid-template-columns: 58px 1fr;
-  gap: 10px;
-  padding: 12px;
-  border-radius: 14px;
-  border: 1px solid rgba(112, 146, 231, 0.18);
-  background: rgba(8, 19, 47, 0.72);
-}
-
-.icon-placeholder {
-  width: 58px;
-  height: 58px;
-  border-radius: 14px;
-  display: grid;
-  place-items: center;
-  font-size: 12px;
-  font-weight: 700;
-  color: #d6e4ff;
-  background: linear-gradient(135deg, #112b65, #1f478f);
-  border: 1px dashed rgba(174, 202, 255, 0.4);
-}
-
-h3 {
-  margin: 0 0 6px;
-  font-size: 16px;
-}
-
-p {
-  margin: 0;
-  color: #9eb3db;
-  line-height: 1.35;
-}
-
-.bottom-banner {
-  margin-top: 0;
-  padding: 14px;
-  border-radius: 14px;
-  display: grid;
-  grid-template-columns: 1fr 86px;
-  gap: 10px;
+.grid-item {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  border: 1px solid rgba(112, 146, 231, 0.2);
-  background: rgba(8, 19, 47, 0.8);
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
 }
 
-.banner-image-placeholder {
-  height: 64px;
+.grid-item:active {
+  transform: scale(0.96);
+}
+
+.item-icon-wrapper {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+}
+
+.item-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* --- Зона CTA (Mobile) --- */
+#cta-section {
+  margin-top: 15px;
+}
+
+.cta-main-card {
+  background-color: #1a1f23;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 15px;
+}
+
+.cta-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.cta-text {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Главная Кнопка */
+.gradient-button {
+  width: 100%;
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-cyan) 100%);
+  color: #ffffff;
+  border: none;
   border-radius: 12px;
-  display: grid;
-  place-items: center;
-  font-size: 12px;
+  padding: 16px;
+  font-size: 1.1rem;
   font-weight: 700;
-  color: #d6e4ff;
-  border: 1px dashed rgba(174, 202, 255, 0.4);
-  background: linear-gradient(145deg, #172e66, #0a1a42);
+  cursor: pointer;
+  box-shadow: 0 0 15px rgba(8, 217, 214, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
 }
 
-@media (max-width: 767px) {
-  h1 {
-    font-size: 34px;
-  }
-
-  h2 {
-    font-size: 26px;
-  }
-
-  .grid {
-    grid-template-columns: 1fr;
-  }
+.gradient-button:active {
+  transform: scale(0.98);
 }
 
-@media (min-width: 992px) {
-  body {
-    padding: 20px 0;
+/* ========================================= */
+/* --- МАГИЯ АДАПТИВА: Дизайн для ПК --- */
+/* ========================================= */
+
+@media (min-width: 768px) {
+  /* 1. Общий контейнер шире и центрирован */
+  #app-container {
+      padding: 40px;
+      margin: 0 auto;
   }
 
-  .app {
-    min-height: calc(100vh - 40px);
-    align-content: stretch;
-    grid-template-columns: minmax(420px, 1.05fr) minmax(460px, 1fr);
-    grid-template-rows: auto 1fr;
-    grid-template-areas:
-      "hero section"
-      "hero bottom";
+  /* 2. Делаем Хедер и Заголовок солиднее */
+  .app-header {
+      margin-bottom: 30px;
   }
 
-  .hero {
-    grid-area: hero;
-    padding: 22px 22px 24px;
-    border-radius: 28px;
-    display: flex;
-    flex-direction: column;
+  .main-heading {
+      font-size: 2.8rem;
   }
 
-  .hero-subtitle {
-    max-width: 420px;
-    font-size: 18px;
+  .main-sub {
+      font-size: 1.1rem;
+      max-width: 600px;
   }
 
-  .hero-image-placeholder {
-    margin-top: auto;
-    height: 300px;
-    border-radius: 18px;
+  /* 3. Превращаем Поток контента в шикарный Горизонтальный Сплит (как на 11.png) */
+  #main-content-flow {
+      flex-direction: row; /* Горизонтально! */
+      gap: 20px;
+      margin-bottom: 20px;
   }
 
-  .section {
-    grid-area: section;
-    padding: 10px 0 0;
+  /* 4. Карточка Прогресса превращается в огромную ПК-карточку */
+  #hero-progress-section {
+      flex: 1.5; /* Шире, чем сетка */
   }
 
-  .bottom-banner {
-    grid-area: bottom;
-    grid-template-columns: 1fr 140px;
-    padding: 18px;
-    border-radius: 18px;
+  .hero-progress-card {
+      flex-direction: column; /* Элементы вертикально */
+      align-items: flex-start;
+      height: 100%;
+      padding: 30px;
+      background: radial-gradient(circle at bottom right, rgba(0, 123, 255, 0.1), #1a1f23 70%); /* Дизайн ПК */
   }
 
-  .banner-image-placeholder {
-    height: 96px;
-  }
-}
-
-@media (min-width: 1360px) {
-  .app {
-    width: min(1320px, 94vw);
-    gap: 22px;
-    grid-template-columns: minmax(500px, 1.1fr) minmax(540px, 1fr);
+  /* Огромный круговой график на ПК */
+  .progress-chart-container {
+      width: 120px; height: 120px;
+      margin-top: 15px;
   }
 
-  h1 {
-    font-size: 54px;
+  .chart-value-text {
+      font-size: 1.5rem;
   }
 
-  h2 {
-    font-size: 36px;
+  .card-title {
+      font-size: 1.3rem;
+      margin-top: 15px;
   }
 
-  .hero-subtitle {
-    max-width: 480px;
-    font-size: 19px;
+  .progress-desc {
+      font-size: 1rem;
   }
 
-  .start-btn {
-    font-size: 18px;
-    padding: 15px 24px;
+  /* 5. Сетка Выбора превращается в Колонку с гориз. карточками (как на 11.png) */
+  #options-grid-section {
+      flex: 1; /* Узкая колонка */
+      display: flex;
+      flex-direction: column;
+      justify-content: stretch;
   }
 
-  .feature-card {
-    padding: 14px;
+  .menu-grid {
+      grid-template-columns: 1fr; /* 1 колонка! */
+      gap: 15px;
+      height: 100%;
+  }
+
+  .grid-item {
+      flex-direction: row; /* Иконка и текст в ряд */
+      justify-content: flex-start;
+      padding: 20px 30px;
+      text-align: left;
+      gap: 20px;
+      background: var(--dark-grey);
+  }
+
+  .item-icon-wrapper {
+      font-size: 2.2rem;
+      margin-bottom: 0;
+  }
+
+  .item-title {
+      font-size: 1.1rem;
+  }
+
+  /* 6. Зона CTA на ПК становится чище и шире */
+  #cta-section {
+      margin-top: 0;
+  }
+
+  .cta-main-card {
+      flex-direction: row; /* Широкая карточка */
+      justify-content: space-between;
+      padding: 25px;
+      text-align: left;
+  }
+
+  .cta-title {
+      font-size: 1.3rem;
+  }
+
+  .gradient-button {
+      width: auto; /* Кнопка по тексту */
+      padding: 16px 30px;
+      font-size: 1.2rem;
   }
 }

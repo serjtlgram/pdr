@@ -1,74 +1,98 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ПДД України 2026</title>
-  <link rel="stylesheet" href="./styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ПДД України 2026</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <main class="app">
-    <section class="hero">
-      <div class="hero-top">
-        <div class="logo-badge">UA</div>
-        <div class="lang-pill">UA</div>
-      </div>
+<body class="pdr-design-theme">
+    <div id="app-container">
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo-trident-badge">
+                    <span class="trident-placeholder"></span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="language-badge">ua</div>
+                <div class="profiles-badge">
+                    <span id="profile-initials"></span>
+                    <span id="profile-count" class="badge-count">1</span>
+                </div>
+            </div>
+        </header>
 
-      <h1>ПДД України</h1>
-      <p class="hero-subtitle">Офіційні правила для безпечного руху та впевненості на дорозі</p>
+        <main>
+            <section id="title-area">
+                <h1 class="main-heading">
+                    Правила<br>
+                    <span class="color-pop">дорожнього рух</span><br>
+                    України
+                </h1>
+                <p class="main-sub">Офіційні правила для безпечного руху та впевненості на дорозі</p>
+            </section>
+            
+            <div id="main-content-flow">
+                <section id="hero-progress-section">
+                    <div class="card hero-progress-card glow-cyan">
+                        <div class="progress-chart-container">
+                            <div class="circular-chart-canvas">
+                                <svg class="chart-svg" viewBox="0 0 100 100">
+                                    <circle class="chart-bg" cx="50" cy="50" r="45"></circle>
+                                    <circle class="chart-value" cx="50" cy="50" r="45" stroke-dasharray="141.37 282.74"></circle>
+                                </svg>
+                                <span id="progress-percent" class="chart-value-text">45%</span>
+                            </div>
+                        </div>
+                        <div class="progress-details">
+                            <h2 class="card-title">Прогрес вивчення</h2>
+                            <p class="progress-desc">Вивчено 12 тем з 34. Залишилось 22</p>
+                        </div>
+                    </div>
+                </section>
+                
+                <section id="options-grid-section">
+                    <div class="menu-grid">
+                        <div class="grid-item glass-block glow-blue" data-section="themes">
+                            <div class="item-icon-wrapper">📚</div>
+                            <h3 class="item-title">Теми</h3>
+                        </div>
+                        <div class="grid-item glass-block glow-cyan" data-section="exam">
+                            <div class="item-icon-wrapper">⏱️</div>
+                            <h3 class="item-title">Іспит</h3>
+                        </div>
+                        <div class="grid-item glass-block glow-blue" data-section="signs">
+                            <div class="item-icon-wrapper">🛑</div>
+                            <h3 class="item-title">Знаки</h3>
+                        </div>
+                        <div class="grid-item glass-block glow-cyan" data-section="fines">
+                            <div class="item-icon-wrapper">💰</div>
+                            <h3 class="item-title">Штрафи</h3>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            
+            <section id="cta-section">
+                <div class="card cta-main-card glow-magenta">
+                    <div class="cta-content">
+                        <h2 class="cta-title">Вчитись легко</h2>
+                        <p class="cta-text">Перевір свої знання з нашими тестами</p>
+                    </div>
+                    <button class="main-cta-button gradient-button">
+                        <span class="btn-text">Продовжити навчання</span>
+                        <span class="btn-icon">→</span>
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
 
-      <button id="start-btn" class="start-btn" type="button">Розпочати навчання</button>
-
-      <div class="hero-image-placeholder">img1</div>
-    </section>
-
-    <section class="section">
-      <h2>Що всередині?</h2>
-      <div class="grid">
-        <article class="feature-card">
-          <div class="icon-placeholder">img2</div>
-          <div>
-            <h3>Правила ПДР</h3>
-            <p>Повний текст правил дорожнього руху України</p>
-          </div>
-        </article>
-
-        <article class="feature-card">
-          <div class="icon-placeholder">img3</div>
-          <div>
-            <h3>Тести</h3>
-            <p>Перевірте свої знання та підготуйтесь до іспиту</p>
-          </div>
-        </article>
-
-        <article class="feature-card">
-          <div class="icon-placeholder">img4</div>
-          <div>
-            <h3>Дорожні знаки</h3>
-            <p>Усі дорожні знаки з поясненнями та прикладами</p>
-          </div>
-        </article>
-
-        <article class="feature-card">
-          <div class="icon-placeholder">img5</div>
-          <div>
-            <h3>Розмітка</h3>
-            <p>Види дорожньої розмітки та їх значення</p>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section class="bottom-banner">
-      <div>
-        <h3>Вчіть правила та будьте в безпеці</h3>
-        <p>Знання ПДР - це ваша безпека, безпека інших та впевненість на дорозі.</p>
-      </div>
-      <div class="banner-image-placeholder">img6</div>
-    </section>
-  </main>
-
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="./app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
