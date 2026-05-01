@@ -61,7 +61,7 @@ body {
   background-position: center right;
   z-index: 0;
   
-  /* ВЕРНУЛИ МАГИЮ: Размывается левый край + слегка верх и низ */
+  /* Размывается левый край + слегка верх и низ */
   -webkit-mask-image: 
       linear-gradient(to right, transparent 0%, black 25%),
       linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);
@@ -230,12 +230,18 @@ body {
 /* ==================================================== */
 @media (max-width: 768px) {
   .hero-section {
-      min-height: 340px;
+      min-height: 300px; /* Уменьшили высоту блока, так как текста стало меньше */
       align-items: center; 
-      margin-bottom: 25px; 
-      padding: 20px; 
-      border-radius: 20px; 
-      overflow: hidden; 
+      
+      /* Магия отступа: растягиваем блок на всю ширину экрана сквозь рамки контейнера */
+      margin-left: -16px;
+      margin-right: -16px;
+      width: calc(100% + 32px);
+      border-radius: 0; /* Убрали скругления, чтобы было от края до края */
+      
+      margin-top: -10px; /* Подтянули выше к логотипу */
+      margin-bottom: 20px; /* Подтянули нижнюю сетку */
+      padding: 20px 16px; /* Вернули внутренний отступ для текста */
   }
 
   .hero-image {
@@ -245,15 +251,15 @@ body {
       left: 0;
       bottom: 0;
       right: 0;
-      background-position: right center; 
+      background-position: right center; /* Сюжет справа */
       background-size: cover; 
       
-      /* ВЕРНУЛИ МАГИЮ: Растворяем слева + слегка размываем верх и низ (на 5%) */
+      /* Растворяем слева + слегка размываем верх и низ */
       -webkit-mask-image: 
-          linear-gradient(to right, transparent 0%, black 60%),
+          linear-gradient(to right, transparent 0%, black 55%),
           linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%);
       mask-image: 
-          linear-gradient(to right, transparent 0%, black 60%),
+          linear-gradient(to right, transparent 0%, black 55%),
           linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%);
       -webkit-mask-composite: destination-in;
       mask-composite: intersect;
@@ -261,35 +267,39 @@ body {
 
   .hero-overlay-content {
       padding-left: 0;
-      width: 60%; 
+      width: 65%; /* Ограничили ширину текста, чтобы не лез на светофор */
   }
 
   .hero-title {
-      font-size: 1.5rem; /* Уменьшили на 0.1rem как просил */
+      font-size: 1.6rem; 
       line-height: 1.2;
-      margin-bottom: 8px;
+      margin-bottom: 16px; /* Отступ сразу до кнопки */
   }
 
+  /* СКРЫВАЕМ ЛИШНИЙ ТЕКСТ НА МОБИЛКАХ */
   .hero-subtitle {
-      font-size: 0.85rem; /* Чуть-чуть уменьшили подзаголовок для гармонии */
-      margin-bottom: 15px; 
-      max-width: 90%;
+      display: none; 
   }
 
   .btn-primary {
       width: auto; 
-      padding: 10px 16px; /* Уменьшили кнопку */
-      font-size: 0.85rem; /* Уменьшили шрифт на кнопке */
+      padding: 12px 20px; 
+      font-size: 0.95rem; 
       border-radius: 10px;
   }
 
-  /* Поправляем отступы в сетке, чтобы подтянуть к верху */
+  /* СКРЫВАЕМ СТРЕЛКУ НА МОБИЛКАХ */
+  .btn-arrow {
+      display: none; 
+  }
+
+  /* Подтягиваем сетку к верху */
   .content-section {
       margin-top: 0;
   }
   .section-title {
       font-size: 1.2rem;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
   }
   .cards-grid {
       grid-template-columns: 1fr 1fr;
