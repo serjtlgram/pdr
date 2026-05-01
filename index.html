@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Telegram Mini App Starter</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>Telegram Mini App</h1>
+    <p class="subtitle">Базовый шаблон с Telegram Web Apps SDK</p>
+
+    <section class="card">
+      <h2>Информация о пользователе</h2>
+      <pre id="user-data">Загрузка...</pre>
+    </section>
+
+    <section class="actions">
+      <button id="send-btn" type="button">Отправить данные в бота</button>
+      <button id="theme-btn" type="button">Показать тему Telegram</button>
+    </section>
+
+    <p id="status" class="status"></p>
+  </main>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
