@@ -1,9 +1,6 @@
 // ==========================================
 // ИНИЦИАЛИЗАЦИЯ И ЛОГИКА
 // ==========================================
-// Берем базу данных из внешнего файла data.js
-const pdrData = window.pdrData;
-
 document.addEventListener("DOMContentLoaded", () => {
     
     const btnStart = document.getElementById('btn-start-learning');
@@ -15,23 +12,28 @@ document.addEventListener("DOMContentLoaded", () => {
     const quizScreen = document.getElementById('quiz-screen');
     
     // Состояние теста
+    let currentTopic = null; 
     let currentQuestions = [];
     let currentQuestionIndex = 0;
     let currentScreenName = 'home';
-    
-    // Массив для хранения ответов пользователя (чтобы сохранять цвета квадратиков)
-    let questionStates = []; // формат: { selectedIndex: number|null, isCorrect: boolean|null }
+    let questionStates = []; 
 
-    // --- Настройка Telegram WebApp ---
+    // --- БЕЗОПАСНАЯ Настройка Telegram WebApp ---
     const tg = window.Telegram ? window.Telegram.WebApp : null;
 
     if (tg) {
-        tg.ready();
-        tg.expand();
-        tg.setHeaderColor('bg_color');
+        try { tg.ready(); } catch(e) { console.warn("TG ready error", e); }
+        try { tg.expand(); } catch(e) { console.warn("TG expand error", e); }
+        
+        // Эта строка вызывала краш на ПК! Обернули в защиту.
+        if (typeof tg.setHeaderColor === 'function') {
+            try { tg.setHeaderColor('bg_color'); } catch(e) { console.warn("TG setHeaderColor not supported", e); }
+        }
 
         window.addImpact = function() {
-            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+            if (tg.HapticFeedback && typeof tg.HapticFeedback.impactOccurred === 'function') {
+                try { tg.HapticFeedback.impactOccurred('medium'); } catch(e) {}
+            }
         };
 
         function applySmartPadding() {
@@ -49,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
         window.addEventListener('resize', applySmartPadding);
 
         if (tg.BackButton) {
-            tg.BackButton.onClick(() => goBack());
+            try { tg.BackButton.onClick(() => goBack()); } catch(e) {}
         }
     } else {
         window.addImpact = function() {}; 
@@ -82,8 +84,10 @@ document.addEventListener("DOMContentLoaded", () => {
         currentScreenName = screenName;
 
         if (tg && tg.BackButton) {
-            if (currentScreenName === 'home') tg.BackButton.hide();
-            else tg.BackButton.show();
+            try {
+                if (currentScreenName === 'home') tg.BackButton.hide();
+                else tg.BackButton.show();
+            } catch(e){}
         }
     }
 
@@ -96,7 +100,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Клик по названию раздела тоже возвращает назад
     document.getElementById('quiz-topic-name').addEventListener('click', goBack);
     document.getElementById('btn-back-from-topics').addEventListener('click', goBack);
     document.getElementById('btn-back-from-quiz').addEventListener('click', goBack);
@@ -117,12 +120,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const topicsList = document.getElementById('topics-list');
         topicsList.innerHTML = ''; 
 
-        if (!pdrData || !pdrData.topics) {
-            console.error("База данных билетов не загружена!");
+        // Безопасное чтение данных
+        const db = window.pdrData;
+        if (!db || !db.topics) {
+            console.error("База данных билетов (data.js) не загружена!");
             return;
         }
 
-        pdrData.topics.forEach(topic => {
+        db.topics.forEach(topic => {
             const card = document.createElement('div');
             card.className = 'feature-card';
             card.innerHTML = `
@@ -143,50 +148,58 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Логика Теста ---
     function startQuiz(topic) {
+        currentTopic = topic;
         document.getElementById('quiz-topic-name').innerText = topic.title;
-        currentQuestions = pdrData.questions.filter(q => q.topicId === topic.id);
+        currentQuestions = window.pdrData.questions.filter(q => q.topicId === topic.id);
         currentQuestionIndex = 0;
         
-        // Создаем чистый лист ответов для текущей сессии
-        questionStates = currentQuestions.map(() => ({ selectedIndex: null, isCorrect: null }));
+        // Получаем общее количество вопросов (79). Если вдруг не указано - страхуемся.
+        const total = topic.totalQuestions || currentQuestions.length || 79;
+        questionStates = Array(total).fill(null).map(() => ({ selectedIndex: null, isCorrect: null }));
         
         if (currentQuestions.length > 0) {
             renderQuestion();
             showScreen(quizScreen, 'quiz');
         } else {
-            if(tg) tg.showAlert("Питання для цього розділу ще не додані!");
+            if(tg && tg.showAlert) tg.showAlert("Питання для цього розділу ще не додані!");
             else alert("Питання для цього розділу ще не додані!");
         }
     }
 
-    // Отрисовка скролл-панели с квадратиками
+    // Отрисовка панели навигации с квадратиками (Все 79 штук)
     function renderNavBar() {
         const navBar = document.getElementById('question-nav-bar');
         navBar.innerHTML = '';
 
-        currentQuestions.forEach((_, idx) => {
+        const total = currentTopic.totalQuestions || currentQuestions.length || 79;
+
+        for (let i = 0; i < total; i++) {
             const btn = document.createElement('button');
             btn.className = 'nav-btn';
-            btn.innerText = idx + 1;
+            btn.innerText = i + 1;
             
-            // Добавляем классы состояний
-            if (idx === currentQuestionIndex) btn.classList.add('active');
-            
-            const state = questionStates[idx];
-            if (state.isCorrect === true) btn.classList.add('correct');
-            else if (state.isCorrect === false) btn.classList.add('wrong');
-            
-            // Переход по клику на любой вопрос
-            btn.addEventListener('click', () => {
-                addImpact();
-                currentQuestionIndex = idx;
-                renderQuestion();
-            });
+            if (i < currentQuestions.length) {
+                // Вопрос добавлен в базу
+                if (i === currentQuestionIndex) btn.classList.add('active');
+                
+                const state = questionStates[i];
+                if (state && state.isCorrect === true) btn.classList.add('correct');
+                else if (state && state.isCorrect === false) btn.classList.add('wrong');
+                
+                btn.addEventListener('click', () => {
+                    addImpact();
+                    currentQuestionIndex = i;
+                    renderQuestion();
+                });
+            } else {
+                // Вопрос еще не добавлен (серый пустой квадратик)
+                btn.classList.add('empty');
+                btn.disabled = true;
+            }
             
             navBar.appendChild(btn);
-        });
+        }
 
-        // Авто-прокрутка к активному квадратику
         const activeBtn = navBar.querySelector('.active');
         if (activeBtn) {
             activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
@@ -196,13 +209,13 @@ document.addEventListener("DOMContentLoaded", () => {
     function renderQuestion() {
         const q = currentQuestions[currentQuestionIndex];
         const currentState = questionStates[currentQuestionIndex];
+        const total = currentTopic.totalQuestions || currentQuestions.length || 79;
         
         document.getElementById('current-q-num').innerText = currentQuestionIndex + 1;
-        document.getElementById('total-q-num').innerText = currentQuestions.length;
+        document.getElementById('total-q-num').innerText = total;
         document.getElementById('quiz-question-text').innerText = q.text;
         
-        // Обновляем квадратики навигации
-        renderNavBar();
+        renderNavBar(); 
         
         const imgEl = document.getElementById('quiz-image');
         imgEl.src = q.image;
@@ -211,14 +224,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const optionsContainer = document.getElementById('quiz-options');
         optionsContainer.innerHTML = '';
 
-        // Отрисовка вариантов ответа
         q.options.forEach((optionText, index) => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
             btn.innerHTML = `<span class="option-number">${index + 1}</span> <span>${optionText}</span>`;
             
-            // Если вопрос уже был отвечен ранее, сразу показываем правильный/неправильный ответ
-            if (currentState.selectedIndex !== null) {
+            if (currentState && currentState.selectedIndex !== null) {
                 btn.disabled = true;
                 if (index === q.correctIndex) {
                     btn.classList.add('correct');
@@ -226,55 +237,61 @@ document.addEventListener("DOMContentLoaded", () => {
                     btn.classList.add('wrong');
                 }
             } else {
-                // Иначе вешаем обработчик клика
                 btn.addEventListener('click', () => handleAnswer(btn, index, q.correctIndex));
             }
             
             optionsContainer.appendChild(btn);
         });
 
+        // Настройка кнопки "Наступне питання" (ОНА ВИДНА ВСЕГДА)
         const nextBtn = document.getElementById('btn-next-question');
+        nextBtn.style.display = 'block';
+
+        if (currentQuestionIndex < total - 1) {
+            nextBtn.innerText = 'Наступне питання →';
+            nextBtn.onclick = () => {
+                addImpact();
+                // Проверяем, добавлен ли следующий вопрос в data.js
+                if (currentQuestionIndex < currentQuestions.length - 1) {
+                    currentQuestionIndex++;
+                    renderQuestion();
+                } else {
+                    if(tg && tg.showAlert) tg.showAlert("Ці питання ще додаються в базу!");
+                    else alert("Ці питання ще додаються в базу!");
+                }
+            };
+        } else {
+            nextBtn.innerText = 'Завершити розділ';
+            nextBtn.onclick = () => {
+                addImpact();
+                showScreen(topicsScreen, 'topics'); 
+            };
+        }
+
+        // Логика отображения спойлеров с пояснениями
         const explanationWrapper = document.getElementById('quiz-explanation-wrapper');
-
-        // Логика отображения кнопки "Наступне питання" и Спойлеров
-        if (currentState.selectedIndex !== null) {
-            // Если отвечено - показываем кнопку и спойлеры
-            if (currentQuestionIndex < currentQuestions.length - 1) {
-                nextBtn.innerText = 'Наступне питання →';
-                nextBtn.style.display = 'block';
-                nextBtn.onclick = () => { addImpact(); currentQuestionIndex++; renderQuestion(); };
-            } else {
-                nextBtn.innerText = 'Завершити розділ';
-                nextBtn.style.display = 'block';
-                nextBtn.onclick = () => { addImpact(); showScreen(topicsScreen, 'topics'); };
+        if (currentState && currentState.selectedIndex !== null && explanationWrapper && (q.ruleText || q.explanationText)) {
+            const detailsRule = document.getElementById('details-rule');
+            const detailsExplanation = document.getElementById('details-explanation');
+            
+            explanationWrapper.style.display = 'flex';
+            
+            if (q.ruleText && detailsRule) {
+                document.getElementById('quiz-rule-text').innerHTML = q.ruleText;
+                detailsRule.style.display = 'block';
+                detailsRule.removeAttribute('open'); 
+            } else if (detailsRule) {
+                detailsRule.style.display = 'none';
             }
-
-            // Настройка спойлеров
-            if (explanationWrapper && (q.ruleText || q.explanationText)) {
-                const detailsRule = document.getElementById('details-rule');
-                const detailsExplanation = document.getElementById('details-explanation');
-                
-                explanationWrapper.style.display = 'flex';
-                
-                if (q.ruleText && detailsRule) {
-                    document.getElementById('quiz-rule-text').innerHTML = q.ruleText;
-                    detailsRule.style.display = 'block';
-                    detailsRule.removeAttribute('open'); // Свернут по умолчанию
-                } else if (detailsRule) {
-                    detailsRule.style.display = 'none';
-                }
-                
-                if (q.explanationText && detailsExplanation) {
-                    document.getElementById('quiz-explanation-text').innerHTML = q.explanationText;
-                    detailsExplanation.style.display = 'block';
-                    detailsExplanation.removeAttribute('open'); // Свернут по умолчанию
-                } else if (detailsExplanation) {
-                    detailsExplanation.style.display = 'none';
-                }
+            
+            if (q.explanationText && detailsExplanation) {
+                document.getElementById('quiz-explanation-text').innerHTML = q.explanationText;
+                detailsExplanation.style.display = 'block';
+                detailsExplanation.removeAttribute('open'); 
+            } else if (detailsExplanation) {
+                detailsExplanation.style.display = 'none';
             }
         } else {
-            // Если вопрос еще не отвечен - прячем кнопку "Далее" и спойлеры
-            nextBtn.style.display = 'none';
             if (explanationWrapper) explanationWrapper.style.display = 'none';
         }
     }
@@ -282,11 +299,9 @@ document.addEventListener("DOMContentLoaded", () => {
     function handleAnswer(clickedBtn, selectedIndex, correctIndex) {
         addImpact(); 
         
-        // Записываем результат в состояние
         const isCorrect = (selectedIndex === correctIndex);
         questionStates[currentQuestionIndex] = { selectedIndex: selectedIndex, isCorrect: isCorrect };
         
-        // Перерисовываем экран (кнопки заблокируются, цвета обновятся, появятся спойлеры и кнопка Далее)
         renderQuestion();
     }
 

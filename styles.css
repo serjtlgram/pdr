@@ -370,7 +370,6 @@ body.light-theme .btn-back:hover {
   font-weight: 600;
 }
 
-/* Стили для кликабельного названия раздела */
 .quiz-topic-label {
   color: #4285F4;
   background: rgba(66, 133, 244, 0.1);
@@ -409,12 +408,11 @@ body.light-theme .btn-back:hover {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding-bottom: 12px; /* Место под скроллбар */
+  padding-bottom: 12px;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
 }
 
-/* Кастомный скроллбар для ПК */
 .question-nav-bar::-webkit-scrollbar {
   height: 6px;
 }
@@ -431,7 +429,6 @@ body.light-theme .question-nav-bar::-webkit-scrollbar-track {
   background: #E5E7EB;
 }
 
-/* Стили самих квадратиков */
 .nav-btn {
   width: 40px;
   height: 40px;
@@ -449,12 +446,11 @@ body.light-theme .question-nav-bar::-webkit-scrollbar-track {
   transition: all 0.2s ease;
 }
 
-.nav-btn:hover {
+.nav-btn:hover:not(.empty) {
   background: #232A3B;
   color: #ffffff;
 }
 
-/* Состояния квадратиков */
 .nav-btn.active {
   border-color: #4285F4;
   color: #ffffff;
@@ -473,13 +469,19 @@ body.light-theme .question-nav-bar::-webkit-scrollbar-track {
   color: #EF4444 !important;
 }
 
-/* Светлая тема для навигации */
+/* Пустые вопросы-заглушки (еще не добавлены) */
+.nav-btn.empty {
+  opacity: 0.3;
+  cursor: not-allowed;
+  border-style: dashed;
+}
+
 body.light-theme .nav-btn {
   background: #F3F4F6;
   color: #6B7280;
   border-color: rgba(0,0,0,0.05);
 }
-body.light-theme .nav-btn:hover {
+body.light-theme .nav-btn:hover:not(.empty) {
   background: #E5E7EB;
   color: #111827;
 }
@@ -587,6 +589,45 @@ body.light-theme .nav-btn.wrong { color: #DC2626 !important; }
   cursor: default;
 }
 
+/* ==================================================== */
+/* НОВАЯ КНОПКА "НАСТУПНЕ ПИТАННЯ" (ПРОПУСК) */
+/* ==================================================== */
+.btn-next-action {
+  display: block;
+  width: 100%;
+  margin: 20px 0;
+  padding: 16px;
+  background: rgba(66, 133, 244, 0.1);
+  color: #4285F4;
+  border: 1px solid rgba(66, 133, 244, 0.3);
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-next-action:hover {
+  background: rgba(66, 133, 244, 0.2);
+}
+
+.btn-next-action:active {
+  transform: scale(0.98);
+}
+
+body.light-theme .btn-next-action {
+  background: #EBF5FF;
+  border-color: #BFDBFE;
+  color: #2563EB;
+}
+
+body.light-theme .btn-next-action:hover {
+  background: #DBEAFE;
+}
+
+
+/* Светлая тема для тестов */
 body.light-theme .quiz-container {
   background-color: #FFFFFF;
   border-color: rgba(0, 0, 0, 0.05);
@@ -691,7 +732,6 @@ body.light-theme .explanation-content {
   
   .quiz-container { padding: 16px; }
   
-  /* Убираем скроллбар на телефонах для красоты (свайп работает) */
   .question-nav-bar::-webkit-scrollbar {
       display: none;
   }
