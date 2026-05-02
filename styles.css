@@ -135,25 +135,35 @@ body {
   transition: color 0.3s ease;
 }
 
+/* ==================================================== */
+/* ПРЕМИАЛЬНАЯ ГЛАВНАЯ КНОПКА (ОБНОВЛЕНО) */
+/* ==================================================== */
 .btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  background: linear-gradient(90deg, #3B82F6 0%, #EAB308 100%);
-  color: #000000;
-  border: none;
-  border-radius: 14px;
+  background: linear-gradient(135deg, #4285F4 0%, #2563EB 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
   padding: 18px 40px;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 700;
+  letter-spacing: 0.3px;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
-  transition: transform 0.1s ease;
+  box-shadow: 0 8px 24px rgba(66, 133, 244, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 12px 28px rgba(66, 133, 244, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
 }
 
 .btn-primary:active {
-  transform: scale(0.97);
+  transform: translateY(1px) scale(0.97);
+  box-shadow: 0 4px 12px rgba(66, 133, 244, 0.2);
 }
 
 /* СЕТКА */
@@ -271,6 +281,19 @@ body.light-theme .hero-subtitle,
 body.light-theme .app-footer,
 body.light-theme .screen-subtitle {
   color: #4B5563;
+}
+
+/* ПРЕМИАЛЬНАЯ КНОПКА В СВЕТЛОЙ ТЕМЕ (ГРАФИТ) */
+body.light-theme .btn-primary {
+  background: linear-gradient(135deg, #111827 0%, #374151 100%);
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+body.light-theme .btn-primary:hover {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #000000 0%, #1F2937 100%);
 }
 
 body.light-theme .feature-card,
@@ -469,7 +492,6 @@ body.light-theme .question-nav-bar::-webkit-scrollbar-track {
   color: #EF4444 !important;
 }
 
-/* Пустые вопросы-заглушки (еще не добавлены) */
 .nav-btn.empty {
   opacity: 0.3;
   cursor: not-allowed;
@@ -648,6 +670,7 @@ body.light-theme .quiz-image-container { background: #E5E7EB; }
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-top: 24px; /* Отступ сверху от блока с вопросами */
 }
 
 .explanation-details {
