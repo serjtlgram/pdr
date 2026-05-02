@@ -14,7 +14,7 @@
     <div id="app-container">
         
         <header class="top-bar">
-            <div class="logo-icon">
+            <div class="logo-icon" id="btn-back-home" style="cursor: pointer;" aria-label="На головну">
                 <img src="img/img3small.webp" alt="Герб України">
             </div>
             
@@ -34,199 +34,187 @@
         </header>
 
         <main>
-            <section class="hero-section">
-                <div class="hero-image"></div>
+            <div id="home-screen" class="screen active">
+                <section class="hero-section">
+                    <div class="hero-image"></div>
+                    <div class="hero-overlay-content">
+                        <h1 class="hero-title desktop-only">Правила<br>дорожнього руху<br><span class="text-accent">України</span></h1>
+                        <h1 class="hero-title mobile-only">Правила<br>Дорожнього<br>Руху<br><span class="text-accent">України</span></h1>
+                        <p class="hero-subtitle">Офіційні правила для безпечного<br>руху та впевнености на дорозі</p>
+                        
+                        <button class="btn-primary" id="btn-start-learning">
+                            <span class="desktop-only">Розпочати навчання</span>
+                            <span class="mobile-only" style="text-align: left; line-height: 1.2;">Розпочати<br>навчання</span>
+                            <span class="btn-arrow">→</span>
+                        </button>
+                    </div>
+                </section>
 
-                <div class="hero-overlay-content">
-                    <h1 class="hero-title desktop-only">
-                        Правила<br>
-                        дорожнього руху<br>
-                        <span class="text-accent">України</span>
-                    </h1>
-                    <h1 class="hero-title mobile-only">
-                        Правила<br>
-                        Дорожнього<br>
-                        Руху<br>
-                        <span class="text-accent">України</span>
-                    </h1>
-                    <p class="hero-subtitle">
-                        Офіційні правила для безпечного<br>
-                        руху та впевнености на дорозі
-                    </p>
-                    <button class="btn-primary">
-                        <span class="desktop-only">Розпочати навчання</span>
-                        <span class="mobile-only" style="text-align: left; line-height: 1.2;">Розпочати<br>навчання</span>
-                        <span class="btn-arrow">→</span>
+                <section class="content-section">
+                    <h2 class="section-title">Що всередині?</h2>
+                    <div class="cards-grid">
+                        <div class="feature-card">
+                            <div class="card-icon" style="background: transparent;">
+                                <svg width="48" height="48" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="64" cy="64" r="56" fill="#0A1A2F"/>
+                                    <circle cx="64" cy="64" r="56" fill="url(#glow)" />
+                                    <g stroke="#6FA8FF" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M64 44 C52 38, 40 40, 40 40 L40 84 C52 80, 64 84, 64 84" />
+                                        <path d="M64 44 C76 38, 88 40, 88 40 L88 84 C76 80, 64 84, 64 84" />
+                                        <line x1="64" y1="44" x2="64" y2="84"/>
+                                    </g>
+                                    <defs>
+                                        <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+                                            <stop offset="0%" stop-color="#1F4FFF" stop-opacity="0.15"/>
+                                            <stop offset="100%" stop-color="#1F4FFF" stop-opacity="0"/>
+                                        </radialGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <div class="card-text">
+                                <h3>Правила ПДР</h3>
+                                <p>Повний текст правил</p>
+                            </div>
+                            <div class="card-arrow">›</div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="card-icon" style="background: transparent;">
+                                <svg width="48" height="48" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="64" cy="64" r="56" fill="#0A1A2F"/>
+                                    <circle cx="64" cy="64" r="56" fill="url(#glow-test)" />
+                                    <g stroke="#7FFFD4" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M48 50 C48 36, 80 36, 80 52 C80 62, 64 62, 64 74" />
+                                        <circle cx="64" cy="88" r="2.5" fill="#7FFFD4" stroke="none"/>
+                                    </g>
+                                    <defs>
+                                        <radialGradient id="glow-test" cx="50%" cy="50%" r="50%">
+                                            <stop offset="0%" stop-color="#00FFC6" stop-opacity="0.18"/>
+                                            <stop offset="100%" stop-color="#00FFC6" stop-opacity="0"/>
+                                        </radialGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <div class="card-text">
+                                <h3>Тести</h3>
+                                <p>Перевірка знань</p>
+                            </div>
+                            <div class="card-arrow">›</div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="card-icon" style="background: transparent;">
+                                <svg width="48" height="48" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="64" cy="64" r="56" fill="#0A1A2F"/>
+                                    <circle cx="64" cy="64" r="56" fill="url(#glow-signs)" />
+                                    <path d="M64 38 L90 84 Q92 88 88 88 L40 88 Q36 88 38 84 Z" stroke="#B388FF" stroke-width="4" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+                                    <g stroke="#B388FF" stroke-width="4" stroke-linecap="round">
+                                        <line x1="64" y1="54" x2="64" y2="72"/>
+                                        <circle cx="64" cy="82" r="3" fill="#B388FF" stroke="none"/>
+                                    </g>
+                                    <defs>
+                                        <radialGradient id="glow-signs" cx="50%" cy="50%" r="50%">
+                                            <stop offset="0%" stop-color="#9B5CFF" stop-opacity="0.2"/>
+                                            <stop offset="100%" stop-color="#9B5CFF" stop-opacity="0"/>
+                                        </radialGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <div class="card-text">
+                                <h3>Знаки</h3>
+                                <p>Усі дорожні знаки</p>
+                            </div>
+                            <div class="card-arrow">›</div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="card-icon" style="background: transparent;">
+                                <svg width="48" height="48" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="64" cy="64" r="56" fill="#0A1A2F"/>
+                                    <circle cx="64" cy="64" r="56" fill="url(#glow-markings)" />
+                                    <g stroke="#FFD84D" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M64 38 L88 50 L64 62 L40 50 Z"/>
+                                        <path d="M64 54 L88 66 L64 78 L40 66 Z"/>
+                                        <path d="M64 70 L88 82 L64 94 L40 82 Z"/>
+                                    </g>
+                                    <defs>
+                                        <radialGradient id="glow-markings" cx="50%" cy="50%" r="50%">
+                                            <stop offset="0%" stop-color="#FFD84D" stop-opacity="0.2"/>
+                                            <stop offset="100%" stop-color="#FFD84D" stop-opacity="0"/>
+                                        </radialGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <div class="card-text">
+                                <h3>Розмітка</h3>
+                                <p>Види та значення</p>
+                            </div>
+                            <div class="card-arrow">›</div>
+                        </div>
+                    </div>
+
+                    <div class="bottom-banner">
+                        <div class="banner-content">
+                            <div class="banner-badge" style="background: transparent;">
+                                <svg width="48" height="48" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="64" cy="64" r="56" fill="#0A1A2F"/>
+                                    <circle cx="64" cy="64" r="56" fill="url(#glow-shield)" />
+                                    <path d="M64 38 L80 46 C84 48, 84 54, 84 60 C84 74, 74 86, 64 92 C54 86, 44 74, 44 60 C44 54, 44 48, 48 46 Z" stroke="#7FAEFF" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <defs>
+                                        <radialGradient id="glow-shield" cx="50%" cy="50%" r="50%">
+                                            <stop offset="0%" stop-color="#3A7BFF" stop-opacity="0.18"/>
+                                            <stop offset="100%" stop-color="#3A7BFF" stop-opacity="0"/>
+                                        </radialGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <div class="banner-text">
+                                <h3>Вчіть правила та будьте в безпеці</h3>
+                                <p>Знання ПДР — це ваша безпека на дорозі</p>
+                            </div>
+                        </div>
+                        <div class="banner-image">
+                            <img src="img/img2small.webp" alt="Безопасность" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                </section>
+                
+                <footer class="app-footer">
+                    <p>💙💛 Зроблено в Україні</p>
+                    <p class="footer-sub">Дані актуальні на 2026 рік</p>
+                </footer>
+            </div>
+
+            <div id="topics-screen" class="screen">
+                <div class="screen-header">
+                    <h2 class="section-title">Вибір розділу</h2>
+                    <p class="screen-subtitle">Оберіть тему для тестування</p>
+                </div>
+                <div class="cards-grid" id="topics-list"></div>
+            </div>
+
+            <div id="quiz-screen" class="screen">
+                <div class="quiz-container">
+                    <div class="quiz-header">
+                        <span class="quiz-topic-label" id="quiz-topic-name">Розділ</span>
+                        <span class="quiz-progress">Питання <span id="current-q-num">1</span> з <span id="total-q-num">1</span></span>
+                    </div>
+                    
+                    <h3 class="quiz-question" id="quiz-question-text">Текст питання...</h3>
+                    
+                    <div class="quiz-image-container">
+                        <img id="quiz-image" src="" alt="Ілюстрація до питання">
+                    </div>
+
+                    <div class="quiz-options" id="quiz-options">
+                        </div>
+                    
+                    <button class="btn-primary" id="btn-next-question" style="display: none; width: 100%; margin-top: 24px;">
+                        Наступне питання →
                     </button>
                 </div>
-            </section>
+            </div>
 
-            <section class="content-section">
-                <h2 class="section-title">Що всередині?</h2>
-                <div class="cards-grid">
-                    <div class="feature-card">
-                        <div class="card-icon" style="background: transparent;">
-                            <svg width="48" height="48" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="64" cy="64" r="56" fill="#0A1A2F"/>
-                                <circle cx="64" cy="64" r="56" fill="url(#glow)" />
-                                <g stroke="#6FA8FF" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M64 44 C52 38, 40 40, 40 40 L40 84 C52 80, 64 84, 64 84" />
-                                    <path d="M64 44 C76 38, 88 40, 88 40 L88 84 C76 80, 64 84, 64 84" />
-                                    <line x1="64" y1="44" x2="64" y2="84"/>
-                                </g>
-                                <defs>
-                                    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-                                        <stop offset="0%" stop-color="#1F4FFF" stop-opacity="0.15"/>
-                                        <stop offset="100%" stop-color="#1F4FFF" stop-opacity="0"/>
-                                    </radialGradient>
-                                </defs>
-                            </svg>
-                        </div>
-                        <div class="card-text">
-                            <h3>Правила ПДР</h3>
-                            <p>Повний текст правил</p>
-                        </div>
-                        <div class="card-arrow">›</div>
-                    </div>
-                    <div class="feature-card">
-                        <div class="card-icon" style="background: transparent;">
-                            <svg width="48" height="48" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="64" cy="64" r="56" fill="#0A1A2F"/>
-                                <circle cx="64" cy="64" r="56" fill="url(#glow-test)" />
-                                <g stroke="#7FFFD4" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M48 50 C48 36, 80 36, 80 52 C80 62, 64 62, 64 74" />
-                                    <circle cx="64" cy="88" r="2.5" fill="#7FFFD4" stroke="none"/>
-                                </g>
-                                <defs>
-                                    <radialGradient id="glow-test" cx="50%" cy="50%" r="50%">
-                                        <stop offset="0%" stop-color="#00FFC6" stop-opacity="0.18"/>
-                                        <stop offset="100%" stop-color="#00FFC6" stop-opacity="0"/>
-                                    </radialGradient>
-                                </defs>
-                            </svg>
-                        </div>
-                        <div class="card-text">
-                            <h3>Тести</h3>
-                            <p>Перевірка знань</p>
-                        </div>
-                        <div class="card-arrow">›</div>
-                    </div>
-                    <div class="feature-card">
-                        <div class="card-icon" style="background: transparent;">
-                            <svg width="48" height="48" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="64" cy="64" r="56" fill="#0A1A2F"/>
-                                <circle cx="64" cy="64" r="56" fill="url(#glow-signs)" />
-                                <path d="M64 38 L90 84 Q92 88 88 88 L40 88 Q36 88 38 84 Z" stroke="#B388FF" stroke-width="4" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
-                                <g stroke="#B388FF" stroke-width="4" stroke-linecap="round">
-                                    <line x1="64" y1="54" x2="64" y2="72"/>
-                                    <circle cx="64" cy="82" r="3" fill="#B388FF" stroke="none"/>
-                                </g>
-                                <defs>
-                                    <radialGradient id="glow-signs" cx="50%" cy="50%" r="50%">
-                                        <stop offset="0%" stop-color="#9B5CFF" stop-opacity="0.2"/>
-                                        <stop offset="100%" stop-color="#9B5CFF" stop-opacity="0"/>
-                                    </radialGradient>
-                                </defs>
-                            </svg>
-                        </div>
-                        <div class="card-text">
-                            <h3>Знаки</h3>
-                            <p>Усі дорожні знаки</p>
-                        </div>
-                        <div class="card-arrow">›</div>
-                    </div>
-                    <div class="feature-card">
-                        <div class="card-icon" style="background: transparent;">
-                            <svg width="48" height="48" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="64" cy="64" r="56" fill="#0A1A2F"/>
-                                <circle cx="64" cy="64" r="56" fill="url(#glow-markings)" />
-                                <g stroke="#FFD84D" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M64 38 L88 50 L64 62 L40 50 Z"/>
-                                    <path d="M64 54 L88 66 L64 78 L40 66 Z"/>
-                                    <path d="M64 70 L88 82 L64 94 L40 82 Z"/>
-                                </g>
-                                <defs>
-                                    <radialGradient id="glow-markings" cx="50%" cy="50%" r="50%">
-                                        <stop offset="0%" stop-color="#FFD84D" stop-opacity="0.2"/>
-                                        <stop offset="100%" stop-color="#FFD84D" stop-opacity="0"/>
-                                    </radialGradient>
-                                </defs>
-                            </svg>
-                        </div>
-                        <div class="card-text">
-                            <h3>Розмітка</h3>
-                            <p>Види та значення</p>
-                        </div>
-                        <div class="card-arrow">›</div>
-                    </div>
-                </div>
-
-                <div class="bottom-banner">
-                    <div class="banner-content">
-                        <div class="banner-badge" style="background: transparent;">
-                            <svg width="48" height="48" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="64" cy="64" r="56" fill="#0A1A2F"/>
-                                <circle cx="64" cy="64" r="56" fill="url(#glow-shield)" />
-                                <path d="M64 38 L80 46 C84 48, 84 54, 84 60 C84 74, 74 86, 64 92 C54 86, 44 74, 44 60 C44 54, 44 48, 48 46 Z" stroke="#7FAEFF" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                                <defs>
-                                    <radialGradient id="glow-shield" cx="50%" cy="50%" r="50%">
-                                        <stop offset="0%" stop-color="#3A7BFF" stop-opacity="0.18"/>
-                                        <stop offset="100%" stop-color="#3A7BFF" stop-opacity="0"/>
-                                    </radialGradient>
-                                </defs>
-                            </svg>
-                        </div>
-                        <div class="banner-text">
-                            <h3>Вчіть правила та будьте в безпеці</h3>
-                            <p>Знання ПДР — це ваша безпека на дорозі</p>
-                        </div>
-                    </div>
-                    <div class="banner-image">
-                        <img src="img/img2small.webp" alt="Безопасность" onerror="this.style.display='none'">
-                    </div>
-                </div>
-            </section>
-
-            <footer class="app-footer">
-                <p>💙💛 Зроблено в Україні</p>
-                <p class="footer-sub">Дані актуальні на 2026 рік</p>
-            </footer>
         </main>
     </div>
     
     <script src="app.js"></script>
-
-    <script>
-        Telegram.WebApp.ready();
-        
-        function applySmartPadding() {
-            if (window.innerWidth <= 768) {
-                const appContainer = document.getElementById('app-container');
-                const screenDiff = window.screen.height - window.innerHeight;
-                
-                if (screenDiff < 130) {
-                    appContainer.style.paddingTop = '75px'; 
-                } else {
-                    appContainer.style.paddingTop = '16px'; 
-                }
-            }
-        }
-        
-        applySmartPadding();
-        window.addEventListener('resize', applySmartPadding);
-
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-
-        themeToggleBtn.addEventListener('click', () => {
-            document.body.classList.toggle('light-theme');
-            
-            if (document.body.classList.contains('light-theme')) {
-                themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
-            } else {
-                themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
-            }
-        });
-    </script>
 </body>
 </html>

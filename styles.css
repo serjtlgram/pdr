@@ -38,6 +38,11 @@ body {
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.logo-icon:active {
+  transform: scale(0.95);
 }
 
 .logo-icon img {
@@ -87,7 +92,6 @@ body {
   bottom: 0;
   right: 0;
   width: 75%;
-  /* КАРТИНКА ДЛЯ ТЕМНОЙ ТЕМЫ */
   background-image: url('img/img1.webp');
   background-size: cover;
   background-position: center right;
@@ -148,6 +152,10 @@ body {
   transition: transform 0.1s ease;
 }
 
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
 /* СЕТКА */
 .section-title {
   font-size: 1.5rem;
@@ -172,7 +180,11 @@ body {
   display: flex;
   align-items: center;
   gap: 16px;
-  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s;
+}
+
+.feature-card:active {
+  transform: scale(0.98);
 }
 
 .card-icon {
@@ -191,6 +203,13 @@ body {
   font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 4px;
+  transition: color 0.3s ease;
+}
+
+.feature-card p {
+  font-size: 0.9rem;
+  color: #8C93A1;
+  line-height: 1.3;
   transition: color 0.3s ease;
 }
 
@@ -239,7 +258,6 @@ body.light-theme {
   color: #111827;
 }
 
-/* ПЕРЕКЛЮЧЕНИЕ КАРТИНКИ В СВЕТЛОЙ ТЕМЕ */
 body.light-theme .hero-image {
   background-image: url('img/img1-1.webp');
 }
@@ -250,7 +268,8 @@ body.light-theme .section-title {
 }
 
 body.light-theme .hero-subtitle,
-body.light-theme .app-footer {
+body.light-theme .app-footer,
+body.light-theme .screen-subtitle {
   color: #4B5563;
 }
 
@@ -278,6 +297,185 @@ body.light-theme .theme-toggle-btn {
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
+/* ==================================================== */
+/* SPA: ЭКРАНЫ И НАВИГАЦИЯ */
+/* ==================================================== */
+.screen {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.screen.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.screen-header {
+  margin-bottom: 24px;
+}
+
+.screen-subtitle {
+  color: #8C93A1;
+  font-size: 0.95rem;
+  margin-top: -16px;
+  margin-bottom: 24px;
+  transition: color 0.3s ease;
+}
+
+/* ==================================================== */
+/* ИНТЕРФЕЙС ТЕСТОВ (QUIZ UI) */
+/* ==================================================== */
+.quiz-container {
+  background-color: #121620;
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.quiz-topic-label {
+  color: #4285F4;
+  background: rgba(66, 133, 244, 0.1);
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.quiz-progress {
+  color: #A0A5B1;
+  transition: color 0.3s ease;
+}
+
+.quiz-question {
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 20px;
+  transition: color 0.3s ease;
+}
+
+.quiz-image-container {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  background: #080B12;
+}
+
+.quiz-image-container img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.option-btn {
+  background-color: #1A1F2B;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  padding: 16px;
+  color: #ffffff;
+  font-size: 1rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.option-btn:hover:not(:disabled) {
+  background-color: #232A3B;
+}
+
+.option-number {
+  width: 24px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+/* Статусы ответов (Верно/Неверно) */
+.option-btn.correct {
+  background-color: rgba(34, 197, 94, 0.15) !important;
+  border-color: #22C55E !important;
+}
+
+.option-btn.correct .option-number {
+  background-color: #22C55E;
+  color: #fff;
+}
+
+.option-btn.wrong {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+  border-color: #EF4444 !important;
+}
+
+.option-btn.wrong .option-number {
+  background-color: #EF4444;
+  color: #fff;
+}
+
+.option-btn:disabled {
+  cursor: default;
+}
+
+/* Светлая тема для тестов */
+body.light-theme .quiz-container {
+  background-color: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .quiz-question {
+  color: #111827;
+}
+
+body.light-theme .quiz-progress {
+  color: #6B7280;
+}
+
+body.light-theme .option-btn {
+  background-color: #F3F4F6;
+  color: #111827;
+}
+
+body.light-theme .option-btn:hover:not(:disabled) {
+  background-color: #E5E7EB;
+}
+
+body.light-theme .option-number {
+  background: #D1D5DB;
+  color: #374151;
+}
+
+body.light-theme .quiz-image-container {
+  background: #E5E7EB;
+}
+
 /* МОБИЛКА */
 @media (max-width: 768px) {
   .desktop-only { display: none !important; }
@@ -302,4 +500,6 @@ body.light-theme .theme-toggle-btn {
   .cards-grid { grid-template-columns: 1fr; gap: 10px; }
   .bottom-banner { flex-direction: column; align-items: flex-start; gap: 10px; }
   .banner-image { align-self: center; max-width: 60px; }
+  
+  .quiz-container { padding: 16px; }
 }

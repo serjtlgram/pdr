@@ -1,40 +1,229 @@
-// Инициализируем SDK Телеграма
-window.Telegram.WebApp.ready();
+// ==========================================
+// 1. БАЗА ДАННЫХ ПДД
+// ==========================================
+const pdrData = {
+    topics: [
+        { 
+            id: "topic_1", 
+            title: "1. Загальні положення", 
+            description: "Основні терміни та поняття", 
+            icon: "📖" 
+        }
+        // Сюда будешь добавлять новые темы (знаки, перекрестки и т.д.)
+    ],
+    questions: [
+        {
+            id: 1,
+            topicId: "topic_1", // Привязка к теме выше
+            text: "1.1. Трамвайна колія – елемент дороги, призначений для руху рейкових транспортних засобів, який обмежується по ширині:",
+            image: "img-quest/1.1.webp",
+            options: [
+                "Спеціально виділеним вимощенням.",
+                "Дорожньою розміткою.",
+                "Спеціально виділеним вимощенням або дорожньою розміткою.",
+                "Нічим не обмежується."
+            ],
+            correctIndex: 2 // Правильный ответ №3 (отсчет идет от нуля: 0, 1, 2)
+        }
+        // Сюда будешь добавлять новые вопросы через запятую
+    ]
+};
 
-// Просим Телеграм раскрыть Mini App на весь доступный экран
-window.Telegram.WebApp.expand();
+// ==========================================
+// 2. ИНИЦИАЛИЗАЦИЯ И ЛОГИКА
+// ==========================================
+document.addEventListener("DOMContentLoaded", () => {
+    
+    // Элементы навигации
+    const btnStart = document.getElementById('btn-start-learning');
+    const btnBackHome = document.getElementById('btn-back-home');
+    
+    // Экраны
+    const homeScreen = document.getElementById('home-screen');
+    const topicsScreen = document.getElementById('topics-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    
+    // Состояние теста
+    let currentQuestions = [];
+    let currentQuestionIndex = 0;
 
-// Получаем объект пользователя
-const user = window.Telegram.WebApp.initDataUnsafe.user;
+    // --- 2.1 Настройка Telegram WebApp ---
+    if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+        tg.setHeaderColor('bg_color'); // Цвет шапки под тему телефона
 
-// Настраиваем Header (телефонную строку состояния) под тему
-window.Telegram.WebApp.setHeaderColor('bg_color');
+        // Функция вибрации для приятного отклика
+        window.addImpact = function() {
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('medium');
+            }
+        };
 
-// Подставляем инициалы пользователя
-const initialsSpan = document.getElementById('profile-initials');
-if (user && user.first_name) {
-    initialsSpan.textContent = user.first_name.charAt(0).toUpperCase();
-} else {
-    initialsSpan.textContent = 'G'; // Placeholder
-}
+        // Умный отступ для полноэкранного режима Android
+        function applySmartPadding() {
+            if (window.innerWidth <= 768) {
+                const appContainer = document.getElementById('app-container');
+                const screenDiff = window.screen.height - window.innerHeight;
+                if (screenDiff < 130) {
+                    appContainer.style.paddingTop = '75px'; 
+                } else {
+                    appContainer.style.paddingTop = '16px'; 
+                }
+            }
+        }
+        applySmartPadding();
+        window.addEventListener('resize', applySmartPadding);
+    } else {
+        // Заглушка, если открыли в браузере
+        window.addImpact = function() {}; 
+    }
 
-// Простой эффект вибрации при нажатии кнопок
-function addImpact() {
-    window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-}
-
-// Примеры обработки событий
-const mainBtn = document.querySelector('.main-cta-button');
-mainBtn.addEventListener('click', () => {
-    addImpact();
-    window.Telegram.WebApp.showAlert('Починаємо навчання! (Вайб активувався)');
-});
-
-const gridItems = document.querySelectorAll('.grid-item');
-gridItems.forEach(item => {
-    item.addEventListener('click', () => {
+    // --- 2.2 Переключение тем (Светлая/Темная) ---
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    
+    themeToggleBtn.addEventListener('click', () => {
         addImpact();
-        const section = item.getAttribute('data-section');
-        window.Telegram.WebApp.showAlert(`Ви вибрали: ${item.querySelector('.item-title').textContent}`);
+        document.body.classList.toggle('light-theme');
+        
+        if (document.body.classList.contains('light-theme')) {
+            // Иконка Луны
+            themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+        } else {
+            // Иконка Солнца
+            themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+        }
     });
+
+    // --- 2.3 SPA Навигация (Переключение экранов) ---
+    function showScreen(screenToShow) {
+        homeScreen.classList.remove('active');
+        topicsScreen.classList.remove('active');
+        quizScreen.classList.remove('active');
+        
+        screenToShow.classList.add('active');
+        window.scrollTo(0, 0); // Прокрутка наверх при смене экрана
+    }
+
+    // Возврат на главную при клике на герб
+    btnBackHome.addEventListener('click', () => {
+        addImpact();
+        showScreen(homeScreen);
+    });
+
+    // Нажатие на "Розпочати навчання"
+    btnStart.addEventListener('click', () => {
+        addImpact();
+        renderTopics();
+        showScreen(topicsScreen);
+    });
+
+    // --- 2.4 Отрисовка списка тем ---
+    function renderTopics() {
+        const topicsList = document.getElementById('topics-list');
+        topicsList.innerHTML = ''; // Очищаем список
+
+        pdrData.topics.forEach(topic => {
+            const card = document.createElement('div');
+            card.className = 'feature-card';
+            card.innerHTML = `
+                <div class="card-icon" style="background: transparent; font-size: 1.8rem;">${topic.icon}</div>
+                <div class="card-text">
+                    <h3>${topic.title}</h3>
+                    <p>${topic.description}</p>
+                </div>
+                <div class="card-arrow">›</div>
+            `;
+            
+            // Запуск теста при клике на карточку темы
+            card.addEventListener('click', () => {
+                addImpact();
+                startQuiz(topic);
+            });
+            topicsList.appendChild(card);
+        });
+    }
+
+    // --- 2.5 Логика Теста ---
+    function startQuiz(topic) {
+        document.getElementById('quiz-topic-name').innerText = topic.title;
+        
+        // Берем из базы только вопросы для выбранной темы
+        currentQuestions = pdrData.questions.filter(q => q.topicId === topic.id);
+        currentQuestionIndex = 0;
+        
+        if (currentQuestions.length > 0) {
+            renderQuestion();
+            showScreen(quizScreen);
+        } else {
+            if(window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.showAlert("Питання для цього розділу ще не додані!");
+            } else {
+                alert("Питання для цього розділу ще не додані!");
+            }
+        }
+    }
+
+    function renderQuestion() {
+        const q = currentQuestions[currentQuestionIndex];
+        
+        document.getElementById('current-q-num').innerText = currentQuestionIndex + 1;
+        document.getElementById('total-q-num').innerText = currentQuestions.length;
+        document.getElementById('quiz-question-text').innerText = q.text;
+        
+        const imgEl = document.getElementById('quiz-image');
+        imgEl.src = q.image;
+        imgEl.parentElement.style.display = q.image ? 'block' : 'none';
+
+        const optionsContainer = document.getElementById('quiz-options');
+        optionsContainer.innerHTML = '';
+
+        q.options.forEach((optionText, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = `<span class="option-number">${index + 1}</span> <span>${optionText}</span>`;
+            
+            btn.addEventListener('click', () => handleAnswer(btn, index, q.correctIndex));
+            optionsContainer.appendChild(btn);
+        });
+
+        document.getElementById('btn-next-question').style.display = 'none';
+    }
+
+    function handleAnswer(clickedBtn, selectedIndex, correctIndex) {
+        addImpact(); // Вибрация при ответе
+        
+        const allBtns = document.querySelectorAll('.option-btn');
+        // Блокируем кнопки, чтобы не нажимали дважды
+        allBtns.forEach(b => b.disabled = true);
+
+        if (selectedIndex === correctIndex) {
+            clickedBtn.classList.add('correct');
+        } else {
+            clickedBtn.classList.add('wrong');
+            // Подсвечиваем правильный, если пользователь ошибся
+            allBtns[correctIndex].classList.add('correct');
+        }
+
+        const nextBtn = document.getElementById('btn-next-question');
+        if (currentQuestionIndex < currentQuestions.length - 1) {
+            nextBtn.innerText = 'Наступне питання →';
+            nextBtn.style.display = 'block';
+            nextBtn.onclick = () => {
+                addImpact();
+                currentQuestionIndex++;
+                renderQuestion();
+            };
+        } else {
+            nextBtn.innerText = 'Завершити тест';
+            nextBtn.style.display = 'block';
+            nextBtn.onclick = () => {
+                addImpact();
+                showScreen(topicsScreen); // Возвращаемся к выбору тем
+            };
+        }
+    }
+
 });
