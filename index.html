@@ -200,9 +200,14 @@
                             <button class="btn-back desktop-only" id="btn-back-from-quiz">
                                 ← Назад
                             </button>
-                            <span class="quiz-topic-label" id="quiz-topic-name">Розділ</span>
+                            <button class="quiz-topic-label" id="quiz-topic-name" aria-label="Повернутися до тем">Розділ</button>
                         </div>
                         <span class="quiz-progress">Питання <span id="current-q-num">1</span> з <span id="total-q-num">1</span></span>
+                    </div>
+                    
+                    <div class="question-nav-wrapper">
+                        <div class="question-nav-bar" id="question-nav-bar">
+                            </div>
                     </div>
                     
                     <h3 class="quiz-question" id="quiz-question-text">Текст питання...</h3>
@@ -216,6 +221,10 @@
                             <div class="quiz-options" id="quiz-options">
                                 </div>
                             
+                            <button class="btn-primary" id="btn-next-question" style="display: none; width: 100%; margin: 20px 0;">
+                                Наступне питання →
+                            </button>
+                            
                             <div class="quiz-explanation-wrapper" id="quiz-explanation-wrapper" style="display: none;">
                                 <details class="explanation-details" id="details-rule">
                                     <summary class="explanation-summary">📖 Пункт ПДР <span style="font-size: 0.8rem;">▼</span></summary>
@@ -228,9 +237,6 @@
                                 </details>
                             </div>
 
-                            <button class="btn-primary" id="btn-next-question" style="display: none; width: 100%; margin-top: 24px;">
-                                Наступне питання →
-                            </button>
                         </div>
                     </div>
                     

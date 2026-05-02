@@ -14,13 +14,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const topicsScreen = document.getElementById('topics-screen');
     const quizScreen = document.getElementById('quiz-screen');
     
+    // Состояние теста
     let currentQuestions = [];
     let currentQuestionIndex = 0;
-    
-    // Переменная для отслеживания текущего экрана (для кнопки Назад)
     let currentScreenName = 'home';
+    
+    // Массив для хранения ответов пользователя (чтобы сохранять цвета квадратиков)
+    let questionStates = []; // формат: { selectedIndex: number|null, isCorrect: boolean|null }
 
-    // --- 2.1 Настройка Telegram WebApp ---
+    // --- Настройка Telegram WebApp ---
     const tg = window.Telegram ? window.Telegram.WebApp : null;
 
     if (tg) {
@@ -46,7 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
         applySmartPadding();
         window.addEventListener('resize', applySmartPadding);
 
-        // Настройка родной кнопки "Назад" в Telegram
         if (tg.BackButton) {
             tg.BackButton.onClick(() => goBack());
         }
@@ -54,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
         window.addImpact = function() {}; 
     }
 
-    // --- 2.2 Переключение тем ---
+    // --- Переключение тем ---
     const themeToggleBtn = document.getElementById('theme-toggle');
     const themeIcon = document.getElementById('theme-icon');
     
@@ -69,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // --- 2.3 SPA Навигация ---
+    // --- SPA Навигация ---
     function showScreen(screenToShow, screenName) {
         homeScreen.classList.remove('active');
         topicsScreen.classList.remove('active');
@@ -80,17 +81,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         currentScreenName = screenName;
 
-        // Управляем отображением нативной кнопки TG Назад
         if (tg && tg.BackButton) {
-            if (currentScreenName === 'home') {
-                tg.BackButton.hide();
-            } else {
-                tg.BackButton.show();
-            }
+            if (currentScreenName === 'home') tg.BackButton.hide();
+            else tg.BackButton.show();
         }
     }
 
-    // Общая функция "Назад"
     function goBack() {
         addImpact();
         if (currentScreenName === 'quiz') {
@@ -100,7 +96,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Подключаем кнопки "Назад" для ПК-версии
+    // Клик по названию раздела тоже возвращает назад
+    document.getElementById('quiz-topic-name').addEventListener('click', goBack);
     document.getElementById('btn-back-from-topics').addEventListener('click', goBack);
     document.getElementById('btn-back-from-quiz').addEventListener('click', goBack);
 
@@ -115,12 +112,11 @@ document.addEventListener("DOMContentLoaded", () => {
         showScreen(topicsScreen, 'topics');
     });
 
-    // --- 2.4 Отрисовка тем ---
+    // --- Отрисовка тем ---
     function renderTopics() {
         const topicsList = document.getElementById('topics-list');
         topicsList.innerHTML = ''; 
 
-        // Защита: если файл data.js не загрузился, pdrData будет undefined
         if (!pdrData || !pdrData.topics) {
             console.error("База данных билетов не загружена!");
             return;
@@ -145,11 +141,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- 2.5 Логика Теста ---
+    // --- Логика Теста ---
     function startQuiz(topic) {
         document.getElementById('quiz-topic-name').innerText = topic.title;
         currentQuestions = pdrData.questions.filter(q => q.topicId === topic.id);
         currentQuestionIndex = 0;
+        
+        // Создаем чистый лист ответов для текущей сессии
+        questionStates = currentQuestions.map(() => ({ selectedIndex: null, isCorrect: null }));
         
         if (currentQuestions.length > 0) {
             renderQuestion();
@@ -160,47 +159,107 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Отрисовка скролл-панели с квадратиками
+    function renderNavBar() {
+        const navBar = document.getElementById('question-nav-bar');
+        navBar.innerHTML = '';
+
+        currentQuestions.forEach((_, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'nav-btn';
+            btn.innerText = idx + 1;
+            
+            // Добавляем классы состояний
+            if (idx === currentQuestionIndex) btn.classList.add('active');
+            
+            const state = questionStates[idx];
+            if (state.isCorrect === true) btn.classList.add('correct');
+            else if (state.isCorrect === false) btn.classList.add('wrong');
+            
+            // Переход по клику на любой вопрос
+            btn.addEventListener('click', () => {
+                addImpact();
+                currentQuestionIndex = idx;
+                renderQuestion();
+            });
+            
+            navBar.appendChild(btn);
+        });
+
+        // Авто-прокрутка к активному квадратику
+        const activeBtn = navBar.querySelector('.active');
+        if (activeBtn) {
+            activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+    }
+
     function renderQuestion() {
         const q = currentQuestions[currentQuestionIndex];
+        const currentState = questionStates[currentQuestionIndex];
         
         document.getElementById('current-q-num').innerText = currentQuestionIndex + 1;
         document.getElementById('total-q-num').innerText = currentQuestions.length;
         document.getElementById('quiz-question-text').innerText = q.text;
         
+        // Обновляем квадратики навигации
+        renderNavBar();
+        
         const imgEl = document.getElementById('quiz-image');
         imgEl.src = q.image;
-        
-        // Если картинки нет, скрываем блок, и блок с ответами растянется
         imgEl.parentElement.style.display = q.image ? 'block' : 'none';
 
         const optionsContainer = document.getElementById('quiz-options');
         optionsContainer.innerHTML = '';
 
+        // Отрисовка вариантов ответа
         q.options.forEach((optionText, index) => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
             btn.innerHTML = `<span class="option-number">${index + 1}</span> <span>${optionText}</span>`;
             
-            btn.addEventListener('click', () => handleAnswer(btn, index, q.correctIndex));
+            // Если вопрос уже был отвечен ранее, сразу показываем правильный/неправильный ответ
+            if (currentState.selectedIndex !== null) {
+                btn.disabled = true;
+                if (index === q.correctIndex) {
+                    btn.classList.add('correct');
+                } else if (index === currentState.selectedIndex) {
+                    btn.classList.add('wrong');
+                }
+            } else {
+                // Иначе вешаем обработчик клика
+                btn.addEventListener('click', () => handleAnswer(btn, index, q.correctIndex));
+            }
+            
             optionsContainer.appendChild(btn);
         });
 
-        // Работа со спойлерами (с проверкой безопасности, чтобы скрипт не падал)
+        const nextBtn = document.getElementById('btn-next-question');
         const explanationWrapper = document.getElementById('quiz-explanation-wrapper');
-        if (explanationWrapper) {
-            const detailsRule = document.getElementById('details-rule');
-            const detailsExplanation = document.getElementById('details-explanation');
-            
-            // Сворачиваем спойлеры при переключении на новый вопрос
-            if (detailsRule) detailsRule.removeAttribute('open');
-            if (detailsExplanation) detailsExplanation.removeAttribute('open');
-            
-            if (q.ruleText || q.explanationText) {
+
+        // Логика отображения кнопки "Наступне питання" и Спойлеров
+        if (currentState.selectedIndex !== null) {
+            // Если отвечено - показываем кнопку и спойлеры
+            if (currentQuestionIndex < currentQuestions.length - 1) {
+                nextBtn.innerText = 'Наступне питання →';
+                nextBtn.style.display = 'block';
+                nextBtn.onclick = () => { addImpact(); currentQuestionIndex++; renderQuestion(); };
+            } else {
+                nextBtn.innerText = 'Завершити розділ';
+                nextBtn.style.display = 'block';
+                nextBtn.onclick = () => { addImpact(); showScreen(topicsScreen, 'topics'); };
+            }
+
+            // Настройка спойлеров
+            if (explanationWrapper && (q.ruleText || q.explanationText)) {
+                const detailsRule = document.getElementById('details-rule');
+                const detailsExplanation = document.getElementById('details-explanation');
+                
                 explanationWrapper.style.display = 'flex';
                 
                 if (q.ruleText && detailsRule) {
                     document.getElementById('quiz-rule-text').innerHTML = q.ruleText;
                     detailsRule.style.display = 'block';
+                    detailsRule.removeAttribute('open'); // Свернут по умолчанию
                 } else if (detailsRule) {
                     detailsRule.style.display = 'none';
                 }
@@ -208,47 +267,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (q.explanationText && detailsExplanation) {
                     document.getElementById('quiz-explanation-text').innerHTML = q.explanationText;
                     detailsExplanation.style.display = 'block';
+                    detailsExplanation.removeAttribute('open'); // Свернут по умолчанию
                 } else if (detailsExplanation) {
                     detailsExplanation.style.display = 'none';
                 }
-            } else {
-                explanationWrapper.style.display = 'none';
             }
+        } else {
+            // Если вопрос еще не отвечен - прячем кнопку "Далее" и спойлеры
+            nextBtn.style.display = 'none';
+            if (explanationWrapper) explanationWrapper.style.display = 'none';
         }
-
-        document.getElementById('btn-next-question').style.display = 'none';
     }
 
     function handleAnswer(clickedBtn, selectedIndex, correctIndex) {
         addImpact(); 
         
-        const allBtns = document.querySelectorAll('.option-btn');
-        allBtns.forEach(b => b.disabled = true);
-
-        if (selectedIndex === correctIndex) {
-            clickedBtn.classList.add('correct');
-        } else {
-            clickedBtn.classList.add('wrong');
-            allBtns[correctIndex].classList.add('correct');
-        }
-
-        const nextBtn = document.getElementById('btn-next-question');
-        if (currentQuestionIndex < currentQuestions.length - 1) {
-            nextBtn.innerText = 'Наступне питання →';
-            nextBtn.style.display = 'block';
-            nextBtn.onclick = () => {
-                addImpact();
-                currentQuestionIndex++;
-                renderQuestion();
-            };
-        } else {
-            nextBtn.innerText = 'Завершити розділ';
-            nextBtn.style.display = 'block';
-            nextBtn.onclick = () => {
-                addImpact();
-                showScreen(topicsScreen, 'topics'); 
-            };
-        }
+        // Записываем результат в состояние
+        const isCorrect = (selectedIndex === correctIndex);
+        questionStates[currentQuestionIndex] = { selectedIndex: selectedIndex, isCorrect: isCorrect };
+        
+        // Перерисовываем экран (кнопки заблокируются, цвета обновятся, появятся спойлеры и кнопка Далее)
+        renderQuestion();
     }
 
 });
