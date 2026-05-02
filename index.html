@@ -17,6 +17,20 @@
             <div class="logo-icon">
                 <img src="img/img3small.webp" alt="Герб України">
             </div>
+            
+            <button id="theme-toggle" class="theme-toggle-btn" aria-label="Переключити тему">
+                <svg id="theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+            </button>
         </header>
 
         <main>
@@ -24,25 +38,21 @@
                 <div class="hero-image"></div>
 
                 <div class="hero-overlay-content">
-                    
                     <h1 class="hero-title desktop-only">
                         Правила<br>
                         дорожнього руху<br>
                         <span class="text-accent">України</span>
                     </h1>
-
                     <h1 class="hero-title mobile-only">
                         Правила<br>
                         Дорожнього<br>
                         Руху<br>
                         <span class="text-accent">України</span>
                     </h1>
-
                     <p class="hero-subtitle">
                         Офіційні правила для безпечного<br>
                         руху та впевнености на дорозі
                     </p>
-
                     <button class="btn-primary">
                         <span class="desktop-only">Розпочати навчання</span>
                         <span class="mobile-only" style="text-align: left; line-height: 1.2;">Розпочати<br>навчання</span>
@@ -53,7 +63,6 @@
 
             <section class="content-section">
                 <h2 class="section-title">Що всередині?</h2>
-                
                 <div class="cards-grid">
                     <div class="feature-card">
                         <div class="card-icon" style="background: transparent;">
@@ -79,7 +88,6 @@
                         </div>
                         <div class="card-arrow">›</div>
                     </div>
-
                     <div class="feature-card">
                         <div class="card-icon" style="background: transparent;">
                             <svg width="48" height="48" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
@@ -103,7 +111,6 @@
                         </div>
                         <div class="card-arrow">›</div>
                     </div>
-
                     <div class="feature-card">
                         <div class="card-icon" style="background: transparent;">
                             <svg width="48" height="48" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
@@ -128,7 +135,6 @@
                         </div>
                         <div class="card-arrow">›</div>
                     </div>
-
                     <div class="feature-card">
                         <div class="card-icon" style="background: transparent;">
                             <svg width="48" height="48" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
@@ -194,28 +200,33 @@
         Telegram.WebApp.ready();
         
         function applySmartPadding() {
-            // Работаем только на мобильных экранах
             if (window.innerWidth <= 768) {
                 const appContainer = document.getElementById('app-container');
-                // Вычисляем разницу между физическим экраном и окном приложения
                 const screenDiff = window.screen.height - window.innerHeight;
                 
-                // Если разница небольшая (до 130px), значит родной шапки бота нет, 
-                // и приложение растянуто прямо под крестик "Закрыть".
                 if (screenDiff < 130) {
-                    appContainer.style.paddingTop = '75px'; // Опускаем герб ниже крестика (меняй тут, если надо)
+                    appContainer.style.paddingTop = '75px'; 
                 } else {
-                    // Разница большая -> значит нас открыли из меню бота и там есть 
-                    // родная черная шапка. Дополнительный отступ не нужен!
                     appContainer.style.paddingTop = '16px'; 
                 }
             }
         }
         
-        // Запускаем при загрузке
         applySmartPadding();
-        // На всякий случай запускаем при изменении размера экрана
         window.addEventListener('resize', applySmartPadding);
+
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            
+            if (document.body.classList.contains('light-theme')) {
+                themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+            } else {
+                themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+            }
+        });
     </script>
 </body>
 </html>

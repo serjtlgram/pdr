@@ -11,23 +11,24 @@ body {
   color: #ffffff;
   line-height: 1.4;
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #app-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 16px; /* Чистый базовый отступ, остальное сделает скрипт */
+  padding: calc(var(--tg-content-safe-area-inset-top, 24px) + 60px) 16px 16px 16px;
 }
 
-/* Шапка */
 .top-bar {
   margin-bottom: 20px;
   display: flex;
+  align-items: center;
+  gap: 16px;
   position: relative;
   z-index: 10;
 }
 
-/* --- Код для логотипа --- */
 .logo-icon {
   width: 64px; 
   height: 64px;
@@ -46,13 +47,30 @@ body {
   filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));
 }
 
-/* УТИЛИТЫ ДЛЯ РАЗДЕЛЕНИЯ ПК И МОБИЛКИ */
+.theme-toggle-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle-btn:active {
+  transform: scale(0.95);
+}
+
 .mobile-only {
   display: none;
 }
 
 /* ==================================================== */
-/* ИДЕАЛЬНОЕ СЛИЯНИЕ (Desktop-first) */
+/* HERO SECTION */
 /* ==================================================== */
 .hero-section {
   position: relative;
@@ -69,10 +87,12 @@ body {
   bottom: 0;
   right: 0;
   width: 75%;
+  /* КАРТИНКА ДЛЯ ТЕМНОЙ ТЕМЫ */
   background-image: url('img/img1.webp');
   background-size: cover;
   background-position: center right;
   z-index: 0;
+  transition: background-image 0.3s ease;
   
   -webkit-mask-image: 
       linear-gradient(to right, transparent 0%, black 25%),
@@ -97,6 +117,7 @@ body {
   line-height: 1.1;
   margin-bottom: 16px;
   letter-spacing: -0.5px;
+  transition: color 0.3s ease;
 }
 
 .text-accent {
@@ -107,9 +128,9 @@ body {
   font-size: 1.15rem;
   color: #A0A5B1;
   margin-bottom: 32px;
+  transition: color 0.3s ease;
 }
 
-/* Кнопка */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -127,21 +148,12 @@ body {
   transition: transform 0.1s ease;
 }
 
-.btn-primary:active {
-  transform: scale(0.97);
-}
-
-.btn-arrow {
-  font-size: 1.2rem;
-}
-
-/* ==================================================== */
-/* СЕТКА И БАННЕРЫ */
-/* ==================================================== */
+/* СЕТКА */
 .section-title {
   font-size: 1.5rem;
   margin-bottom: 24px;
   font-weight: 700;
+  transition: color 0.3s ease;
 }
 
 .cards-grid {
@@ -160,6 +172,7 @@ body {
   display: flex;
   align-items: center;
   gap: 16px;
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card-icon {
@@ -178,12 +191,7 @@ body {
   font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 4px;
-}
-
-.feature-card p {
-  font-size: 0.9rem;
-  color: #8C93A1;
-  line-height: 1.3;
+  transition: color 0.3s ease;
 }
 
 .card-arrow {
@@ -200,41 +208,13 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 40px;
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .banner-content {
   display: flex;
   align-items: center;
   gap: 16px;
-}
-
-.banner-badge {
-  width: 44px;
-  height: 44px;
-  background: rgba(66, 133, 244, 0.1);
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.2rem;
-}
-
-.banner-text h3 {
-  font-size: 1.1rem;
-  margin-bottom: 4px;
-}
-
-.banner-text p {
-  font-size: 0.9rem;
-  color: #8C93A1;
-}
-
-.banner-image {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  max-width: 60px;
 }
 
 .banner-image img {
@@ -248,110 +228,78 @@ body {
   text-align: center;
   padding-bottom: 40px;
   opacity: 0.6;
+  transition: color 0.3s ease;
 }
 
 /* ==================================================== */
-/* ПОЛНОСТЬЮ ОБНОВЛЕННАЯ МОБИЛЬНАЯ ВЕРСИЯ */
+/* СВЕТЛАЯ ТЕМА */
 /* ==================================================== */
-@media (max-width: 768px) {
-  .desktop-only {
-      display: none !important;
-  }
-  .mobile-only {
-      display: block;
-  }
+body.light-theme {
+  background-color: #F3F4F6;
+  color: #111827;
+}
 
+/* ПЕРЕКЛЮЧЕНИЕ КАРТИНКИ В СВЕТЛОЙ ТЕМЕ */
+body.light-theme .hero-image {
+  background-image: url('img/img1-1.webp');
+}
+
+body.light-theme .hero-title,
+body.light-theme .section-title {
+  color: #111827;
+}
+
+body.light-theme .hero-subtitle,
+body.light-theme .app-footer {
+  color: #4B5563;
+}
+
+body.light-theme .feature-card,
+body.light-theme .bottom-banner {
+  background-color: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .feature-card h3,
+body.light-theme .banner-text h3 {
+  color: #111827;
+}
+
+body.light-theme .feature-card p,
+body.light-theme .banner-text p {
+  color: #6B7280;
+}
+
+body.light-theme .theme-toggle-btn {
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #111827;
+  background: #FFFFFF;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* МОБИЛКА */
+@media (max-width: 768px) {
+  .desktop-only { display: none !important; }
+  .mobile-only { display: block; }
   .hero-section {
       min-height: 300px;
       align-items: center; 
-      
-      margin-left: -16px;
-      margin-right: -16px;
+      margin: -10px -16px 20px;
       width: calc(100% + 32px);
-      border-radius: 0; 
-      
-      margin-top: -10px; 
-      margin-bottom: 20px; 
       padding: 20px 16px; 
   }
-
   .hero-image {
-      width: 100%; 
-      height: 100%; 
-      top: 0;
-      left: 0;
-      bottom: 0;
-      right: 0;
+      width: 100%; height: 100%; 
       background-position: right center; 
-      background-size: cover; 
-      
-      -webkit-mask-image: 
-          linear-gradient(to right, transparent 0%, black 55%),
-          linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%);
-      mask-image: 
-          linear-gradient(to right, transparent 0%, black 55%),
-          linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%);
-      -webkit-mask-composite: destination-in;
-      mask-composite: intersect;
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 55%), linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%);
+      mask-image: linear-gradient(to right, transparent 0%, black 55%), linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%);
   }
-
-  .hero-overlay-content {
-      padding-left: 0;
-      width: 65%;
-      margin-top: -30px; 
-  }
-
-  .hero-title {
-      font-size: 1.5rem; 
-      line-height: 1.1;
-      margin-bottom: 16px;
-  }
-
-  .hero-subtitle {
-      display: none; 
-  }
-
-  .btn-primary {
-      width: auto; 
-      padding: 10px 16px; 
-      font-size: 0.85rem; 
-      border-radius: 10px;
-  }
-
-  .btn-arrow {
-      display: none; 
-  }
-
-  .content-section {
-      margin-top: 0;
-  }
-  .section-title {
-      font-size: 1.2rem;
-      margin-bottom: 12px;
-  }
-  
-  .cards-grid {
-      grid-template-columns: 1fr;
-      gap: 10px;
-  }
-  
-  .feature-card {
-      padding: 16px;
-  }
-
-  .bottom-banner {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 10px;
-  }
-
-  .banner-content {
-      width: 100%;
-  }
-
-  .banner-image {
-      align-self: center; 
-      margin-top: 0; 
-      max-width: 60px;
-  }
+  .hero-overlay-content { padding-left: 0; width: 65%; margin-top: -30px; }
+  .hero-title { font-size: 1.5rem; }
+  .hero-subtitle { display: none; }
+  .btn-primary { padding: 10px 16px; font-size: 0.85rem; border-radius: 10px; }
+  .cards-grid { grid-template-columns: 1fr; gap: 10px; }
+  .bottom-banner { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .banner-image { align-self: center; max-width: 60px; }
 }
