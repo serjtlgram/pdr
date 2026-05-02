@@ -184,6 +184,9 @@
 
             <div id="topics-screen" class="screen">
                 <div class="screen-header">
+                    <button class="btn-back desktop-only" id="btn-back-from-topics" style="margin-bottom: 16px;">
+                        ← Назад на головну
+                    </button>
                     <h2 class="section-title">Вибір розділу</h2>
                     <p class="screen-subtitle">Оберіть тему для тестування</p>
                 </div>
@@ -193,22 +196,32 @@
             <div id="quiz-screen" class="screen">
                 <div class="quiz-container">
                     <div class="quiz-header">
-                        <span class="quiz-topic-label" id="quiz-topic-name">Розділ</span>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <button class="btn-back desktop-only" id="btn-back-from-quiz">
+                                ← Назад
+                            </button>
+                            <span class="quiz-topic-label" id="quiz-topic-name">Розділ</span>
+                        </div>
                         <span class="quiz-progress">Питання <span id="current-q-num">1</span> з <span id="total-q-num">1</span></span>
                     </div>
                     
                     <h3 class="quiz-question" id="quiz-question-text">Текст питання...</h3>
                     
-                    <div class="quiz-image-container">
-                        <img id="quiz-image" src="" alt="Ілюстрація до питання">
-                    </div>
-
-                    <div class="quiz-options" id="quiz-options">
+                    <div class="quiz-content-wrapper">
+                        <div class="quiz-image-container">
+                            <img id="quiz-image" src="" alt="Ілюстрація до питання">
                         </div>
+
+                        <div class="quiz-options-wrapper">
+                            <div class="quiz-options" id="quiz-options">
+                                </div>
+                            
+                            <button class="btn-primary" id="btn-next-question" style="display: none; width: 100%; margin-top: 24px;">
+                                Наступне питання →
+                            </button>
+                        </div>
+                    </div>
                     
-                    <button class="btn-primary" id="btn-next-question" style="display: none; width: 100%; margin-top: 24px;">
-                        Наступне питання →
-                    </button>
                 </div>
             </div>
 

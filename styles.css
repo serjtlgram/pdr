@@ -298,7 +298,7 @@ body.light-theme .theme-toggle-btn {
 }
 
 /* ==================================================== */
-/* SPA: ЭКРАНЫ И НАВИГАЦИЯ */
+/* SPA: ЭКРАНЫ, НАВИГАЦИЯ, КНОПКА НАЗАД */
 /* ==================================================== */
 .screen {
   display: none;
@@ -324,6 +324,31 @@ body.light-theme .theme-toggle-btn {
   margin-top: -16px;
   margin-bottom: 24px;
   transition: color 0.3s ease;
+}
+
+/* Стили визуальной кнопки Назад (для ПК) */
+.btn-back {
+  background: none;
+  border: none;
+  color: #A0A5B1;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.3s ease;
+}
+
+.btn-back:hover {
+  color: #ffffff;
+}
+
+body.light-theme .btn-back {
+  color: #6B7280;
+}
+
+body.light-theme .btn-back:hover {
+  color: #111827;
 }
 
 /* ==================================================== */
@@ -366,11 +391,17 @@ body.light-theme .theme-toggle-btn {
   transition: color 0.3s ease;
 }
 
+/* Обертка для контента теста (Адаптив: Картинка и Ответы) */
+.quiz-content-wrapper {
+  display: flex;
+  flex-direction: column; /* По умолчанию друг под другом */
+  gap: 20px;
+}
+
 .quiz-image-container {
   width: 100%;
   border-radius: 12px;
   overflow: hidden;
-  margin-bottom: 24px;
   background: #080B12;
 }
 
@@ -378,6 +409,10 @@ body.light-theme .theme-toggle-btn {
   width: 100%;
   height: auto;
   display: block;
+}
+
+.quiz-options-wrapper {
+  width: 100%;
 }
 
 .quiz-options {
@@ -476,7 +511,27 @@ body.light-theme .quiz-image-container {
   background: #E5E7EB;
 }
 
+/* ==================================================== */
+/* ДЕСКТОПНЫЙ ЛЕЙАУТ (ДВЕ КОЛОНКИ ДЛЯ ТЕСТА) */
+/* ==================================================== */
+@media (min-width: 769px) {
+  .quiz-content-wrapper {
+      flex-direction: row; /* Ставим в один ряд */
+      align-items: flex-start;
+  }
+  
+  .quiz-image-container {
+      flex: 1; /* Занимает 50% пространства */
+  }
+  
+  .quiz-options-wrapper {
+      flex: 1; /* Занимает 50% пространства */
+  }
+}
+
+/* ==================================================== */
 /* МОБИЛКА */
+/* ==================================================== */
 @media (max-width: 768px) {
   .desktop-only { display: none !important; }
   .mobile-only { display: block; }
