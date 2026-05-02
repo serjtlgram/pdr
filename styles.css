@@ -512,6 +512,60 @@ body.light-theme .quiz-image-container {
 }
 
 /* ==================================================== */
+/* СПОЙЛЕРЫ (ПОЯСНЕНИЯ) */
+/* ==================================================== */
+.quiz-explanation-wrapper {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.explanation-details {
+  background-color: #1A1F2B;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.explanation-summary {
+  padding: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  list-style: none;
+  user-select: none;
+  color: #ffffff;
+}
+
+.explanation-summary::-webkit-details-marker {
+  display: none;
+}
+
+.explanation-content {
+  padding: 0 16px 16px 16px;
+  font-size: 0.95rem;
+  color: #A0A5B1;
+  line-height: 1.5;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  margin-top: 4px;
+  padding-top: 16px;
+}
+
+/* Светлая тема для спойлеров */
+body.light-theme .explanation-details {
+  background-color: #F9FAFB;
+  border-color: rgba(0, 0, 0, 0.05);
+}
+body.light-theme .explanation-summary { color: #111827; }
+body.light-theme .explanation-content {
+  color: #4B5563;
+  border-top-color: rgba(0, 0, 0, 0.05);
+}
+
+/* ==================================================== */
 /* ДЕСКТОПНЫЙ ЛЕЙАУТ (ДВЕ КОЛОНКИ ДЛЯ ТЕСТА) */
 /* ==================================================== */
 @media (min-width: 769px) {

@@ -216,6 +216,18 @@
                             <div class="quiz-options" id="quiz-options">
                                 </div>
                             
+                            <div class="quiz-explanation-wrapper" id="quiz-explanation-wrapper" style="display: none;">
+                                <details class="explanation-details" id="details-rule">
+                                    <summary class="explanation-summary">📖 Пункт ПДР <span style="font-size: 0.8rem;">▼</span></summary>
+                                    <div class="explanation-content" id="quiz-rule-text"></div>
+                                </details>
+                                
+                                <details class="explanation-details" id="details-explanation">
+                                    <summary class="explanation-summary">💡 Пояснення <span style="font-size: 0.8rem;">▼</span></summary>
+                                    <div class="explanation-content" id="quiz-explanation-text"></div>
+                                </details>
+                            </div>
+
                             <button class="btn-primary" id="btn-next-question" style="display: none; width: 100%; margin-top: 24px;">
                                 Наступне питання →
                             </button>
@@ -228,6 +240,7 @@
         </main>
     </div>
     
+    <script src="data.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

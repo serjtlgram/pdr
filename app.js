@@ -1,34 +1,9 @@
 // ==========================================
-// 1. БАЗА ДАННЫХ ПДД
+// ИНИЦИАЛИЗАЦИЯ И ЛОГИКА
 // ==========================================
-const pdrData = {
-    topics: [
-        { 
-            id: "topic_1", 
-            title: "1. Загальні положення", 
-            description: "Основні терміни та поняття", 
-            icon: "📖" 
-        }
-    ],
-    questions: [
-        {
-            id: 1,
-            topicId: "topic_1", 
-            text: "1.1. Трамвайна колія – елемент дороги, призначений для руху рейкових транспортних засобів, який обмежується по ширині:",
-            image: "img-quest/1.1.webp",
-            options: [
-                "Спеціально виділеним вимощенням.",
-                "Дорожньою розміткою.",
-                "Відповіді, зазначені в пунктах 1 та 2."
-            ],
-            correctIndex: 2 
-        }
-    ]
-};
+// Берем базу данных из внешнего файла data.js
+const pdrData = window.pdrData;
 
-// ==========================================
-// 2. ИНИЦИАЛИЗАЦИЯ И ЛОГИКА
-// ==========================================
 document.addEventListener("DOMContentLoaded", () => {
     
     const btnStart = document.getElementById('btn-start-learning');
@@ -145,6 +120,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const topicsList = document.getElementById('topics-list');
         topicsList.innerHTML = ''; 
 
+        // Защита: если файл data.js не загрузился, pdrData будет undefined
+        if (!pdrData || !pdrData.topics) {
+            console.error("База данных билетов не загружена!");
+            return;
+        }
+
         pdrData.topics.forEach(topic => {
             const card = document.createElement('div');
             card.className = 'feature-card';
@@ -189,7 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const imgEl = document.getElementById('quiz-image');
         imgEl.src = q.image;
         
-        // Если картинки нет, скрываем блок, и блок с ответами растянется на 100% ширины
+        // Если картинки нет, скрываем блок, и блок с ответами растянется
         imgEl.parentElement.style.display = q.image ? 'block' : 'none';
 
         const optionsContainer = document.getElementById('quiz-options');
@@ -203,6 +184,37 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.addEventListener('click', () => handleAnswer(btn, index, q.correctIndex));
             optionsContainer.appendChild(btn);
         });
+
+        // Работа со спойлерами (с проверкой безопасности, чтобы скрипт не падал)
+        const explanationWrapper = document.getElementById('quiz-explanation-wrapper');
+        if (explanationWrapper) {
+            const detailsRule = document.getElementById('details-rule');
+            const detailsExplanation = document.getElementById('details-explanation');
+            
+            // Сворачиваем спойлеры при переключении на новый вопрос
+            if (detailsRule) detailsRule.removeAttribute('open');
+            if (detailsExplanation) detailsExplanation.removeAttribute('open');
+            
+            if (q.ruleText || q.explanationText) {
+                explanationWrapper.style.display = 'flex';
+                
+                if (q.ruleText && detailsRule) {
+                    document.getElementById('quiz-rule-text').innerHTML = q.ruleText;
+                    detailsRule.style.display = 'block';
+                } else if (detailsRule) {
+                    detailsRule.style.display = 'none';
+                }
+                
+                if (q.explanationText && detailsExplanation) {
+                    document.getElementById('quiz-explanation-text').innerHTML = q.explanationText;
+                    detailsExplanation.style.display = 'block';
+                } else if (detailsExplanation) {
+                    detailsExplanation.style.display = 'none';
+                }
+            } else {
+                explanationWrapper.style.display = 'none';
+            }
+        }
 
         document.getElementById('btn-next-question').style.display = 'none';
     }
