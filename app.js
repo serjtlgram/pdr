@@ -3,6 +3,35 @@
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
     
+    // --- БЕЗОПАСНАЯ Настройка Telegram WebApp ---
+    const tg = window.Telegram ? window.Telegram.WebApp : null;
+    const tgUser = tg && tg.initDataUnsafe ? tg.initDataUnsafe.user : null;
+    const userId = tgUser ? tgUser.id : null; 
+
+    // 1. БЛОКУВАННЯ ДОДАТКУ ПОЗА TELEGRAM
+    if (!tgUser) {
+        document.getElementById('not-tg-blocker').classList.add('active');
+        document.getElementById('app-container').style.display = 'none';
+        return; // Зупиняємо виконання всього подальшого коду
+    }
+
+    // 2. ВСТАНОВЛЕННЯ АВАТАРКИ КОРИСТУВАЧА
+    const avatarContainer = document.getElementById('user-avatar-container');
+    const avatarImg = document.getElementById('user-avatar-img');
+    
+    if (tgUser) {
+        avatarContainer.style.display = 'flex';
+        if (tgUser.photo_url) {
+            avatarImg.src = tgUser.photo_url;
+            avatarImg.style.display = 'block';
+        } else {
+            // Якщо фото немає, ставимо першу літеру імені або стандартну іконку
+            avatarImg.style.display = 'none';
+            avatarContainer.innerHTML = tgUser.first_name ? tgUser.first_name.charAt(0).toUpperCase() : '👤';
+        }
+    }
+
+    // Основні змінні
     const btnStart = document.getElementById('btn-start-learning');
     const btnBackHome = document.getElementById('btn-back-home');
     
@@ -21,9 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Фоновая проверка подписки
     let isUserVerified = true; 
     let lastCheckTime = 0;
-
-    // --- БЕЗОПАСНАЯ Настройка Telegram WebApp ---
-    const tg = window.Telegram ? window.Telegram.WebApp : null;
 
     if (tg) {
         try { tg.ready(); } catch(e) { console.warn("TG ready error", e); }
@@ -74,10 +100,6 @@ document.addEventListener("DOMContentLoaded", () => {
             themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
         }
     });
-
-    // --- АНТИЧИТ: ЛОГИКА ПРОВЕРКИ ПОДПИСКИ ---
-    const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
-    const userId = tgUser ? tgUser.id : null; 
 
     // Фоновая (тихая) проверка
     async function runSilentVerification() {
@@ -382,16 +404,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         renderQuestion();
 
-        // ИСПРАВЛЕНИЕ: Плавный скролл в самый низ (к пояснениям)
+        // Плавный скролл в самый низ (к пояснениям)
         setTimeout(() => {
             const explanationWrapper = document.getElementById('quiz-explanation-wrapper');
             const nextBtn = document.getElementById('btn-next-question');
             
-            // Если появились пояснения, крутим к ним так, чтобы их нижний край был на экране (block: 'end')
             if (explanationWrapper && explanationWrapper.style.display !== 'none') {
                 explanationWrapper.scrollIntoView({ behavior: 'smooth', block: 'end' });
             } else if (nextBtn) {
-                // Если пояснений нет, просто крутим к кнопке "Наступне питання"
                 nextBtn.scrollIntoView({ behavior: 'smooth', block: 'end' });
             }
         }, 50);

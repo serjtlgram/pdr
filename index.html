@@ -8,9 +8,18 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=3">
+    <link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
+    <div id="not-tg-blocker" class="modal-overlay" style="display: none; background: #080B12; z-index: 99999;">
+        <div class="modal-content">
+            <h3 style="font-size: 2rem; margin-bottom: 20px;">📱</h3>
+            <h3>Тільки для Telegram</h3>
+            <p>Цей додаток працює лише всередині месенджера Telegram. Будь ласка, відкрийте його через нашого офіційного бота.</p>
+            <a href="https://t.me/ispytpdrbot" class="btn-primary" style="width: 100%; text-decoration: none;">Перейти в бота</a>
+        </div>
+    </div>
+
     <div id="app-container">
         
         <header class="top-bar">
@@ -18,19 +27,24 @@
                 <img src="img/img3small.webp" alt="Герб України">
             </div>
             
-            <button id="theme-toggle" class="theme-toggle-btn" aria-label="Переключити тему">
-                <svg id="theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="5"></circle>
-                    <line x1="12" y1="1" x2="12" y2="3"></line>
-                    <line x1="12" y1="21" x2="12" y2="23"></line>
-                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                    <line x1="1" y1="12" x2="3" y2="12"></line>
-                    <line x1="21" y1="12" x2="23" y2="12"></line>
-                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                </svg>
-            </button>
+            <div class="header-actions">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Переключити тему">
+                    <svg id="theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <div class="user-avatar" id="user-avatar-container" style="display: none;">
+                    <img id="user-avatar-img" src="" alt="User">
+                </div>
+            </div>
         </header>
 
         <main>
@@ -242,8 +256,6 @@
                 </div>
             </div>
 
-
-
             <div id="sub-modal" class="modal-overlay">
                 <div class="modal-content">
                     <h3>Необхідна підписка 🛑</h3>
@@ -253,12 +265,10 @@
                 </div>
             </div>
 
-
-
         </main>
     </div>
     
-    <script src="data.js?v=3"></script>
-    <script src="app.js?v=3"></script>
+    <script src="data.js?v=4"></script>
+    <script src="app.js?v=4"></script>
 </body>
 </html>
