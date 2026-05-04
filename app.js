@@ -259,7 +259,6 @@ document.addEventListener("DOMContentLoaded", () => {
             navBar.appendChild(btn);
         }
 
-        // ИСПРАВЛЕНИЕ: Мягкий горизонтальный скролл панели кнопок без рывков страницы вверх
         const activeBtn = navBar.querySelector('.active');
         if (activeBtn) {
             navBar.scrollTo({
@@ -383,11 +382,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
         renderQuestion();
 
-        // ИСПРАВЛЕНИЕ: Плавный скролл вниз к пояснениям и кнопке "Далее" после ответа
+        // ИСПРАВЛЕНИЕ: Плавный скролл в самый низ (к пояснениям)
         setTimeout(() => {
+            const explanationWrapper = document.getElementById('quiz-explanation-wrapper');
             const nextBtn = document.getElementById('btn-next-question');
-            if (nextBtn) {
-                nextBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            
+            // Если появились пояснения, крутим к ним так, чтобы их нижний край был на экране (block: 'end')
+            if (explanationWrapper && explanationWrapper.style.display !== 'none') {
+                explanationWrapper.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            } else if (nextBtn) {
+                // Если пояснений нет, просто крутим к кнопке "Наступне питання"
+                nextBtn.scrollIntoView({ behavior: 'smooth', block: 'end' });
             }
         }, 50);
     }
