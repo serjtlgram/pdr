@@ -82,7 +82,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Фоновая (тихая) проверка
     async function runSilentVerification() {
         const now = Date.now();
-        // Перевіряємо не частіше ніж раз на 10 хвилин (600000 мс)
         if (now - lastCheckTime < 600000) return;
         if (!userId) return;
 
@@ -260,9 +259,13 @@ document.addEventListener("DOMContentLoaded", () => {
             navBar.appendChild(btn);
         }
 
+        // ИСПРАВЛЕНИЕ: Мягкий горизонтальный скролл панели кнопок без рывков страницы вверх
         const activeBtn = navBar.querySelector('.active');
         if (activeBtn) {
-            activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            navBar.scrollTo({
+                left: activeBtn.offsetLeft - (navBar.offsetWidth / 2) + (activeBtn.offsetWidth / 2),
+                behavior: 'smooth'
+            });
         }
     }
 
@@ -379,6 +382,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         renderQuestion();
+
+        // ИСПРАВЛЕНИЕ: Плавный скролл вниз к пояснениям и кнопке "Далее" после ответа
+        setTimeout(() => {
+            const nextBtn = document.getElementById('btn-next-question');
+            if (nextBtn) {
+                nextBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }, 50);
     }
 
 });
