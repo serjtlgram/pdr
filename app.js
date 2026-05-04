@@ -18,6 +18,10 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentScreenName = 'home';
     let questionStates = []; 
 
+    // Фоновая проверка подписки
+    let isUserVerified = true; 
+    let lastCheckTime = 0;
+
     // --- БЕЗОПАСНАЯ Настройка Telegram WebApp ---
     const tg = window.Telegram ? window.Telegram.WebApp : null;
 
@@ -25,7 +29,6 @@ document.addEventListener("DOMContentLoaded", () => {
         try { tg.ready(); } catch(e) { console.warn("TG ready error", e); }
         try { tg.expand(); } catch(e) { console.warn("TG expand error", e); }
         
-        // Эта строка вызывала краш на ПК! Обернули в защиту.
         if (typeof tg.setHeaderColor === 'function') {
             try { tg.setHeaderColor('bg_color'); } catch(e) { console.warn("TG setHeaderColor not supported", e); }
         }
@@ -73,15 +76,34 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // --- АНТИЧИТ: ЛОГИКА ПРОВЕРКИ ПОДПИСКИ ---
-    // Достаем ID пользователя из Telegram
     const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
     const userId = tgUser ? tgUser.id : null; 
 
-    async function checkSubscriptionStatus() {
-        if (!userId) return false; // Если открыли не в ТГ - не пускаем
-        
+    // Фоновая (тихая) проверка
+    async function runSilentVerification() {
+        const now = Date.now();
+        // Перевіряємо не частіше ніж раз на 10 хвилин (600000 мс)
+        if (now - lastCheckTime < 600000) return;
+        if (!userId) return;
+
         try {
-            // Запрос летит на твой бэкенд в Oracle
+            const response = await fetch(`https://pdrua.duckdns.org/check-sub?user_id=${userId}`);
+            const data = await response.json();
+            
+            isUserVerified = (data.is_subscribed === true);
+            if (isUserVerified) {
+                lastCheckTime = now;
+            }
+        } catch (error) {
+            console.error("Фонова перевірка не вдалася:", error);
+            isUserVerified = true; 
+        }
+    }
+
+    // Ручная проверка для кнопки в модальном окне
+    async function checkSubscriptionStatus() {
+        if (!userId) return false; 
+        try {
             const response = await fetch(`https://pdrua.duckdns.org/check-sub?user_id=${userId}`);
             const data = await response.json();
             return data.is_subscribed === true;
@@ -91,7 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Обработка кнопок в модальном окне
     const subModal = document.getElementById('sub-modal');
     const btnCheckSub = document.getElementById('btn-check-sub');
 
@@ -104,7 +125,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const isSub = await checkSubscriptionStatus();
 
         if (isSub) {
-            subModal.classList.remove('active'); // Закрываем модалку
+            isUserVerified = true;
+            lastCheckTime = Date.now();
+            subModal.classList.remove('active'); 
         } else {
             if(tg && tg.showAlert) tg.showAlert("Ви ще не підписані! Перейдіть за посиланням та підпишіться.");
             else alert("Ви ще не підписані!");
@@ -162,10 +185,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const topicsList = document.getElementById('topics-list');
         topicsList.innerHTML = ''; 
 
-        // Безопасное чтение данных
         const db = window.pdrData;
         if (!db || !db.topics) {
-            console.error("База данных билетов (data.js) не загружена!");
+            console.error("База данных билетов не загружена!");
             return;
         }
 
@@ -195,7 +217,6 @@ document.addEventListener("DOMContentLoaded", () => {
         currentQuestions = window.pdrData.questions.filter(q => q.topicId === topic.id);
         currentQuestionIndex = 0;
         
-        // Получаем общее количество вопросов (79). Если вдруг не указано - страхуемся.
         const total = topic.totalQuestions || currentQuestions.length || 79;
         questionStates = Array(total).fill(null).map(() => ({ selectedIndex: null, isCorrect: null }));
         
@@ -208,7 +229,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Отрисовка панели навигации с квадратиками (Все 79 штук)
     function renderNavBar() {
         const navBar = document.getElementById('question-nav-bar');
         navBar.innerHTML = '';
@@ -221,7 +241,6 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.innerText = i + 1;
             
             if (i < currentQuestions.length) {
-                // Вопрос добавлен в базу
                 if (i === currentQuestionIndex) btn.classList.add('active');
                 
                 const state = questionStates[i];
@@ -234,7 +253,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     renderQuestion();
                 });
             } else {
-                // Вопрос еще не добавлен (серый пустой квадратик)
                 btn.classList.add('empty');
                 btn.disabled = true;
             }
@@ -249,6 +267,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function renderQuestion() {
+        // Запускаем фоновую проверку
+        let totalAnswersGiven = parseInt(localStorage.getItem('pdr_answers_count') || '0');
+        if (totalAnswersGiven >= 2) {
+            runSilentVerification();
+        }
+
         const q = currentQuestions[currentQuestionIndex];
         const currentState = questionStates[currentQuestionIndex];
         const total = currentTopic.totalQuestions || currentQuestions.length || 79;
@@ -285,7 +309,6 @@ document.addEventListener("DOMContentLoaded", () => {
             optionsContainer.appendChild(btn);
         });
 
-        // Настройка кнопки "Наступне питання" (ОНА ВИДНА ВСЕГДА)
         const nextBtn = document.getElementById('btn-next-question');
         nextBtn.style.display = 'block';
 
@@ -293,7 +316,6 @@ document.addEventListener("DOMContentLoaded", () => {
             nextBtn.innerText = 'Наступне питання →';
             nextBtn.onclick = () => {
                 addImpact();
-                // Проверяем, добавлен ли следующий вопрос в data.js
                 if (currentQuestionIndex < currentQuestions.length - 1) {
                     currentQuestionIndex++;
                     renderQuestion();
@@ -310,7 +332,6 @@ document.addEventListener("DOMContentLoaded", () => {
             };
         }
 
-        // Логика отображения спойлеров с пояснениями
         const explanationWrapper = document.getElementById('quiz-explanation-wrapper');
         if (currentState && currentState.selectedIndex !== null && explanationWrapper && (q.ruleText || q.explanationText)) {
             const detailsRule = document.getElementById('details-rule');
@@ -338,38 +359,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    async function handleAnswer(clickedBtn, selectedIndex, correctIndex) {
+    function handleAnswer(clickedBtn, selectedIndex, correctIndex) {
         addImpact(); 
         
-        // Читаем из памяти телефона, сколько раз человек уже отвечал за всю жизнь
         let totalAnswersGiven = parseInt(localStorage.getItem('pdr_answers_count') || '0');
 
-        // Если это 3-й ответ или больше — запускаем жесткую проверку
-        if (totalAnswersGiven >= 2) {
-            // Визуально показываем, что идет проверка (защита от двойного клика)
-            const originalHtml = clickedBtn.innerHTML;
-            clickedBtn.innerHTML = `<span class="option-number">⏳</span> <span>Перевірка...</span>`;
-            clickedBtn.disabled = true;
-
-            const isSub = await checkSubscriptionStatus();
-
-            if (!isSub) {
-                // Если отписался или не был подписан — возвращаем кнопку как было и блокируем экран
-                clickedBtn.innerHTML = originalHtml;
-                clickedBtn.disabled = false;
-                document.getElementById('sub-modal').classList.add('active');
-                return; // 🛑 Прерываем выполнение! Ответ не засчитан.
-            }
-            
-            // Если подписан — возвращаем визуальный вид кнопки и пускаем дальше
-            clickedBtn.innerHTML = originalHtml;
+        // Блокируем, если ответов больше 2 и фоновая проверка показала, что подписки нет
+        if (totalAnswersGiven >= 2 && !isUserVerified) {
+            document.getElementById('sub-modal').classList.add('active');
+            return;
         }
 
-        // Если проверка пройдена (или это первые 2 вопроса), засчитываем ответ
         const isCorrect = (selectedIndex === correctIndex);
         questionStates[currentQuestionIndex] = { selectedIndex: selectedIndex, isCorrect: isCorrect };
         
-        // Увеличиваем счетчик ответов в памяти
         if (totalAnswersGiven < 2) {
             totalAnswersGiven++;
             localStorage.setItem('pdr_answers_count', totalAnswersGiven.toString());
