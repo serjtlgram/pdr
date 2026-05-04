@@ -72,6 +72,48 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // --- АНТИЧИТ: ЛОГИКА ПРОВЕРКИ ПОДПИСКИ ---
+    // Достаем ID пользователя из Telegram
+    const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user;
+    const userId = tgUser ? tgUser.id : null; 
+
+    async function checkSubscriptionStatus() {
+        if (!userId) return false; // Если открыли не в ТГ - не пускаем
+        
+        try {
+            // Запрос летит на твой бэкенд в Oracle
+            const response = await fetch(`https://pdrua.duckdns.org/check-sub?user_id=${userId}`);
+            const data = await response.json();
+            return data.is_subscribed === true;
+        } catch (error) {
+            console.error("Помилка перевірки:", error);
+            return false;
+        }
+    }
+
+    // Обработка кнопок в модальном окне
+    const subModal = document.getElementById('sub-modal');
+    const btnCheckSub = document.getElementById('btn-check-sub');
+
+    btnCheckSub.addEventListener('click', async () => {
+        addImpact();
+        const originalText = btnCheckSub.innerText;
+        btnCheckSub.innerText = "Перевіряю...";
+        btnCheckSub.disabled = true;
+
+        const isSub = await checkSubscriptionStatus();
+
+        if (isSub) {
+            subModal.classList.remove('active'); // Закрываем модалку
+        } else {
+            if(tg && tg.showAlert) tg.showAlert("Ви ще не підписані! Перейдіть за посиланням та підпишіться.");
+            else alert("Ви ще не підписані!");
+        }
+
+        btnCheckSub.innerText = originalText;
+        btnCheckSub.disabled = false;
+    });
+
     // --- SPA Навигация ---
     function showScreen(screenToShow, screenName) {
         homeScreen.classList.remove('active');
@@ -296,12 +338,43 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function handleAnswer(clickedBtn, selectedIndex, correctIndex) {
+    async function handleAnswer(clickedBtn, selectedIndex, correctIndex) {
         addImpact(); 
         
+        // Читаем из памяти телефона, сколько раз человек уже отвечал за всю жизнь
+        let totalAnswersGiven = parseInt(localStorage.getItem('pdr_answers_count') || '0');
+
+        // Если это 3-й ответ или больше — запускаем жесткую проверку
+        if (totalAnswersGiven >= 2) {
+            // Визуально показываем, что идет проверка (защита от двойного клика)
+            const originalHtml = clickedBtn.innerHTML;
+            clickedBtn.innerHTML = `<span class="option-number">⏳</span> <span>Перевірка...</span>`;
+            clickedBtn.disabled = true;
+
+            const isSub = await checkSubscriptionStatus();
+
+            if (!isSub) {
+                // Если отписался или не был подписан — возвращаем кнопку как было и блокируем экран
+                clickedBtn.innerHTML = originalHtml;
+                clickedBtn.disabled = false;
+                document.getElementById('sub-modal').classList.add('active');
+                return; // 🛑 Прерываем выполнение! Ответ не засчитан.
+            }
+            
+            // Если подписан — возвращаем визуальный вид кнопки и пускаем дальше
+            clickedBtn.innerHTML = originalHtml;
+        }
+
+        // Если проверка пройдена (или это первые 2 вопроса), засчитываем ответ
         const isCorrect = (selectedIndex === correctIndex);
         questionStates[currentQuestionIndex] = { selectedIndex: selectedIndex, isCorrect: isCorrect };
         
+        // Увеличиваем счетчик ответов в памяти
+        if (totalAnswersGiven < 2) {
+            totalAnswersGiven++;
+            localStorage.setItem('pdr_answers_count', totalAnswersGiven.toString());
+        }
+
         renderQuestion();
     }
 
