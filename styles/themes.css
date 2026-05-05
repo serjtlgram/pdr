@@ -1,9 +1,9 @@
 body:not(.light-theme) .hero-image {
-  background-image: url("img/img1.webp");
+  background-image: url("../img/img1.webp");
 }
 
 body.light-theme .hero-image {
-  background-image: url("img/img1-1.webp");
+  background-image: url("../img/img1-1.webp");
 }
 
 body.light-theme .logo-icon {
