@@ -114,3 +114,13 @@ body.light-theme .card-icon svg [fill="#0A1A2F"],
 body.light-theme .banner-badge svg [fill="#0A1A2F"] {
   fill: #dbe7ff;
 }
+
+/* Приглушаем неоновые цвета самих иконок в светлой теме */
+body.light-theme .card-icon svg [stroke="#6FA8FF"] { stroke: #3b5ea8; }
+body.light-theme .card-icon svg [stroke="#7FFFD4"] { stroke: #1f7668; }
+body.light-theme .card-icon svg [stroke="#B388FF"] { stroke: #6d55b8; }
+body.light-theme .card-icon svg [stroke="#FFD84D"] { stroke: #8a6a12; }
+body.light-theme .banner-badge svg [stroke="#7FAEFF"] { stroke: #3f66b5; }
+
+body.light-theme .card-icon svg [fill="#7FFFD4"] { fill: #1f7668; }
+body.light-theme .card-icon svg [fill="#B388FF"] { fill: #6d55b8; }
