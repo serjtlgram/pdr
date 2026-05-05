@@ -89,20 +89,48 @@ document.addEventListener("DOMContentLoaded", () => {
         window.addImpact = function() {}; 
     }
 
-    // --- Переключение тем ---
-    const themeToggleBtn = document.getElementById('theme-toggle');
-    const themeIcon = document.getElementById('theme-icon');
-    
-    themeToggleBtn.addEventListener('click', () => {
-        addImpact();
-        document.body.classList.toggle('light-theme');
-        
-        if (document.body.classList.contains('light-theme')) {
-            themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
-        } else {
-            themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+        // --- Переключение тем с сохранением в Telegram CloudStorage ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        // Иконки для кнопок
+        const iconMoon = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+        const iconSun = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+
+        // 1. При загрузке проверяем, есть ли сохраненная тема в облаке Telegram
+        if (tg && tg.CloudStorage) {
+            tg.CloudStorage.getItem('app_theme', (err, savedTheme) => {
+                if (!err && savedTheme) {
+                    if (savedTheme === 'light') {
+                        document.body.classList.add('light-theme');
+                        themeIcon.innerHTML = iconMoon; // Показываем луну, так как тема светлая
+                    } else {
+                        document.body.classList.remove('light-theme');
+                        themeIcon.innerHTML = iconSun; // Показываем солнце
+                    }
+                }
+            });
         }
-    });
+
+        // 2. Логика переключения по клику
+        themeToggleBtn.addEventListener('click', () => {
+            addImpact();
+            document.body.classList.toggle('light-theme');
+            
+            const isLightNow = document.body.classList.contains('light-theme');
+            
+            // Меняем иконку
+            if (isLightNow) {
+                themeIcon.innerHTML = iconMoon;
+            } else {
+                themeIcon.innerHTML = iconSun;
+            }
+
+            // Сохраняем выбор пользователя в облако Telegram
+            if (tg && tg.CloudStorage) {
+                tg.CloudStorage.setItem('app_theme', isLightNow ? 'light' : 'dark');
+            }
+        });
 
     // --- Фоновая (тихая) проверка ---
     async function runSilentVerification() {
