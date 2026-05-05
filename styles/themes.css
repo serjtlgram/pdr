@@ -1,14 +1,15 @@
+body:not(.light-theme) .hero-image {
+  background-image: url("img/img1.webp");
+}
+
 body.light-theme .hero-image {
   background-image: url("img/img1-1.webp");
 }
 
 body.light-theme .logo-icon {
-  background: #ffffff;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  padding: 6px;
-  box-shadow: none;
+  background: #f8fafc;
+  border-color: rgba(17, 24, 39, 0.12);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 body.light-theme .theme-toggle-btn {

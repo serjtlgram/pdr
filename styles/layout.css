@@ -8,15 +8,17 @@
 }
 
 .logo-icon {
-  width: 64px;
-  height: 64px;
-  background: transparent;
-  border-radius: 0;
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  padding: 6px;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  transition: transform var(--tr-fast);
+  transition: transform var(--tr-fast), background-color var(--tr-mid), border-color var(--tr-mid);
 }
 
 .logo-icon:active {
@@ -27,7 +29,7 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25));
 }
 
 .header-actions {
