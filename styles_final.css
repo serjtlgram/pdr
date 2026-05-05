@@ -871,3 +871,33 @@ body.light-theme .modal-content {
 }
 body.light-theme .modal-content h3 { color: #111827; }
 body.light-theme .modal-content p { color: #4B5563; }
+
+/* ========================================================== */
+/* ИСПРАВЛЕНИЯ ДЛЯ СВЕТЛОЙ ТЕМЫ                               */
+/* ДОБАВИТЬ В САМЫЙ КОНЕЦ ФАЙЛА styles_final.css              */
+/* ========================================================== */
+
+/* 1. ГЕРБ УКРАИНЫ: белая подложка без градиента */
+/* Предполагаем, что светлая тема — это отсутствие класса .dark-theme на body */
+body:not(.dark-theme) .logo-icon {
+  background: #ffffff !important; /* Убираем градиент, ставим чистый белый */
+  box-shadow: none !important; /* Убираем размытое свечение */
+  
+  /* Задай здесь точный диаметр твоей кнопки смены темы (обычно 40px или 44px) */
+  width: 44px !important; 
+  height: 44px !important;
+  border-radius: 50% !important;
+  
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 6px !important; /* Отступ, чтобы герб не упирался в края круга */
+}
+
+/* 2. ЧЕРНЫЕ ТОЧКИ: делаем подложки под SVG-иконками светлее */
+/* Вставь свой точный класс точек (вместо .icon-dot-bg), если он называется иначе в HTML */
+body:not(.dark-theme) .icon-dot-bg,
+body:not(.dark-theme) .topic-icon,
+body:not(.dark-theme) .svg-wrapper {
+  background-color: #e5e7eb !important; /* Заменяем угольно-черный на мягкий светло-серый */
+}
