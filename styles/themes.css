@@ -108,3 +108,9 @@ body.light-theme .option-number {
   background: #e0e7ff;
   color: #2563eb;
 }
+
+/* Осветляем темные подложки внутри SVG только в светлой теме */
+body.light-theme .card-icon svg [fill="#0A1A2F"],
+body.light-theme .banner-badge svg [fill="#0A1A2F"] {
+  fill: #dbe7ff;
+}
