@@ -1,0 +1,45 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  font-family: var(--font-main);
+}
+
+body {
+  background-color: var(--c-bg);
+  color: var(--c-text);
+  line-height: 1.4;
+  overflow-x: hidden;
+  transition: background-color var(--tr-mid), color var(--tr-mid);
+}
+
+#app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: calc(var(--tg-content-safe-area-inset-top, 24px) + 60px) 16px 16px;
+}
+
+.mobile-only {
+  display: none;
+}
+
+.screen {
+  display: none;
+  animation: fadeIn var(--tr-mid);
+}
+
+.screen.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

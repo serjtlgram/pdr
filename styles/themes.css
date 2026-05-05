@@ -1,0 +1,109 @@
+body.light-theme .hero-image {
+  background-image: url("img/img1-1.webp");
+}
+
+body.light-theme .logo-icon {
+  background: #ffffff;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  padding: 6px;
+  box-shadow: none;
+}
+
+body.light-theme .theme-toggle-btn {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: #fff;
+  color: #111827;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .user-avatar {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+body.light-theme .feature-card,
+body.light-theme .bottom-banner,
+body.light-theme .quiz-container {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .btn-primary {
+  background: linear-gradient(135deg, #111827 0%, #374151 100%);
+  color: #fff;
+  border: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+body.light-theme .btn-primary:hover {
+  background: linear-gradient(135deg, #000000 0%, #1f2937 100%);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+}
+
+body.light-theme .btn-back:hover,
+body.light-theme .feature-card h3,
+body.light-theme .banner-text h3,
+body.light-theme .quiz-question,
+body.light-theme .explanation-summary,
+body.light-theme .modal-content h3 {
+  color: #111827;
+}
+
+body.light-theme .feature-card p,
+body.light-theme .banner-text p,
+body.light-theme .quiz-progress,
+body.light-theme .explanation-content,
+body.light-theme .modal-content p {
+  color: #6b7280;
+}
+
+body.light-theme .question-nav-bar::-webkit-scrollbar-track,
+body.light-theme .quiz-image-container,
+body.light-theme .icon-dot-bg,
+body.light-theme .topic-icon,
+body.light-theme .svg-wrapper {
+  background: #e5e7eb;
+}
+
+body.light-theme .nav-btn {
+  background: #fff;
+  color: #6b7280;
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+body.light-theme .nav-btn:hover:not(.empty) {
+  background: #f1f5f9;
+  color: #111827;
+}
+
+body.light-theme .nav-btn.active {
+  border-color: var(--c-primary);
+  color: var(--c-primary);
+  background: #ebf5ff;
+}
+
+body.light-theme .nav-btn.correct {
+  color: #16a34a;
+}
+
+body.light-theme .nav-btn.wrong {
+  color: #dc2626;
+}
+
+body.light-theme .option-btn {
+  background-color: #f8fafc;
+  color: #111827;
+  border-color: #e2e8f0;
+}
+
+body.light-theme .option-btn:hover:not(:disabled) {
+  background-color: #f1f5f9;
+}
+
+body.light-theme .option-number {
+  background: #e0e7ff;
+  color: #2563eb;
+}

@@ -1,0 +1,40 @@
+:root {
+  --font-main: "Inter", sans-serif;
+
+  --c-bg: #080b12;
+  --c-bg-alt: #121620;
+  --c-surface: #1a1f2b;
+  --c-text: #ffffff;
+  --c-text-soft: #a0a5b1;
+  --c-text-muted: #8c93a1;
+  --c-border-soft: rgba(255, 255, 255, 0.05);
+  --c-border-faint: rgba(255, 255, 255, 0.03);
+
+  --c-primary: #4285f4;
+  --c-primary-strong: #2563eb;
+  --c-primary-soft: rgba(66, 133, 244, 0.1);
+  --c-primary-soft-hover: rgba(66, 133, 244, 0.2);
+
+  --c-success: #22c55e;
+  --c-danger: #ef4444;
+
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+
+  --tr-fast: 0.2s ease;
+  --tr-mid: 0.3s ease;
+}
+
+body.light-theme {
+  --c-bg: #f3f4f6;
+  --c-bg-alt: #ffffff;
+  --c-surface: #f8fafc;
+  --c-text: #111827;
+  --c-text-soft: #4b5563;
+  --c-text-muted: #6b7280;
+  --c-border-soft: rgba(0, 0, 0, 0.1);
+  --c-border-faint: rgba(0, 0, 0, 0.05);
+  --c-primary-soft: #ebf5ff;
+  --c-primary-soft-hover: #dbeafe;
+}
