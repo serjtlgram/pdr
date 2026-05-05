@@ -309,6 +309,14 @@ body.light-theme {
   color: #111827;
 }
 
+/* Покращення герба (логотипа) у світлій темі */
+body.light-theme .logo-icon {
+  background: #ffffff;
+  border-radius: 50%;
+  padding: 5px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
 body.light-theme .hero-image {
   background-image: url('img/img1-1.webp');
 }
@@ -538,13 +546,15 @@ body.light-theme .question-nav-bar::-webkit-scrollbar-track {
   border-style: dashed;
 }
 
+/* Виправлення кнопок навігації у світлій темі */
 body.light-theme .nav-btn {
-  background: #F3F4F6;
+  background: #ffffff;
   color: #6B7280;
-  border-color: rgba(0,0,0,0.05);
+  border-color: #E2E8F0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
 }
 body.light-theme .nav-btn:hover:not(.empty) {
-  background: #E5E7EB;
+  background: #F1F5F9;
   color: #111827;
 }
 body.light-theme .nav-btn.active {
@@ -688,7 +698,6 @@ body.light-theme .btn-next-action:hover {
   background: #DBEAFE;
 }
 
-
 /* Светлая тема для тестов */
 body.light-theme .quiz-container {
   background-color: #FFFFFF;
@@ -698,9 +707,15 @@ body.light-theme .quiz-container {
 
 body.light-theme .quiz-question { color: #111827; }
 body.light-theme .quiz-progress { color: #6B7280; }
-body.light-theme .option-btn { background-color: #F3F4F6; color: #111827; }
-body.light-theme .option-btn:hover:not(:disabled) { background-color: #E5E7EB; }
-body.light-theme .option-number { background: #D1D5DB; color: #374151; }
+body.light-theme .option-btn { background-color: #F8FAFC; color: #111827; border-color: #E2E8F0; }
+body.light-theme .option-btn:hover:not(:disabled) { background-color: #F1F5F9; }
+
+/* Виправлення чорних точок відповідей у світлій темі */
+body.light-theme .option-number { 
+    background: #E0E7FF; 
+    color: #2563EB; 
+}
+
 body.light-theme .quiz-image-container { background: #E5E7EB; }
 
 /* ==================================================== */
