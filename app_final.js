@@ -203,6 +203,18 @@ document.addEventListener("DOMContentLoaded", () => {
         showScreen(topicsScreen, 'topics');
     });
 
+    // --- СЛОВНИК СУЧАСНИХ SVG ІКОНОК ДЛЯ РОЗДІЛІВ ---
+    const modernIcons = {
+        "topic_1": `<svg viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>`, // Книга
+        "topic_2": `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2v10M12 22v-6M4.93 4.93l4.24 4.24M19.07 19.07l-4.24-4.24M19.07 4.93l-4.24 4.24M4.93 19.07l4.24-4.24"/></svg>`, // Кермо
+        "topic_3": `<svg viewBox="0 0 24 24"><path d="M12 2v2M5.3 5.3l1.4 1.4M18.7 5.3l-1.4 1.4M12 22H7a5 5 0 0 1 5-5h0a5 5 0 0 1 5 5h-5z"/></svg>`, // Мигалка
+        "topic_4": `<svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><path d="M12 7v7M9 18l3-4 3 4M8 11h8"/></svg>`, // Пішохід
+        "topic_5": `<svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`, // Пасажири
+        "topic_6": `<svg viewBox="0 0 24 24"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2"/></svg>`, // Велосипед
+        "topic_7": `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="2"/><path d="M12 2v8M12 14v8M2 12h8M14 12h8M4.9 4.9l5.7 5.7M13.4 13.4l5.7 5.7M4.9 19.1l5.7-5.7M13.4 10.6l5.7-5.7"/></svg>`, // Колесо воза
+        "topic_8": `<svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="17" r="2"/></svg>` // Світлофор
+    };
+
     // --- 4. НОВАЯ ОТРИСОВКА РАЗДЕЛОВ (ПЛИТКА) ---
     function renderTopics(filter = "") {
         const grid = document.getElementById('topics-grid');
@@ -226,12 +238,16 @@ document.addEventListener("DOMContentLoaded", () => {
             
             // Динамический цвет
             const colorClass = `c${(index % 6) + 1}`;
-            const icon = topic.icon || "🚦";
+            
+            // Беремо сучасну іконку зі словника, або залишаємо емодзі як запасний варіант
+            const iconHtml = modernIcons[topic.id] || `<span style="font-size: 1.5rem;">${topic.icon || "🚦"}</span>`;
 
             const card = document.createElement('div');
             card.className = `topic-card ${colorClass}`;
+            
+            // Використовуємо новий контейнер .topic-icon-wrapper
             card.innerHTML = `
-                <div class="topic-icon">${icon}</div>
+                <div class="topic-icon-wrapper">${iconHtml}</div>
                 <div class="topic-title">${topic.title}</div>
                 <div class="topic-info">
                     <span>${solved}/${totalQ} питань</span>
