@@ -555,9 +555,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 localStorage.removeItem('pdr_topic_stats');
                 localStorage.removeItem('pdr_quiz_states');
                 
-                // Оновлюємо інтерфейс
+                // Оновлюємо інтерфейс плиток
                 renderTopics();
+                
+                // Закриваємо вікно профілю
                 profileModal.classList.remove('active');
+                
+                // ПРИМУСОВО перекидаємо на екран розділів, щоб користувач побачив обнулення
+                showScreen(topicsScreen, 'topics');
                 
                 // Показуємо повідомлення про успіх
                 if (tg && tg.showAlert) {
