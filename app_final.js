@@ -284,10 +284,33 @@ document.addEventListener("DOMContentLoaded", () => {
         currentTopic = topic;
         document.getElementById('quiz-topic-name').innerText = topic.title;
         currentQuestions = window.pdrData.questions.filter(q => q.topicId === topic.id);
-        currentQuestionIndex = 0;
         
         const total = topic.totalQuestions || currentQuestions.length || 79;
+        
+        // 1. Создаем пустой массив состояний
         questionStates = Array(total).fill(null).map(() => ({ selectedIndex: null, isCorrect: null }));
+        
+        // 2. Загружаем сохраненный прогресс из памяти
+        const savedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
+        if (savedStates[topic.id]) {
+            // Восстанавливаем ответы. Если добавились новые вопросы, старые ответы не слетят
+            savedStates[topic.id].forEach((savedState, idx) => {
+                if (idx < total && savedState) {
+                    questionStates[idx] = savedState;
+                }
+            });
+        }
+
+        // 3. Ищем первый неотвеченный вопрос, чтобы сразу перекинуть на него пользователя
+        let firstUnanswered = questionStates.findIndex(state => state.selectedIndex === null);
+        
+        if (firstUnanswered !== -1 && firstUnanswered < currentQuestions.length) {
+            currentQuestionIndex = firstUnanswered; // Прыгаем на первый неотвеченный
+        } else if (firstUnanswered === -1 && currentQuestions.length > 0) {
+            currentQuestionIndex = currentQuestions.length - 1; // Если все отвечены, показываем последний доступный
+        } else {
+            currentQuestionIndex = 0; // На всякий случай
+        }
         
         if (currentQuestions.length > 0) {
             renderQuestion();
@@ -450,6 +473,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const isCorrect = (selectedIndex === correctIndex);
         questionStates[currentQuestionIndex] = { selectedIndex: selectedIndex, isCorrect: isCorrect };
         
+        // --- НОВОЕ: Сохраняем детальный прогресс по вопросам в память ---
+        const allSavedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
+        allSavedStates[currentTopic.id] = questionStates;
+        localStorage.setItem('pdr_quiz_states', JSON.stringify(allSavedStates));
+        // -----------------------------------------------------------------
+
         // Зберігаємо статистику для прогрес-бару
         if (isCorrect) {
             const stats = JSON.parse(localStorage.getItem('pdr_topic_stats') || "{}");
