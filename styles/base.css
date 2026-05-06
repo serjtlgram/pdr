@@ -372,6 +372,18 @@ body {
   border-color: var(--c-success);
 }
 
+/* Окрашиваем рамку и фон правильного ответа в светлой теме */
+body.light-theme .option-btn.correct {
+  border-color: #16a34a;
+  background-color: rgba(22, 163, 74, 0.08);
+}
+
+/* Окрашиваем рамку и фон неправильного ответа в светлой теме */
+body.light-theme .option-btn.wrong {
+  border-color: #dc2626;
+  background-color: rgba(220, 38, 38, 0.08);
+}
+
 .option-btn.correct .option-number {
   background-color: var(--c-success);
   color: #fff;
@@ -984,10 +996,14 @@ body.light-theme .nav-btn.active {
 
 body.light-theme .nav-btn.correct {
   color: #16a34a;
+  border-color: #16a34a;
+  background-color: rgba(22, 163, 74, 0.12);
 }
 
 body.light-theme .nav-btn.wrong {
   color: #dc2626;
+  border-color: #dc2626;
+  background-color: rgba(220, 38, 38, 0.12);
 }
 
 body.light-theme .option-btn {
