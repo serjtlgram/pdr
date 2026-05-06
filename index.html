@@ -200,14 +200,20 @@
             </div>
 
             <div id="topics-screen" class="screen">
-                <div class="screen-header">
-                    <button class="btn-back desktop-only" id="btn-back-from-topics" style="margin-bottom: 16px;">
-                        ← Назад на головну
-                    </button>
-                    <h2 class="section-title">Вибір розділу</h2>
-                    <p class="screen-subtitle">Оберіть тему для тестування</p>
+                <header class="screen-header">
+                    <h2 class="section-title">Розділи навчання</h2>
+                    <p class="screen-subtitle">Оберіть тему для підготовки</p>
+                </header>
+            
+                <div id="topics-grid" class="topics-grid">
+                    </div>
+            
+                <div class="search-footer">
+                    <div class="search-container">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="topic-search" placeholder="Пошук розділу...">
+                    </div>
                 </div>
-                <div class="cards-grid" id="topics-list"></div>
             </div>
 
             <div id="quiz-screen" class="screen">

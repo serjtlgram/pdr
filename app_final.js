@@ -435,4 +435,66 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 50);
     }
 
+        // --- Вставь это в app_final.js ---
+
+    const topicsData = [
+        { id: 1, title: "Загальні положення", icon: "🚦", questions: 45, color: "c1" },
+        { id: 2, title: "Обов'язки водіїв", icon: "🪪", questions: 32, color: "c2" },
+        { id: 3, title: "Спеціальні сигнали", icon: "🚨", questions: 18, color: "c3" },
+        { id: 4, title: "Права пішоходів", icon: "🚶", questions: 25, color: "c4" },
+        { id: 5, title: "Пасажири", icon: "🚌", questions: 12, color: "c5" },
+        { id: 6, title: "Дорожні знаки", icon: "🛑", questions: 120, color: "c6" }
+    ];
+
+    function renderTopics(filter = "") {
+        const grid = document.getElementById('topics-grid');
+        if (!grid) return;
+        
+        grid.innerHTML = "";
+        
+        // Получаем статистику из localStorage (если есть)
+        const stats = JSON.parse(localStorage.getItem('pdr_topic_stats') || "{}");
+
+        const filtered = topicsData.filter(t => 
+            t.title.toLowerCase().includes(filter.toLowerCase())
+        );
+
+        filtered.forEach(topic => {
+            const solved = stats[topic.id] || 0;
+            const progressPercent = Math.min(100, Math.round((solved / topic.questions) * 100));
+            
+            const card = document.createElement('div');
+            card.className = `topic-card ${topic.color}`;
+            card.innerHTML = `
+                <div class="topic-icon">${topic.icon}</div>
+                <div class="topic-title">${topic.title}</div>
+                <div class="topic-info">
+                    <span>${solved}/${topic.questions} питань</span>
+                    <div class="topic-progress-bg">
+                        <div class="topic-progress-fill" style="width: ${progressPercent}%"></div>
+                    </div>
+                </div>
+            `;
+            
+            card.onclick = () => {
+                console.log(`Загрузка темы: ${topic.id}`);
+                // Тут твоя логика открытия теста
+            };
+            
+            grid.appendChild(card);
+        });
+    }
+
+    // Слушатель поиска
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('topic-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                renderTopics(e.target.value);
+            });
+        }
+        
+        renderTopics(); // Первичная отрисовка
+    });
+
 });
