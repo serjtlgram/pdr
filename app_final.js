@@ -485,7 +485,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Слушатель поиска
+    // Слушатель поиска.
     document.addEventListener('DOMContentLoaded', () => {
         const searchInput = document.getElementById('topic-search');
         if (searchInput) {

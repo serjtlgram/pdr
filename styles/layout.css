@@ -230,7 +230,7 @@ body:not(.light-theme) .topic-progress-bg { background: rgba(255,255,255,0.1); }
   width: 0%; /* Меняется через JS */
 }
 
-/* --- Футер с поиском --- */
+/* --- Футер с поиском. --- */
 .search-footer {
   position: fixed;
   bottom: 0;
