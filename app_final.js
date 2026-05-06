@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const userId = tgUser ? tgUser.id : null; 
 
     // 1. БЛОКИРОВКА ПОЗА TELEGRAM
-    if (!tgUser) {
+    if (!tgUser && window.location.hostname !== 'localhost') {
         document.getElementById('not-tg-blocker').classList.add('active');
         document.getElementById('app-container').style.display = 'none';
         return; 
@@ -89,48 +89,38 @@ document.addEventListener("DOMContentLoaded", () => {
         window.addImpact = function() {}; 
     }
 
-        // --- Переключение тем с сохранением в Telegram CloudStorage ---
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
+    // --- Переключение тем с сохранением в Telegram CloudStorage ---
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
 
-        // Иконки для кнопок
-        const iconMoon = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
-        const iconSun = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+    const iconMoon = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+    const iconSun = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
 
-        // 1. При загрузке проверяем, есть ли сохраненная тема в облаке Telegram
-        if (tg && tg.CloudStorage) {
-            tg.CloudStorage.getItem('app_theme', (err, savedTheme) => {
-                if (!err && savedTheme) {
-                    if (savedTheme === 'light') {
-                        document.body.classList.add('light-theme');
-                        themeIcon.innerHTML = iconMoon; // Показываем луну, так как тема светлая
-                    } else {
-                        document.body.classList.remove('light-theme');
-                        themeIcon.innerHTML = iconSun; // Показываем солнце
-                    }
+    if (tg && tg.CloudStorage) {
+        tg.CloudStorage.getItem('app_theme', (err, savedTheme) => {
+            if (!err && savedTheme) {
+                if (savedTheme === 'light') {
+                    document.body.classList.add('light-theme');
+                    themeIcon.innerHTML = iconMoon; 
+                } else {
+                    document.body.classList.remove('light-theme');
+                    themeIcon.innerHTML = iconSun; 
                 }
-            });
-        }
-
-        // 2. Логика переключения по клику
-        themeToggleBtn.addEventListener('click', () => {
-            addImpact();
-            document.body.classList.toggle('light-theme');
-            
-            const isLightNow = document.body.classList.contains('light-theme');
-            
-            // Меняем иконку
-            if (isLightNow) {
-                themeIcon.innerHTML = iconMoon;
-            } else {
-                themeIcon.innerHTML = iconSun;
-            }
-
-            // Сохраняем выбор пользователя в облако Telegram
-            if (tg && tg.CloudStorage) {
-                tg.CloudStorage.setItem('app_theme', isLightNow ? 'light' : 'dark');
             }
         });
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+        addImpact();
+        document.body.classList.toggle('light-theme');
+        
+        const isLightNow = document.body.classList.contains('light-theme');
+        themeIcon.innerHTML = isLightNow ? iconMoon : iconSun;
+
+        if (tg && tg.CloudStorage) {
+            tg.CloudStorage.setItem('app_theme', isLightNow ? 'light' : 'dark');
+        }
+    });
 
     // --- Фоновая (тихая) проверка ---
     async function runSilentVerification() {
@@ -193,13 +183,13 @@ document.addEventListener("DOMContentLoaded", () => {
         addImpact();
         if (currentScreenName === 'quiz') {
             showScreen(topicsScreen, 'topics');
+            renderTopics(); // Оновлюємо прогрес при поверненні
         } else if (currentScreenName === 'topics') {
             showScreen(homeScreen, 'home');
         }
     }
 
     document.getElementById('quiz-topic-name').addEventListener('click', goBack);
-    document.getElementById('btn-back-from-topics').addEventListener('click', goBack);
     document.getElementById('btn-back-from-quiz').addEventListener('click', goBack);
 
     btnBackHome.addEventListener('click', () => {
@@ -213,31 +203,57 @@ document.addEventListener("DOMContentLoaded", () => {
         showScreen(topicsScreen, 'topics');
     });
 
-    // --- Отрисовка тем ---
-    function renderTopics() {
-        const topicsList = document.getElementById('topics-list');
-        topicsList.innerHTML = ''; 
-
+    // --- 4. НОВАЯ ОТРИСОВКА РАЗДЕЛОВ (ПЛИТКА) ---
+    function renderTopics(filter = "") {
+        const grid = document.getElementById('topics-grid');
+        if (!grid) return;
+        
+        grid.innerHTML = "";
+        
         const db = window.pdrData;
         if (!db || !db.topics) return;
 
-        db.topics.forEach(topic => {
+        const stats = JSON.parse(localStorage.getItem('pdr_topic_stats') || "{}");
+
+        const filtered = db.topics.filter(t => 
+            t.title.toLowerCase().includes(filter.toLowerCase())
+        );
+
+        filtered.forEach((topic, index) => {
+            const totalQ = topic.totalQuestions || 0;
+            const solved = stats[topic.id] || 0;
+            const progressPercent = totalQ > 0 ? Math.min(100, Math.round((solved / totalQ) * 100)) : 0;
+            
+            // Динамический цвет
+            const colorClass = `c${(index % 6) + 1}`;
+            const icon = topic.icon || "🚦";
+
             const card = document.createElement('div');
-            card.className = 'feature-card';
+            card.className = `topic-card ${colorClass}`;
             card.innerHTML = `
-                <div class="card-icon" style="background: transparent; font-size: 1.8rem;">${topic.icon}</div>
-                <div class="card-text">
-                    <h3>${topic.title}</h3>
-                    <p>${topic.description}</p>
+                <div class="topic-icon">${icon}</div>
+                <div class="topic-title">${topic.title}</div>
+                <div class="topic-info">
+                    <span>${solved}/${totalQ} питань</span>
+                    <div class="topic-progress-bg">
+                        <div class="topic-progress-fill" style="width: ${progressPercent}%"></div>
+                    </div>
                 </div>
-                <div class="card-arrow">›</div>
             `;
-            card.addEventListener('click', () => {
+            
+            card.onclick = () => {
                 addImpact();
                 startQuiz(topic);
-            });
-            topicsList.appendChild(card);
+            };
+            
+            grid.appendChild(card);
         });
+    }
+
+    // Поиск
+    const searchInput = document.getElementById('topic-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => renderTopics(e.target.value));
     }
 
     // --- Логика Теста ---
@@ -300,9 +316,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function renderQuestion() {
-        if (totalAnswersGiven >= 2) {
-            runSilentVerification();
-        }
+        if (totalAnswersGiven >= 2) runSilentVerification();
 
         const q = currentQuestions[currentQuestionIndex];
         const currentState = questionStates[currentQuestionIndex];
@@ -333,11 +347,8 @@ document.addEventListener("DOMContentLoaded", () => {
             
             if (currentState && currentState.selectedIndex !== null) {
                 btn.disabled = true;
-                if (index === q.correctIndex) {
-                    btn.classList.add('correct');
-                } else if (index === currentState.selectedIndex) {
-                    btn.classList.add('wrong');
-                }
+                if (index === q.correctIndex) btn.classList.add('correct');
+                else if (index === currentState.selectedIndex) btn.classList.add('wrong');
             } else {
                 btn.addEventListener('click', () => handleAnswer(btn, index, q.correctIndex));
             }
@@ -365,6 +376,7 @@ document.addEventListener("DOMContentLoaded", () => {
             nextBtn.onclick = () => {
                 addImpact();
                 showScreen(topicsScreen, 'topics'); 
+                renderTopics(); // Обновляем прогресс-бары при выходе
             };
         }
 
@@ -398,7 +410,6 @@ document.addEventListener("DOMContentLoaded", () => {
     async function handleAnswer(clickedBtn, selectedIndex, correctIndex) {
         addImpact(); 
 
-        // Если лимит превышен
         if (totalAnswersGiven >= 2) {
             if (isCheckingNow) {
                 const originalHtml = clickedBtn.innerHTML;
@@ -409,13 +420,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!isUserVerified) {
                 document.getElementById('sub-modal').classList.add('active');
-                return; // Блокируем ответ
+                return; 
             }
         }
 
         const isCorrect = (selectedIndex === correctIndex);
         questionStates[currentQuestionIndex] = { selectedIndex: selectedIndex, isCorrect: isCorrect };
         
+        // Зберігаємо статистику для прогрес-бару
+        if (isCorrect) {
+            const stats = JSON.parse(localStorage.getItem('pdr_topic_stats') || "{}");
+            stats[currentTopic.id] = (stats[currentTopic.id] || 0) + 1;
+            
+            // Захист: щоб правильних відповідей не стало більше, ніж питань
+            const totalQ = currentTopic.totalQuestions || currentQuestions.length;
+            if (stats[currentTopic.id] > totalQ) stats[currentTopic.id] = totalQ;
+            
+            localStorage.setItem('pdr_topic_stats', JSON.stringify(stats));
+        }
+
         if (totalAnswersGiven < 2) {
             totalAnswersGiven++;
             localStorage.setItem('pdr_answers_count', totalAnswersGiven.toString());
@@ -434,67 +457,4 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }, 50);
     }
-
-        // --- Вставь это в app_final.js ---
-
-    const topicsData = [
-        { id: 1, title: "Загальні положення", icon: "🚦", questions: 45, color: "c1" },
-        { id: 2, title: "Обов'язки водіїв", icon: "🪪", questions: 32, color: "c2" },
-        { id: 3, title: "Спеціальні сигнали", icon: "🚨", questions: 18, color: "c3" },
-        { id: 4, title: "Права пішоходів", icon: "🚶", questions: 25, color: "c4" },
-        { id: 5, title: "Пасажири", icon: "🚌", questions: 12, color: "c5" },
-        { id: 6, title: "Дорожні знаки", icon: "🛑", questions: 120, color: "c6" }
-    ];
-
-    function renderTopics(filter = "") {
-        const grid = document.getElementById('topics-grid');
-        if (!grid) return;
-        
-        grid.innerHTML = "";
-        
-        // Получаем статистику из localStorage (если есть)
-        const stats = JSON.parse(localStorage.getItem('pdr_topic_stats') || "{}");
-
-        const filtered = topicsData.filter(t => 
-            t.title.toLowerCase().includes(filter.toLowerCase())
-        );
-
-        filtered.forEach(topic => {
-            const solved = stats[topic.id] || 0;
-            const progressPercent = Math.min(100, Math.round((solved / topic.questions) * 100));
-            
-            const card = document.createElement('div');
-            card.className = `topic-card ${topic.color}`;
-            card.innerHTML = `
-                <div class="topic-icon">${topic.icon}</div>
-                <div class="topic-title">${topic.title}</div>
-                <div class="topic-info">
-                    <span>${solved}/${topic.questions} питань</span>
-                    <div class="topic-progress-bg">
-                        <div class="topic-progress-fill" style="width: ${progressPercent}%"></div>
-                    </div>
-                </div>
-            `;
-            
-            card.onclick = () => {
-                console.log(`Загрузка темы: ${topic.id}`);
-                // Тут твоя логика открытия теста
-            };
-            
-            grid.appendChild(card);
-        });
-    }
-
-    // Слушатель поиска.
-    document.addEventListener('DOMContentLoaded', () => {
-        const searchInput = document.getElementById('topic-search');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                renderTopics(e.target.value);
-            });
-        }
-        
-        renderTopics(); // Первичная отрисовка
-    });
-
 });
