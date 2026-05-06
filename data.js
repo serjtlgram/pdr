@@ -66,7 +66,7 @@ window.pdrData = {
         },
         {
             id: "topic_9",
-            title: "9. Попереджувальні сигнали",
+            title: "9. Попереджу-<br>вальні сигнали",
             description: "",
             icon: "⚠️",
             totalQuestions: 60
