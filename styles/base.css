@@ -700,6 +700,28 @@ body:not(.light-theme) .topic-icon-wrapper {
   fill: none;
 }
 
+/* Выстраиваем иконку и стрелочку в один ряд */
+.topic-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+/* Стили для стрелочки */
+.topic-chevron {
+  opacity: 0.3; /* Делаем ее полупрозрачной, чтобы не отвлекала */
+  margin-top: 4px; /* Слегка опускаем для идеального выравнивания */
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* При нажатии/наведении стрелочка становится ярче и чуть сдвигается */
+.topic-card:active .topic-chevron,
+.topic-card:hover .topic-chevron {
+  opacity: 0.8;
+  transform: translateX(3px);
+}
+
 /* Цвета для светлой темы */
 .topic-card.c1 { background: #E3F2FD; color: #0D47A1; }
 .topic-card.c2 { background: #E8F5E9; color: #1B5E20; }

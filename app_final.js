@@ -245,9 +245,16 @@ document.addEventListener("DOMContentLoaded", () => {
             const card = document.createElement('div');
             card.className = `topic-card ${colorClass}`;
             
-            // Використовуємо новий контейнер .topic-icon-wrapper
+            // Добавили обертку topic-header и иконку-стрелочку (chevron)
             card.innerHTML = `
-                <div class="topic-icon-wrapper">${iconHtml}</div>
+                <div class="topic-header">
+                    <div class="topic-icon-wrapper">${iconHtml}</div>
+                    <div class="topic-chevron">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </div>
                 <div class="topic-title">${topic.title}</div>
                 <div class="topic-info">
                     <span>${solved}/${totalQ} питань</span>
