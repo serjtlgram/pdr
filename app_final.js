@@ -509,4 +509,62 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }, 50);
     }
+
+            // --- ПРОФІЛЬ ТА СКИДАННЯ ПРОГРЕСУ (BOTTOM SHEET) ---
+            const profileModal = document.getElementById('profile-modal');
+            const btnResetProgress = document.getElementById('btn-reset-progress');
+
+            // Відкриття модалки при кліку на аватар
+            if (avatarContainer) {
+                avatarContainer.addEventListener('click', () => {
+                    addImpact();
+                    profileModal.classList.add('active');
+                });
+            }
+
+            // Закриття модалки при кліку на темний фон
+            if (profileModal) {
+                profileModal.addEventListener('click', (e) => {
+                    if (e.target === profileModal) {
+                        profileModal.classList.remove('active');
+                    }
+                });
+            }
+
+            // Логіка скидання прогресу
+            if (btnResetProgress) {
+                btnResetProgress.addEventListener('click', () => {
+                    addImpact();
+                    
+                    // Використовуємо нативне вікно підтвердження Telegram, якщо воно доступне
+                    const confirmMsg = "Ви впевнені, що хочете скинути прогрес по розділам?";
+                    
+                    if (tg && tg.showConfirm) {
+                        tg.showConfirm(confirmMsg, (confirmed) => {
+                            if (confirmed) executeReset();
+                        });
+                    } else {
+                        if (confirm(confirmMsg)) executeReset();
+                    }
+                });
+            }
+
+            function executeReset() {
+                // Видаляємо ТІЛЬКИ прогрес по питанням та статистику розділів
+                // Глобальний лічильник (pdr_answers_count) НЕ чіпаємо!
+                localStorage.removeItem('pdr_topic_stats');
+                localStorage.removeItem('pdr_quiz_states');
+                
+                // Оновлюємо інтерфейс
+                renderTopics();
+                profileModal.classList.remove('active');
+                
+                // Показуємо повідомлення про успіх
+                if (tg && tg.showAlert) {
+                    tg.showAlert("Прогрес успішно скинуто!");
+                } else {
+                    alert("Прогрес успішно скинуто!");
+                }
+            }
+
 });

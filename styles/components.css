@@ -449,3 +449,154 @@
   margin-bottom: 24px;
   line-height: 1.5;
 }
+
+/* --- Bottom Sheet (Виїжджаюче вікно профілю) --- */
+.bottom-sheet-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(8, 11, 18, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: none; /* Приховано за замовчуванням */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.bottom-sheet-overlay.active {
+  display: block;
+  opacity: 1;
+}
+
+.bottom-sheet-content {
+  position: absolute;
+  bottom: -100%;
+  left: 0;
+  width: 100%;
+  background: var(--c-bg-alt);
+  border-radius: 24px 24px 0 0;
+  padding: 16px 24px 40px;
+  transition: bottom 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.bottom-sheet-overlay.active .bottom-sheet-content {
+  bottom: 0;
+}
+
+.bottom-sheet-drag-handle {
+  width: 40px;
+  height: 4px;
+  background: var(--c-text-muted);
+  border-radius: 2px;
+  margin: 0 auto 20px;
+  opacity: 0.5;
+}
+
+.bottom-sheet-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  text-align: center;
+  color: var(--c-text);
+}
+
+/* Кнопка та іконка інформації */
+.settings-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+.btn-danger-outline {
+  flex: 1;
+  background: transparent;
+  color: var(--c-danger);
+  border: 1px solid var(--c-danger);
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-danger-outline:active {
+  background: rgba(239, 68, 68, 0.1);
+  transform: scale(0.98);
+}
+
+.info-tooltip-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--c-surface);
+  color: var(--c-text-soft);
+  border: 1px solid var(--c-border-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.info-icon:active {
+  color: var(--c-text);
+  border-color: var(--c-text-soft);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Спливаюча підказка */
+.info-tooltip-text {
+  position: absolute;
+  bottom: 130%;
+  right: 0;
+  width: 240px;
+  background: var(--c-surface);
+  color: var(--c-text);
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  border: 1px solid var(--c-border-soft);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  transform: translateY(10px);
+  z-index: 10;
+}
+
+/* Показуємо підказку при наведенні (на ПК) або натисканні (на телефоні) */
+.info-tooltip-container:hover .info-tooltip-text,
+.info-tooltip-container:active .info-tooltip-text {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Адаптація для світлої теми */
+body.light-theme .info-tooltip-text {
+  background: #fff;
+  border-color: #e2e8f0;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+body.light-theme .info-icon {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
