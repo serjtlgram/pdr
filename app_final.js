@@ -234,6 +234,41 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // --- Логіка нових карток на головній сторінці ---
+    const cardLearning = document.getElementById('card-learning');
+    const cardExam = document.getElementById('card-exam');
+    const cardHard = document.getElementById('card-hard');
+
+    if (cardLearning) {
+        cardLearning.addEventListener('click', () => {
+            addImpact();
+            renderTopics();
+            showScreen(topicsScreen, 'topics');
+        });
+    }
+
+    if (cardExam) {
+        cardExam.addEventListener('click', () => {
+            addImpact();
+            if(tg && tg.showAlert) {
+                tg.showAlert("Режим іспиту знаходиться в розробці! Скоро додамо 🚀");
+            } else {
+                alert("Режим іспиту знаходиться в розробці!");
+            }
+        });
+    }
+
+    if (cardHard) {
+        cardHard.addEventListener('click', () => {
+            addImpact();
+            if(tg && tg.showAlert) {
+                tg.showAlert("Розділ складних питань знаходиться в розробці! Збираємо вашу статистику 📊");
+            } else {
+                alert("Розділ складних питань знаходиться в розробці!");
+            }
+        });
+    }
+
     // --- СЛОВНИК СУЧАСНИХ SVG ІКОНОК ДЛЯ РОЗДІЛІВ ---
     const modernIcons = {
         "topic_1": `<svg viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>`, 
@@ -626,8 +661,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }, 50);
         });
     }
-
-  
 
     if (btnResetProgress) {
         btnResetProgress.addEventListener('click', () => {

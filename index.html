@@ -72,98 +72,47 @@
                 <section class="content-section">
                     <h2 class="section-title">Що всередині?</h2>
                     <div class="cards-grid">
-                        <div class="feature-card">
-                            <div class="card-icon" style="background: transparent;">
-                                <svg width="48" height="48" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="64" cy="64" r="56" fill="#0A1A2F"/>
-                                    <circle cx="64" cy="64" r="56" fill="url(#glow)" />
-                                    <g stroke="#6FA8FF" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M64 44 C52 38, 40 40, 40 40 L40 84 C52 80, 64 84, 64 84" />
-                                        <path d="M64 44 C76 38, 88 40, 88 40 L88 84 C76 80, 64 84, 64 84" />
-                                        <line x1="64" y1="44" x2="64" y2="84"/>
-                                    </g>
-                                    <defs>
-                                        <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-                                            <stop offset="0%" stop-color="#1F4FFF" stop-opacity="0.15"/>
-                                            <stop offset="100%" stop-color="#1F4FFF" stop-opacity="0"/>
-                                        </radialGradient>
-                                    </defs>
+                        <!-- Картка 1: Навчання -->
+                        <div class="feature-card" id="card-learning">
+                            <div class="card-icon" style="color: #3B82F6; background: rgba(59, 130, 246, 0.12);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path>
                                 </svg>
                             </div>
                             <div class="card-text">
-                                <h3>Правила ПДР</h3>
-                                <p>Повний текст правил</p>
+                                <h3>РОЗПОЧАТИ НАВЧАННЯ</h3>
+                                <p>поступове вивчення розділів ПДР через питання які будуть на іспиті</p>
                             </div>
                             <div class="card-arrow">›</div>
                         </div>
-                        <div class="feature-card">
-                            <div class="card-icon" style="background: transparent;">
-                                <svg width="48" height="48" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="64" cy="64" r="56" fill="#0A1A2F"/>
-                                    <circle cx="64" cy="64" r="56" fill="url(#glow-test)" />
-                                    <g stroke="#7FFFD4" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M48 50 C48 36, 80 36, 80 52 C80 62, 64 62, 64 74" />
-                                        <circle cx="64" cy="88" r="2.5" fill="#7FFFD4" stroke="none"/>
-                                    </g>
-                                    <defs>
-                                        <radialGradient id="glow-test" cx="50%" cy="50%" r="50%">
-                                            <stop offset="0%" stop-color="#00FFC6" stop-opacity="0.18"/>
-                                            <stop offset="100%" stop-color="#00FFC6" stop-opacity="0"/>
-                                        </radialGradient>
-                                    </defs>
+
+                        <!-- Картка 2: Іспит -->
+                        <div class="feature-card" id="card-exam">
+                            <div class="card-icon" style="color: #8B5CF6; background: rgba(139, 92, 246, 0.12);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
                                 </svg>
                             </div>
                             <div class="card-text">
-                                <h3>Тести</h3>
-                                <p>Перевірка знань</p>
+                                <h3>ІСПИТ</h3>
+                                <p>імітація справжніх іспитів: 20 випадкових питань за 20 хвилин</p>
                             </div>
                             <div class="card-arrow">›</div>
                         </div>
-                        <div class="feature-card">
-                            <div class="card-icon" style="background: transparent;">
-                                <svg width="48" height="48" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="64" cy="64" r="56" fill="#0A1A2F"/>
-                                    <circle cx="64" cy="64" r="56" fill="url(#glow-signs)" />
-                                    <path d="M64 38 L90 84 Q92 88 88 88 L40 88 Q36 88 38 84 Z" stroke="#B388FF" stroke-width="4" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
-                                    <g stroke="#B388FF" stroke-width="4" stroke-linecap="round">
-                                        <line x1="64" y1="54" x2="64" y2="72"/>
-                                        <circle cx="64" cy="82" r="3" fill="#B388FF" stroke="none"/>
-                                    </g>
-                                    <defs>
-                                        <radialGradient id="glow-signs" cx="50%" cy="50%" r="50%">
-                                            <stop offset="0%" stop-color="#9B5CFF" stop-opacity="0.2"/>
-                                            <stop offset="100%" stop-color="#9B5CFF" stop-opacity="0"/>
-                                        </radialGradient>
-                                    </defs>
+
+                        <!-- Картка 3: Складні питання -->
+                        <div class="feature-card" id="card-hard">
+                            <div class="card-icon" style="color: #F59E0B; background: rgba(245, 158, 11, 0.12);">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
                                 </svg>
                             </div>
                             <div class="card-text">
-                                <h3>Знаки</h3>
-                                <p>Усі дорожні знаки</p>
-                            </div>
-                            <div class="card-arrow">›</div>
-                        </div>
-                        <div class="feature-card">
-                            <div class="card-icon" style="background: transparent;">
-                                <svg width="48" height="48" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="64" cy="64" r="56" fill="#0A1A2F"/>
-                                    <circle cx="64" cy="64" r="56" fill="url(#glow-markings)" />
-                                    <g stroke="#FFD84D" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M64 38 L88 50 L64 62 L40 50 Z"/>
-                                        <path d="M64 54 L88 66 L64 78 L40 66 Z"/>
-                                        <path d="M64 70 L88 82 L64 94 L40 82 Z"/>
-                                    </g>
-                                    <defs>
-                                        <radialGradient id="glow-markings" cx="50%" cy="50%" r="50%">
-                                            <stop offset="0%" stop-color="#FFD84D" stop-opacity="0.2"/>
-                                            <stop offset="100%" stop-color="#FFD84D" stop-opacity="0"/>
-                                        </radialGradient>
-                                    </defs>
-                                </svg>
-                            </div>
-                            <div class="card-text">
-                                <h3>Розмітка</h3>
-                                <p>Види та значення</p>
+                                <h3>СКЛАДНІ ПИТАННЯ</h3>
+                                <p>коли ви відповісте на 100+ питань, тут з'являться ті, які викликали труднощі</p>
                             </div>
                             <div class="card-arrow">›</div>
                         </div>
