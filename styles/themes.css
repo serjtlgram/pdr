@@ -124,3 +124,17 @@ body.light-theme .banner-badge svg [stroke="#7FAEFF"] { stroke: #3f66b5; }
 
 body.light-theme .card-icon svg [fill="#7FFFD4"] { fill: #1f7668; }
 body.light-theme .card-icon svg [fill="#B388FF"] { fill: #6d55b8; }
+
+/* Гумористичний банер (Світла тема) */
+body.light-theme .stat-humor-banner {
+  background: #ffffff;
+  border-color: #e5e7eb;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+/* Спеціальний стиль для 100% (Світла тема) */
+body.light-theme .stat-humor-banner.tier-max {
+  background: linear-gradient(90deg, #f0fdf4, #dcfce7);
+  border-color: #bbf7d0;
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.1);
+}

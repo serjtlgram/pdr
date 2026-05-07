@@ -610,6 +610,45 @@ document.addEventListener("DOMContentLoaded", () => {
         return { successRate, answered: totalAnswered, total: totalExpected, completionRate };
     }
 
+    // Функція для оновлення гумористичного банера
+    function updateHumorBanner(successRate) {
+        const banner = document.getElementById('stat-humor-banner');
+        if (!banner) return;
+
+        let text = "";
+        let iconLeft = "";
+        let iconRight = "";
+        let isMax = false;
+
+        if (successRate <= 30) {
+            text = "Схоже, правила поки що<br>керують вами 😅";
+            iconLeft = "🔰"; iconRight = "📚";
+        } else if (successRate <= 45) {
+            text = "Ви вже розумієте, що «головна дорога» —<br>це не життєва позиція";
+            iconLeft = "🛣️"; iconRight = "🤔";
+        } else if (successRate <= 65) {
+            text = "Дорожні знаки<br>починають вас поважати";
+            iconLeft = "🚸"; iconRight = "😎";
+        } else if (successRate <= 85) {
+            text = "Навігатор більше не переживає<br>за ваше майбутнє";
+            iconLeft = "📱"; iconRight = "😌";
+        } else if (successRate <= 99) {
+            text = "Ще трохи — і вас почнуть<br>пропускати навіть маршрутки";
+            iconLeft = "🚐"; iconRight = "👑";
+        } else {
+            text = "Світлофор бачить вас —<br>і перемикається на <span style='color: var(--c-success); font-weight: 800;'>зелений</span>";
+            iconLeft = "🏆"; iconRight = "🚦";
+            isMax = true;
+        }
+
+        banner.className = `stat-humor-banner ${isMax ? 'tier-max' : ''}`;
+        banner.innerHTML = `
+            <div class="humor-icon left">${iconLeft}</div>
+            <div class="humor-text">${text}</div>
+            <div class="humor-icon right">${iconRight}</div>
+        `;
+    }
+
     function animateCircles(successRate, completionRate) {
         const circleSuccess = document.getElementById('circle-success');
         const circleCompletion = document.getElementById('circle-completion');
@@ -649,9 +688,11 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('stat-answered-text').innerText = stats.answered;
             document.getElementById('stat-total-text').innerText = stats.total;
 
+            // ОНОВЛЮЄМО БАНЕР ТУТ
+            updateHumorBanner(stats.successRate);
+
             profileModal.classList.add('active');
 
-            // Примусово показуємо кнопку "Назад" від Telegram
             if (tg && tg.BackButton) {
                 tg.BackButton.show();
             }
