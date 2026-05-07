@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const userId = tgUser ? tgUser.id : null; 
 
     // 1. БЛОКИРОВКА ПОЗА TELEGRAM
-    if (!tgUser && window.location.hostname !== 'localhost') {
+    if (!tgUser && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
         document.getElementById('not-tg-blocker').classList.add('active');
         document.getElementById('app-container').style.display = 'none';
         return; 
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const avatarContainer = document.getElementById('user-avatar-container');
     const avatarImg = document.getElementById('user-avatar-img');
     
-    if (tgUser) {
+    if (tgUser && avatarContainer) {
         avatarContainer.style.display = 'flex';
         if (tgUser.photo_url) {
             avatarImg.src = tgUser.photo_url;
@@ -28,6 +28,11 @@ document.addEventListener("DOMContentLoaded", () => {
             avatarImg.style.display = 'none';
             avatarContainer.innerHTML = tgUser.first_name ? tgUser.first_name.charAt(0).toUpperCase() : '👤';
         }
+    } else if (avatarContainer) {
+        // Для тестування в браузері без Telegram
+        avatarContainer.style.display = 'flex';
+        avatarImg.style.display = 'none';
+        avatarContainer.innerHTML = '👤';
     }
 
     // Основные переменные интерфейса
@@ -110,17 +115,19 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    themeToggleBtn.addEventListener('click', () => {
-        addImpact();
-        document.body.classList.toggle('light-theme');
-        
-        const isLightNow = document.body.classList.contains('light-theme');
-        themeIcon.innerHTML = isLightNow ? iconMoon : iconSun;
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+            addImpact();
+            document.body.classList.toggle('light-theme');
+            
+            const isLightNow = document.body.classList.contains('light-theme');
+            themeIcon.innerHTML = isLightNow ? iconMoon : iconSun;
 
-        if (tg && tg.CloudStorage) {
-            tg.CloudStorage.setItem('app_theme', isLightNow ? 'light' : 'dark');
-        }
-    });
+            if (tg && tg.CloudStorage) {
+                tg.CloudStorage.setItem('app_theme', isLightNow ? 'light' : 'dark');
+            }
+        });
+    }
 
     // --- Фоновая (тихая) проверка ---
     async function runSilentVerification() {
@@ -141,24 +148,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Кнопка в модальном окне ---
     const subModal = document.getElementById('sub-modal');
-    document.getElementById('btn-check-sub').addEventListener('click', async () => {
-        addImpact();
-        const btn = document.getElementById('btn-check-sub');
-        btn.innerText = "Перевіряю...";
-        btn.disabled = true;
+    const btnCheckSub = document.getElementById('btn-check-sub');
+    if (btnCheckSub) {
+        btnCheckSub.addEventListener('click', async () => {
+            addImpact();
+            btnCheckSub.innerText = "Перевіряю...";
+            btnCheckSub.disabled = true;
 
-        await runSilentVerification();
+            await runSilentVerification();
 
-        if (isUserVerified) {
-            subModal.classList.remove('active'); 
-        } else {
-            if(tg && tg.showAlert) tg.showAlert("Ви ще не підписані! Перейдіть за посиланням та підпишіться.");
-            else alert("Ви ще не підписані!");
-        }
+            if (isUserVerified) {
+                subModal.classList.remove('active'); 
+            } else {
+                if(tg && tg.showAlert) tg.showAlert("Ви ще не підписані! Перейдіть за посиланням та підпишіться.");
+                else alert("Ви ще не підписані!");
+            }
 
-        btn.innerText = "Я підписався! Перевірити";
-        btn.disabled = false;
-    });
+            btnCheckSub.innerText = "Я підписався! Перевірити";
+            btnCheckSub.disabled = false;
+        });
+    }
 
     // --- SPA Навигация ---
     function showScreen(screenToShow, screenName) {
@@ -183,116 +192,112 @@ document.addEventListener("DOMContentLoaded", () => {
         addImpact();
         if (currentScreenName === 'quiz') {
             showScreen(topicsScreen, 'topics');
-            renderTopics(); // Оновлюємо прогрес при поверненні
+            renderTopics(); 
         } else if (currentScreenName === 'topics') {
             showScreen(homeScreen, 'home');
         }
     }
 
-    document.getElementById('quiz-topic-name').addEventListener('click', goBack);
-    document.getElementById('btn-back-from-quiz').addEventListener('click', goBack);
+    const quizTopicName = document.getElementById('quiz-topic-name');
+    if (quizTopicName) quizTopicName.addEventListener('click', goBack);
+    
+    const btnBackFromQuiz = document.getElementById('btn-back-from-quiz');
+    if (btnBackFromQuiz) btnBackFromQuiz.addEventListener('click', goBack);
 
-    btnBackHome.addEventListener('click', () => {
-        addImpact();
-        showScreen(homeScreen, 'home');
-    });
+    if (btnBackHome) {
+        btnBackHome.addEventListener('click', () => {
+            addImpact();
+            showScreen(homeScreen, 'home');
+        });
+    }
 
-    btnStart.addEventListener('click', () => {
-        addImpact();
-        renderTopics();
-        showScreen(topicsScreen, 'topics');
-    });
+    if (btnStart) {
+        btnStart.addEventListener('click', () => {
+            addImpact();
+            renderTopics();
+            showScreen(topicsScreen, 'topics');
+        });
+    }
 
     // --- СЛОВНИК СУЧАСНИХ SVG ІКОНОК ДЛЯ РОЗДІЛІВ ---
     const modernIcons = {
-        "topic_1": `<svg viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>`, // Книга
-        "topic_2": `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2v10M12 22v-6M4.93 4.93l4.24 4.24M19.07 19.07l-4.24-4.24M19.07 4.93l-4.24 4.24M4.93 19.07l4.24-4.24"/></svg>`, // Кермо
-        "topic_3": `<svg viewBox="0 0 24 24"><path d="M12 2v2M5.3 5.3l1.4 1.4M18.7 5.3l-1.4 1.4M12 22H7a5 5 0 0 1 5-5h0a5 5 0 0 1 5 5h-5z"/></svg>`, // Мигалка
-        "topic_4": `<svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><path d="M12 7v7M9 18l3-4 3 4M8 11h8"/></svg>`, // Пішохід
-        "topic_5": `<svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`, // Пасажири
-        "topic_6": `<svg viewBox="0 0 24 24"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2"/></svg>`, // Велосипед
-        "topic_7": `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="2"/><path d="M12 2v8M12 14v8M2 12h8M14 12h8M4.9 4.9l5.7 5.7M13.4 13.4l5.7 5.7M4.9 19.1l5.7-5.7M13.4 10.6l5.7-5.7"/></svg>`, // Колесо воза
-        "topic_8": `<svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="17" r="2"/></svg>` // Світлофор
+        "topic_1": `<svg viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>`, 
+        "topic_2": `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2v10M12 22v-6M4.93 4.93l4.24 4.24M19.07 19.07l-4.24-4.24M19.07 4.93l-4.24 4.24M4.93 19.07l4.24-4.24"/></svg>`, 
+        "topic_3": `<svg viewBox="0 0 24 24"><path d="M12 2v2M5.3 5.3l1.4 1.4M18.7 5.3l-1.4 1.4M12 22H7a5 5 0 0 1 5-5h0a5 5 0 0 1 5 5h-5z"/></svg>`, 
+        "topic_4": `<svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><path d="M12 7v7M9 18l3-4 3 4M8 11h8"/></svg>`, 
+        "topic_5": `<svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`, 
+        "topic_6": `<svg viewBox="0 0 24 24"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2"/></svg>`, 
+        "topic_7": `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="2"/><path d="M12 2v8M12 14v8M2 12h8M14 12h8M4.9 4.9l5.7 5.7M13.4 13.4l5.7 5.7M4.9 19.1l5.7-5.7M13.4 10.6l5.7-5.7"/></svg>`, 
+        "topic_8": `<svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="17" r="2"/></svg>` 
     };
 
-// --- 4. НОВАЯ ОТРИСОВКА РАЗДЕЛОВ (ПЛИТКА) ---
-function renderTopics(filter = "") {
-    const grid = document.getElementById('topics-grid');
-    if (!grid) return;
-    
-    grid.innerHTML = "";
-    
-    const db = window.pdrData;
-    if (!db || !db.topics) return;
-
-    // Берем детальную статистику по каждому вопросу (тут есть и правильные, и неправильные)
-    const allSavedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
-
-    const filtered = db.topics.filter(t => 
-        t.title.toLowerCase().includes(filter.toLowerCase())
-    );
-
-    filtered.forEach((topic, index) => {
-        const totalQ = topic.totalQuestions || 0;
-        const topicStates = allSavedStates[topic.id] || [];
+    // --- 4. НОВАЯ ОТРИСОВКА РАЗДЕЛОВ (ПЛИТКА) ---
+    function renderTopics(filter = "") {
+        const grid = document.getElementById('topics-grid');
+        if (!grid) return;
         
-        let answeredCount = 0;
-        let correctCount = 0;
+        grid.innerHTML = "";
+        
+        const db = window.pdrData;
+        if (!db || !db.topics) return;
 
-        // Подсчитываем сколько всего отвечено и сколько из них правильно
-        topicStates.forEach(state => {
-            if (state && state.selectedIndex !== null) {
-                answeredCount++;
-                if (state.isCorrect) {
-                    correctCount++;
+        const allSavedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
+
+        const filtered = db.topics.filter(t => 
+            t.title.toLowerCase().includes(filter.toLowerCase())
+        );
+
+        filtered.forEach((topic, index) => {
+            const totalQ = topic.totalQuestions || 0;
+            const topicStates = allSavedStates[topic.id] || [];
+            
+            let answeredCount = 0;
+            let correctCount = 0;
+
+            topicStates.forEach(state => {
+                if (state && state.selectedIndex !== null) {
+                    answeredCount++;
+                    if (state.isCorrect) {
+                        correctCount++;
+                    }
                 }
-            }
+            });
+
+            const progressPercent = totalQ > 0 ? Math.min(100, Math.round((answeredCount / totalQ) * 100)) : 0;
+            const successRate = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+            const infoText = `${answeredCount}/${totalQ} &bull; ${successRate}% вірно`;
+            const colorClass = `c${(index % 6) + 1}`;
+            const iconHtml = modernIcons[topic.id] || `<span style="font-size: 1.5rem;">${topic.icon || "🚦"}</span>`;
+
+            const card = document.createElement('div');
+            card.className = `topic-card ${colorClass}`;
+            
+            card.innerHTML = `
+                <div class="topic-header">
+                    <div class="topic-icon-wrapper">${iconHtml}</div>
+                    <div class="topic-chevron">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </div>
+                <div class="topic-title">${topic.title}</div>
+                <div class="topic-info">
+                    <span>${infoText}</span>
+                    <div class="topic-progress-bg">
+                        <div class="topic-progress-fill" style="width: ${progressPercent}%"></div>
+                    </div>
+                </div>
+            `;
+            
+            card.onclick = () => {
+                addImpact();
+                startQuiz(topic);
+            };
+            
+            grid.appendChild(card);
         });
-
-        // Прогресс-бар теперь показывает процент ПРОХОЖДЕНИЯ (отвеченные / всего вопросов)
-        const progressPercent = totalQ > 0 ? Math.min(100, Math.round((answeredCount / totalQ) * 100)) : 0;
-        
-        // Вычисляем процент успешности (правильные / отвеченные)
-        const successRate = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
-        
-        // Формируем нужный текст: "9/79 • 87% вірно"
-        const infoText = `${answeredCount}/${totalQ} &bull; ${successRate}% вірно`;
-        
-        // Динамический цвет
-        const colorClass = `c${(index % 6) + 1}`;
-        
-        // Беремо сучасну іконку зі словника, або залишаємо емодзі як запасний варіант
-        const iconHtml = modernIcons[topic.id] || `<span style="font-size: 1.5rem;">${topic.icon || "🚦"}</span>`;
-
-        const card = document.createElement('div');
-        card.className = `topic-card ${colorClass}`;
-        
-        card.innerHTML = `
-            <div class="topic-header">
-                <div class="topic-icon-wrapper">${iconHtml}</div>
-                <div class="topic-chevron">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                </div>
-            </div>
-            <div class="topic-title">${topic.title}</div>
-            <div class="topic-info">
-                <span>${infoText}</span>
-                <div class="topic-progress-bg">
-                    <div class="topic-progress-fill" style="width: ${progressPercent}%"></div>
-                </div>
-            </div>
-        `;
-        
-        card.onclick = () => {
-            addImpact();
-            startQuiz(topic);
-        };
-        
-        grid.appendChild(card);
-    });
-}
+    }
 
     // Поиск
     const searchInput = document.getElementById('topic-search');
@@ -308,13 +313,10 @@ function renderTopics(filter = "") {
         
         const total = topic.totalQuestions || currentQuestions.length || 79;
         
-        // 1. Создаем пустой массив состояний
         questionStates = Array(total).fill(null).map(() => ({ selectedIndex: null, isCorrect: null }));
         
-        // 2. Загружаем сохраненный прогресс из памяти
         const savedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
         if (savedStates[topic.id]) {
-            // Восстанавливаем ответы. Если добавились новые вопросы, старые ответы не слетят
             savedStates[topic.id].forEach((savedState, idx) => {
                 if (idx < total && savedState) {
                     questionStates[idx] = savedState;
@@ -322,15 +324,14 @@ function renderTopics(filter = "") {
             });
         }
 
-        // 3. Ищем первый неотвеченный вопрос, чтобы сразу перекинуть на него пользователя
         let firstUnanswered = questionStates.findIndex(state => state.selectedIndex === null);
         
         if (firstUnanswered !== -1 && firstUnanswered < currentQuestions.length) {
-            currentQuestionIndex = firstUnanswered; // Прыгаем на первый неотвеченный
+            currentQuestionIndex = firstUnanswered; 
         } else if (firstUnanswered === -1 && currentQuestions.length > 0) {
-            currentQuestionIndex = currentQuestions.length - 1; // Если все отвечены, показываем последний доступный
+            currentQuestionIndex = currentQuestions.length - 1; 
         } else {
-            currentQuestionIndex = 0; // На всякий случай
+            currentQuestionIndex = 0; 
         }
         
         if (currentQuestions.length > 0) {
@@ -443,7 +444,7 @@ function renderTopics(filter = "") {
             nextBtn.onclick = () => {
                 addImpact();
                 showScreen(topicsScreen, 'topics'); 
-                renderTopics(); // Обновляем прогресс-бары при выходе
+                renderTopics(); 
             };
         }
 
@@ -494,18 +495,14 @@ function renderTopics(filter = "") {
         const isCorrect = (selectedIndex === correctIndex);
         questionStates[currentQuestionIndex] = { selectedIndex: selectedIndex, isCorrect: isCorrect };
         
-        // --- НОВОЕ: Сохраняем детальный прогресс по вопросам в память ---
         const allSavedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
         allSavedStates[currentTopic.id] = questionStates;
         localStorage.setItem('pdr_quiz_states', JSON.stringify(allSavedStates));
-        // -----------------------------------------------------------------
 
-        // Зберігаємо статистику для прогрес-бару
         if (isCorrect) {
             const stats = JSON.parse(localStorage.getItem('pdr_topic_stats') || "{}");
             stats[currentTopic.id] = (stats[currentTopic.id] || 0) + 1;
             
-            // Захист: щоб правильних відповідей не стало більше, ніж питань
             const totalQ = currentTopic.totalQuestions || currentQuestions.length;
             if (stats[currentTopic.id] > totalQ) stats[currentTopic.id] = totalQ;
             
@@ -531,12 +528,11 @@ function renderTopics(filter = "") {
         }, 50);
     }
 
-          // --- ПРОФІЛЬ ТА СТАТИСТИКА ---
+    // --- ПРОФІЛЬ ТА СТАТИСТИКА ---
     const profileModal = document.getElementById('profile-modal');
     const btnCloseProfile = document.getElementById('btn-close-profile');
     const btnResetProgress = document.getElementById('btn-reset-progress');
 
-    // Функція розрахунку статистики
     function calculateStats() {
         const db = window.pdrData;
         if (!db || !db.topics) return { successRate: 0, answered: 0, total: 0, completionRate: 0 };
@@ -564,30 +560,24 @@ function renderTopics(filter = "") {
         return { successRate, answered: totalAnswered, total: totalExpected, completionRate };
     }
 
-    // Той самий "фінт вухами" - анімація кілець
     function animateCircles(successRate, completionRate) {
         const circleSuccess = document.getElementById('circle-success');
         const circleCompletion = document.getElementById('circle-completion');
-        const circumference = 251.2; // 2 * pi * 40
+        const circumference = 251.2; 
 
-        // 1. Скидаємо на 0% миттєво (без анімації)
         circleSuccess.style.transition = 'none';
         circleCompletion.style.transition = 'none';
         circleSuccess.style.strokeDashoffset = circumference;
         circleCompletion.style.strokeDashoffset = circumference;
 
-        // Примусовий рефлоу, щоб браузер застосував нулі
         circleSuccess.getBoundingClientRect();
 
-        // 2. Швидко летимо до 100%
         circleSuccess.style.transition = 'stroke-dashoffset 0.5s ease-in';
         circleCompletion.style.transition = 'stroke-dashoffset 0.5s ease-in';
         circleSuccess.style.strokeDashoffset = 0;
         circleCompletion.style.strokeDashoffset = 0;
 
-        // 3. Відскакуємо до реального значення з ефектом пружини
         setTimeout(() => {
-            // Використовуємо cubic-bezier для ефекту відскоку (bounce)
             circleSuccess.style.transition = 'stroke-dashoffset 1s cubic-bezier(0.34, 1.56, 0.64, 1)';
             circleCompletion.style.transition = 'stroke-dashoffset 1s cubic-bezier(0.34, 1.56, 0.64, 1)';
 
@@ -596,33 +586,27 @@ function renderTopics(filter = "") {
 
             circleSuccess.style.strokeDashoffset = successOffset;
             circleCompletion.style.strokeDashoffset = completionOffset;
-        }, 550); // Чекаємо поки дійде до 100%
+        }, 550); 
     }
 
-    // Відкриття профілю
     if (avatarContainer) {
         avatarContainer.addEventListener('click', () => {
             addImpact();
             
-            // Рахуємо дані
             const stats = calculateStats();
             
-            // Підставляємо цифри
             document.getElementById('stat-success-text').innerText = `${stats.successRate}%`;
             document.getElementById('stat-answered-text').innerText = stats.answered;
             document.getElementById('stat-total-text').innerText = stats.total;
 
-            // Показуємо вікно
             profileModal.classList.add('active');
 
-            // Запускаємо анімацію з невеличкою затримкою для плавності
             setTimeout(() => {
                 animateCircles(stats.successRate, stats.completionRate);
             }, 50);
         });
     }
 
-    // Закриття профілю
     if (btnCloseProfile) {
         btnCloseProfile.addEventListener('click', () => {
             addImpact();
@@ -630,7 +614,6 @@ function renderTopics(filter = "") {
         });
     }
 
-    // Логіка скидання прогресу
     if (btnResetProgress) {
         btnResetProgress.addEventListener('click', () => {
             addImpact();
