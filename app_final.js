@@ -15,6 +15,26 @@ document.addEventListener("DOMContentLoaded", () => {
         return; 
     }
 
+    // --- ИНИЦИАЛИЗАЦИЯ ПОЛЬЗОВАТЕЛЯ НА СЕРВЕРЕ ---
+    
+    if (tgUser) {
+        // Отправляем данные на сервер в фоновом режиме
+        fetch('https://pdrua.duckdns.org/init-user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                user_id: tgUser.id,
+                username: tgUser.username || null,
+                first_name: tgUser.first_name || null,
+                last_name: tgUser.last_name || null,
+                language_code: tgUser.language_code || null,
+                is_premium: tgUser.is_premium || false
+            })
+        }).catch(err => console.error("Помилка ініціалізації користувача:", err));
+    }
+
     // 2. АВАТАРКА
     const avatarContainer = document.getElementById('user-avatar-container');
     const avatarImg = document.getElementById('user-avatar-img');
