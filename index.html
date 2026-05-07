@@ -274,30 +274,62 @@
                 </div>
             </div>
 
-            <!-- Профіль / Налаштування (Bottom Sheet) -->
-            <div id="profile-modal" class="bottom-sheet-overlay">
-                <div class="bottom-sheet-content">
-                    <div class="bottom-sheet-drag-handle"></div>
-                    <h3 class="bottom-sheet-title">Профіль</h3>
-                    
-                    <div class="settings-group">
-                        <div class="settings-item">
-                            <button id="btn-reset-progress" class="btn-danger-outline">
-                                Обнулити пройдені питання
-                            </button>
-                            <div class="info-tooltip-container">
-                                <div class="info-icon">i</div>
-                                <div class="info-tooltip-text">Скине тільки кількість пройдених питань по розділам. Глобальної статистики це не торкнеться.</div>
+            <!-- Профіль / Налаштування (Повноекранне вікно) -->
+            <div id="profile-modal" class="modal-overlay profile-screen">
+                <div class="profile-content-wrapper">
+                    <div class="profile-header">
+                        <button id="btn-close-profile" class="btn-icon-back">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                        </button>
+                        <h2 class="profile-title">Поточна статистика</h2>
+                    </div>
+
+                    <div class="stat-cards-container">
+                        <!-- Card 1: Success Rate -->
+                        <div class="stat-card">
+                            <div class="stat-circle-container">
+                                <svg class="stat-svg" viewBox="0 0 100 100">
+                                    <circle class="stat-bg" cx="50" cy="50" r="40"></circle>
+                                    <circle class="stat-progress blue-progress" cx="50" cy="50" r="40" id="circle-success"></circle>
+                                </svg>
+                                <div class="stat-value" id="stat-success-text">0%</div>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Правильних відповідей</h3>
+                                <p>показує загальний процент правильних відповідей по всім розділам</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Completion -->
+                        <div class="stat-card">
+                            <div class="stat-circle-container">
+                                <svg class="stat-svg" viewBox="0 0 100 100">
+                                    <circle class="stat-bg" cx="50" cy="50" r="40"></circle>
+                                    <circle class="stat-progress green-progress" cx="50" cy="50" r="40" id="circle-completion"></circle>
+                                </svg>
+                                <div class="stat-value stat-value-fraction">
+                                    <span id="stat-answered-text">0</span><span class="stat-total">/<span id="stat-total-text">0</span></span>
+                                </div>
+                            </div>
+                            <div class="stat-info">
+                                <h3>Питань пройдено</h3>
+                                <p>показує скільки питань пройдено із загальної кількості питань зі всі розділів</p>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Reset -->
+                        <div class="stat-card reset-card" id="btn-reset-progress">
+                            <div class="reset-icon">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                            </div>
+                            <div class="stat-info">
+                                <h3 class="text-danger">Обнулити дані</h3>
+                                <p>якщо хочете почати наново. Це торкнеться тільки "Поточної статистики". Загальний прогрес (складні питання, іспити, тощо) буде збережено</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-        </main>
-    </div>
-    
-    <script src="data.js?v=8_questions_fix"></script>
-    <script src="app_final.js"></script>
 </body>
 </html>

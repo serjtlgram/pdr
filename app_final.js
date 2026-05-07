@@ -255,8 +255,8 @@ function renderTopics(filter = "") {
         // Вычисляем процент успешности (правильные / отвеченные)
         const successRate = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
         
-        // Формируем нужный текст: "9/79 • 87% пройдено"
-        const infoText = `${answeredCount}/${totalQ} &bull; ${successRate}% пройдено`;
+        // Формируем нужный текст: "9/79 • 87% вірно"
+        const infoText = `${answeredCount}/${totalQ} &bull; ${successRate}% вірно`;
         
         // Динамический цвет
         const colorClass = `c${(index % 6) + 1}`;
@@ -531,66 +531,135 @@ function renderTopics(filter = "") {
         }, 50);
     }
 
-            // --- ПРОФІЛЬ ТА СКИДАННЯ ПРОГРЕСУ (BOTTOM SHEET) ---
-            const profileModal = document.getElementById('profile-modal');
-            const btnResetProgress = document.getElementById('btn-reset-progress');
+          // --- ПРОФІЛЬ ТА СТАТИСТИКА ---
+    const profileModal = document.getElementById('profile-modal');
+    const btnCloseProfile = document.getElementById('btn-close-profile');
+    const btnResetProgress = document.getElementById('btn-reset-progress');
 
-            // Відкриття модалки при кліку на аватар
-            if (avatarContainer) {
-                avatarContainer.addEventListener('click', () => {
-                    addImpact();
-                    profileModal.classList.add('active');
-                });
-            }
+    // Функція розрахунку статистики
+    function calculateStats() {
+        const db = window.pdrData;
+        if (!db || !db.topics) return { successRate: 0, answered: 0, total: 0, completionRate: 0 };
 
-            // Закриття модалки при кліку на темний фон
-            if (profileModal) {
-                profileModal.addEventListener('click', (e) => {
-                    if (e.target === profileModal) {
-                        profileModal.classList.remove('active');
-                    }
-                });
-            }
+        const allSavedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
+        let totalExpected = 0;
+        let totalAnswered = 0;
+        let totalCorrect = 0;
 
-            // Логіка скидання прогресу
-            if (btnResetProgress) {
-                btnResetProgress.addEventListener('click', () => {
-                    addImpact();
-                    
-                    // Використовуємо нативне вікно підтвердження Telegram, якщо воно доступне
-                    const confirmMsg = "Ви впевнені, що хочете скинути прогрес по розділам?";
-                    
-                    if (tg && tg.showConfirm) {
-                        tg.showConfirm(confirmMsg, (confirmed) => {
-                            if (confirmed) executeReset();
-                        });
-                    } else {
-                        if (confirm(confirmMsg)) executeReset();
-                    }
-                });
-            }
-
-            function executeReset() {
-                // Видаляємо ТІЛЬКИ прогрес по питанням та статистику розділів
-                // Глобальний лічильник (pdr_answers_count) НЕ чіпаємо!
-                localStorage.removeItem('pdr_topic_stats');
-                localStorage.removeItem('pdr_quiz_states');
-                
-                // Оновлюємо інтерфейс плиток
-                renderTopics();
-                
-                // Закриваємо вікно профілю
-                profileModal.classList.remove('active');
-                
-                // ПРИМУСОВО перекидаємо на екран розділів, щоб користувач побачив обнулення
-                showScreen(topicsScreen, 'topics');
-                
-                // Показуємо повідомлення про успіх
-                if (tg && tg.showAlert) {
-                    tg.showAlert("Прогрес успішно скинуто!");
-                } else {
-                    alert("Прогрес успішно скинуто!");
+        db.topics.forEach(topic => {
+            totalExpected += (topic.totalQuestions || 0);
+            const topicStates = allSavedStates[topic.id] || [];
+            
+            topicStates.forEach(state => {
+                if (state && state.selectedIndex !== null) {
+                    totalAnswered++;
+                    if (state.isCorrect) totalCorrect++;
                 }
+            });
+        });
+
+        const successRate = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+        const completionRate = totalExpected > 0 ? (totalAnswered / totalExpected) : 0;
+
+        return { successRate, answered: totalAnswered, total: totalExpected, completionRate };
+    }
+
+    // Той самий "фінт вухами" - анімація кілець
+    function animateCircles(successRate, completionRate) {
+        const circleSuccess = document.getElementById('circle-success');
+        const circleCompletion = document.getElementById('circle-completion');
+        const circumference = 251.2; // 2 * pi * 40
+
+        // 1. Скидаємо на 0% миттєво (без анімації)
+        circleSuccess.style.transition = 'none';
+        circleCompletion.style.transition = 'none';
+        circleSuccess.style.strokeDashoffset = circumference;
+        circleCompletion.style.strokeDashoffset = circumference;
+
+        // Примусовий рефлоу, щоб браузер застосував нулі
+        circleSuccess.getBoundingClientRect();
+
+        // 2. Швидко летимо до 100%
+        circleSuccess.style.transition = 'stroke-dashoffset 0.5s ease-in';
+        circleCompletion.style.transition = 'stroke-dashoffset 0.5s ease-in';
+        circleSuccess.style.strokeDashoffset = 0;
+        circleCompletion.style.strokeDashoffset = 0;
+
+        // 3. Відскакуємо до реального значення з ефектом пружини
+        setTimeout(() => {
+            // Використовуємо cubic-bezier для ефекту відскоку (bounce)
+            circleSuccess.style.transition = 'stroke-dashoffset 1s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            circleCompletion.style.transition = 'stroke-dashoffset 1s cubic-bezier(0.34, 1.56, 0.64, 1)';
+
+            const successOffset = circumference - (successRate / 100) * circumference;
+            const completionOffset = circumference - completionRate * circumference;
+
+            circleSuccess.style.strokeDashoffset = successOffset;
+            circleCompletion.style.strokeDashoffset = completionOffset;
+        }, 550); // Чекаємо поки дійде до 100%
+    }
+
+    // Відкриття профілю
+    if (avatarContainer) {
+        avatarContainer.addEventListener('click', () => {
+            addImpact();
+            
+            // Рахуємо дані
+            const stats = calculateStats();
+            
+            // Підставляємо цифри
+            document.getElementById('stat-success-text').innerText = `${stats.successRate}%`;
+            document.getElementById('stat-answered-text').innerText = stats.answered;
+            document.getElementById('stat-total-text').innerText = stats.total;
+
+            // Показуємо вікно
+            profileModal.classList.add('active');
+
+            // Запускаємо анімацію з невеличкою затримкою для плавності
+            setTimeout(() => {
+                animateCircles(stats.successRate, stats.completionRate);
+            }, 50);
+        });
+    }
+
+    // Закриття профілю
+    if (btnCloseProfile) {
+        btnCloseProfile.addEventListener('click', () => {
+            addImpact();
+            profileModal.classList.remove('active');
+        });
+    }
+
+    // Логіка скидання прогресу
+    if (btnResetProgress) {
+        btnResetProgress.addEventListener('click', () => {
+            addImpact();
+            
+            const confirmMsg = "Ви впевнені, що хочете скинути поточну статистику?";
+            
+            if (tg && tg.showConfirm) {
+                tg.showConfirm(confirmMsg, (confirmed) => {
+                    if (confirmed) executeReset();
+                });
+            } else {
+                if (confirm(confirmMsg)) executeReset();
             }
+        });
+    }
+
+    function executeReset() {
+        localStorage.removeItem('pdr_topic_stats');
+        localStorage.removeItem('pdr_quiz_states');
+        
+        renderTopics();
+        profileModal.classList.remove('active');
+        showScreen(topicsScreen, 'topics');
+        
+        if (tg && tg.showAlert) {
+            tg.showAlert("Дані успішно обнулено!");
+        } else {
+            alert("Дані успішно обнулено!");
+        }
+    }
 
 });
