@@ -190,6 +190,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function goBack() {
         addImpact();
+        
+        // 1. Перевіряємо, чи відкрите вікно статистики
+        const profileModal = document.getElementById('profile-modal');
+        if (profileModal && profileModal.classList.contains('active')) {
+            profileModal.classList.remove('active');
+            
+            // Повертаємо кнопку Telegram у правильний стан
+            if (tg && tg.BackButton) {
+                if (currentScreenName === 'home') tg.BackButton.hide();
+                else tg.BackButton.show();
+            }
+            return; // Зупиняємо функцію, щоб не вийти ще далі
+        }
+
+        // 2. Стандартна логіка повернення між екранами
         if (currentScreenName === 'quiz') {
             showScreen(topicsScreen, 'topics');
             renderTopics(); 
@@ -601,18 +616,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
             profileModal.classList.add('active');
 
+            // Примусово показуємо кнопку "Назад" від Telegram
+            if (tg && tg.BackButton) {
+                tg.BackButton.show();
+            }
+
             setTimeout(() => {
                 animateCircles(stats.successRate, stats.completionRate);
             }, 50);
         });
     }
 
-    if (btnCloseProfile) {
-        btnCloseProfile.addEventListener('click', () => {
-            addImpact();
-            profileModal.classList.remove('active');
-        });
-    }
+  
 
     if (btnResetProgress) {
         btnResetProgress.addEventListener('click', () => {

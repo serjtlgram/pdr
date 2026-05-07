@@ -557,7 +557,7 @@
 
 .stat-value-fraction {
   flex-direction: row;
-  align-items: baseline;
+  align-items: center;
   gap: 2px;
 }
 
