@@ -622,7 +622,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (successRate <= 30) {
             text = "Схоже, правила поки що<br>керують вами 😅";
-            iconLeft = "🔰"; iconRight = "📚";
+            iconLeft = "🚨"; iconRight = "⚠️";
         } else if (successRate <= 45) {
             text = "Ви вже розумієте, що «головна дорога» —<br>це не життєва позиція";
             iconLeft = "🛣️"; iconRight = "🤔";
