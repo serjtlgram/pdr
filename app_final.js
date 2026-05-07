@@ -215,63 +215,84 @@ document.addEventListener("DOMContentLoaded", () => {
         "topic_8": `<svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="17" r="2"/></svg>` // Світлофор
     };
 
-    // --- 4. НОВАЯ ОТРИСОВКА РАЗДЕЛОВ (ПЛИТКА) ---
-    function renderTopics(filter = "") {
-        const grid = document.getElementById('topics-grid');
-        if (!grid) return;
+// --- 4. НОВАЯ ОТРИСОВКА РАЗДЕЛОВ (ПЛИТКА) ---
+function renderTopics(filter = "") {
+    const grid = document.getElementById('topics-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = "";
+    
+    const db = window.pdrData;
+    if (!db || !db.topics) return;
+
+    // Берем детальную статистику по каждому вопросу (тут есть и правильные, и неправильные)
+    const allSavedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
+
+    const filtered = db.topics.filter(t => 
+        t.title.toLowerCase().includes(filter.toLowerCase())
+    );
+
+    filtered.forEach((topic, index) => {
+        const totalQ = topic.totalQuestions || 0;
+        const topicStates = allSavedStates[topic.id] || [];
         
-        grid.innerHTML = "";
-        
-        const db = window.pdrData;
-        if (!db || !db.topics) return;
+        let answeredCount = 0;
+        let correctCount = 0;
 
-        const stats = JSON.parse(localStorage.getItem('pdr_topic_stats') || "{}");
-
-        const filtered = db.topics.filter(t => 
-            t.title.toLowerCase().includes(filter.toLowerCase())
-        );
-
-        filtered.forEach((topic, index) => {
-            const totalQ = topic.totalQuestions || 0;
-            const solved = stats[topic.id] || 0;
-            const progressPercent = totalQ > 0 ? Math.min(100, Math.round((solved / totalQ) * 100)) : 0;
-            
-            // Динамический цвет
-            const colorClass = `c${(index % 6) + 1}`;
-            
-            // Беремо сучасну іконку зі словника, або залишаємо емодзі як запасний варіант
-            const iconHtml = modernIcons[topic.id] || `<span style="font-size: 1.5rem;">${topic.icon || "🚦"}</span>`;
-
-            const card = document.createElement('div');
-            card.className = `topic-card ${colorClass}`;
-            
-            // Добавили обертку topic-header и иконку-стрелочку (chevron)
-            card.innerHTML = `
-                <div class="topic-header">
-                    <div class="topic-icon-wrapper">${iconHtml}</div>
-                    <div class="topic-chevron">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                    </div>
-                </div>
-                <div class="topic-title">${topic.title}</div>
-                <div class="topic-info">
-                    <span>${solved}/${totalQ} питань</span>
-                    <div class="topic-progress-bg">
-                        <div class="topic-progress-fill" style="width: ${progressPercent}%"></div>
-                    </div>
-                </div>
-            `;
-            
-            card.onclick = () => {
-                addImpact();
-                startQuiz(topic);
-            };
-            
-            grid.appendChild(card);
+        // Подсчитываем сколько всего отвечено и сколько из них правильно
+        topicStates.forEach(state => {
+            if (state && state.selectedIndex !== null) {
+                answeredCount++;
+                if (state.isCorrect) {
+                    correctCount++;
+                }
+            }
         });
-    }
+
+        // Прогресс-бар теперь показывает процент ПРОХОЖДЕНИЯ (отвеченные / всего вопросов)
+        const progressPercent = totalQ > 0 ? Math.min(100, Math.round((answeredCount / totalQ) * 100)) : 0;
+        
+        // Вычисляем процент успешности (правильные / отвеченные)
+        const successRate = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+        
+        // Формируем нужный текст: "9/79 • 87% пройдено"
+        const infoText = `${answeredCount}/${totalQ} &bull; ${successRate}% пройдено`;
+        
+        // Динамический цвет
+        const colorClass = `c${(index % 6) + 1}`;
+        
+        // Беремо сучасну іконку зі словника, або залишаємо емодзі як запасний варіант
+        const iconHtml = modernIcons[topic.id] || `<span style="font-size: 1.5rem;">${topic.icon || "🚦"}</span>`;
+
+        const card = document.createElement('div');
+        card.className = `topic-card ${colorClass}`;
+        
+        card.innerHTML = `
+            <div class="topic-header">
+                <div class="topic-icon-wrapper">${iconHtml}</div>
+                <div class="topic-chevron">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </div>
+            </div>
+            <div class="topic-title">${topic.title}</div>
+            <div class="topic-info">
+                <span>${infoText}</span>
+                <div class="topic-progress-bg">
+                    <div class="topic-progress-fill" style="width: ${progressPercent}%"></div>
+                </div>
+            </div>
+        `;
+        
+        card.onclick = () => {
+            addImpact();
+            startQuiz(topic);
+        };
+        
+        grid.appendChild(card);
+    });
+}
 
     // Поиск
     const searchInput = document.getElementById('topic-search');
