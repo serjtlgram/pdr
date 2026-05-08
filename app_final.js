@@ -289,6 +289,33 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    if (cardHard) {
+        cardHard.addEventListener('click', () => {
+            addImpact();
+            if(tg && tg.showAlert) {
+                tg.showAlert("Розділ складних питань знаходиться в розробці! Збираємо вашу статистику 📊");
+            } else {
+                alert("Розділ складних питань знаходиться в розробці!");
+            }
+        });
+    } // <--- ОСЬ ЦЯ ДУЖКА ЗАКРИВАЄ cardHard
+
+    // --- Логіка для неактивних категорій ПДР ---
+    const inactiveCategories = document.querySelectorAll('.category-btn.inactive');
+    inactiveCategories.forEach(btn => {
+        btn.addEventListener('click', () => {
+            addImpact(); // Вібрація
+            const catName = btn.getAttribute('data-cat');
+            const msg = `Категорія "${catName}" знаходиться в розробці! 🚧\n\nЗараз для вивчення доступна тільки категорія "B" (Легкові автомобілі).`;
+            
+            if(tg && tg.showAlert) {
+                tg.showAlert(msg);
+            } else {
+                alert(msg);
+            }
+        });
+    });
+
     // --- СЛОВНИК СУЧАСНИХ SVG ІКОНОК ДЛЯ РОЗДІЛІВ ---
     const modernIcons = {
         "topic_1": `<svg viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>`, 

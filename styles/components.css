@@ -779,3 +779,54 @@ body.light-theme .info-icon {
   background: #f8fafc;
   border-color: #e2e8f0;
 }
+
+/* --- Блок Категорій ПДР --- */
+.categories-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.category-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 0;
+  border-radius: 30px; /* Форма пігулки */
+  background: transparent;
+  border: 1px solid var(--c-border-soft);
+  color: var(--c-text-soft);
+  cursor: pointer;
+  transition: all var(--tr-fast);
+}
+
+.category-btn.active {
+  border-color: var(--c-primary);
+  color: var(--c-primary);
+  background: var(--c-primary-soft);
+  box-shadow: 0 0 20px rgba(66, 133, 244, 0.15);
+}
+
+.category-btn.inactive:active {
+  transform: scale(0.92);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.cat-letter {
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.category-btn svg {
+  width: 24px;
+  height: 24px;
+  opacity: 0.8;
+}
+
+.category-btn.active svg {
+  opacity: 1;
+}
