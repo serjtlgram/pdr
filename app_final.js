@@ -501,20 +501,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!q) {
             // Если мы точно знаем, что на сервере больше нет вопросов
             if (noMoreQuestionsOnServer) {
-                document.getElementById('quiz-question-text').innerText = "Наступні питання будуть додані пізніше 🚧";
-                document.getElementById('quiz-options').innerHTML = "";
-                
-                const imgEl = document.getElementById('quiz-image');
-                if (imgEl) imgEl.parentElement.style.display = 'none';
-                
-                const nextBtn = document.getElementById('btn-next-question');
-                nextBtn.style.display = 'block';
-                nextBtn.innerText = 'Завершити розділ';
-                nextBtn.onclick = () => {
-                    addImpact();
-                    showScreen(topicsScreen, 'topics'); 
-                    renderTopics(); 
-                };
+                // Возвращаем пользователя на последний доступный вопрос
+                currentQuestionIndex = currentQuestions.length - 1;
+                showToast("Наступні питання будуть додані пізніше 🚧");
+                renderQuestion();
                 return;
             }
 
@@ -822,6 +812,49 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             alert("Дані успішно обнулено!");
         }
+    }
+
+    // --- ФУНКЦІЯ ДЛЯ СПЛИВАЮЧИХ ПОВІДОМЛЕНЬ (TOAST) ---
+    function showToast(message) {
+        let toast = document.getElementById('app-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'app-toast';
+            toast.style.position = 'fixed';
+            toast.style.bottom = '100px'; 
+            toast.style.left = '50%';
+            toast.style.transform = 'translateX(-50%)';
+            toast.style.backgroundColor = 'var(--c-surface)';
+            toast.style.color = 'var(--c-text)';
+            toast.style.border = '1px solid var(--c-border-soft)';
+            toast.style.padding = '12px 24px';
+            toast.style.borderRadius = '100px';
+            toast.style.fontSize = '0.95rem';
+            toast.style.fontWeight = '600';
+            toast.style.zIndex = '10000';
+            toast.style.textAlign = 'center';
+            toast.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
+            toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            toast.style.whiteSpace = 'nowrap';
+            document.body.appendChild(toast);
+        }
+        
+        toast.innerHTML = message;
+        toast.style.opacity = '0';
+        toast.style.transform = 'translate(-50%, 10px)';
+        toast.style.display = 'block';
+        
+        setTimeout(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translate(-50%, 0)';
+        }, 10);
+        
+        clearTimeout(toast.hideTimeout);
+        toast.hideTimeout = setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translate(-50%, 10px)';
+            setTimeout(() => { toast.style.display = 'none'; }, 300);
+        }, 3000);
     }
 
 });
