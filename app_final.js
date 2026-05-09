@@ -34,10 +34,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- ПРЕДЗАГРУЗКА РАЗДЕЛОВ В ФОНЕ ---
-    fetch('https://pdrua.duckdns.org/api/topics')
+    // Начинаем грузить данные сразу при открытии мини-аппа и сохраняем этот процесс
+    topicsPromise = fetch('https://pdrua.duckdns.org/api/topics')
         .then(res => res.json())
-        .then(data => { globalTopics = data; })
-        .catch(e => console.error(e));
+        .catch(e => { console.error(e); return[]; });
+        
+    topicsPromise.then(data => { 
+        if (data && data.length > 0) globalTopics = data; 
+    });
 
     // 2. АВАТАРКА
     const avatarContainer = document.getElementById('user-avatar-container');
@@ -75,22 +79,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let noMoreQuestionsOnServer = false; // Флаг, если вопросы в базе закончились
 
     // Резервная копия разделов для моментальной загрузки
-    let globalTopics = [
-        { id: "topic_1", title: "1. Загальні положення", totalQuestions: 79 },
-        { id: "topic_2", title: "2. Обов'язки і права водіїв механічних транспортних засобів", totalQuestions: 39 },
-        { id: "topic_3", title: "3. Рух транспортних засобів із спеціальними сигналами", totalQuestions: 15 },
-        { id: "topic_4", title: "4. Обов'язки і права пішоходів", totalQuestions: 14 },
-        { id: "topic_5", title: "5. Обов'язки і права пасажирів", totalQuestions: 5 },
-        { id: "topic_6", title: "6. Вимоги до велосипедистів", totalQuestions: 14 },
-        { id: "topic_7", title: "7. Вимоги до осіб, які керують гужовим транспортом, і погоничів тварин", totalQuestions: 4 },
-        { id: "topic_8", title: "8. Регулювання дорожнього руху", totalQuestions: 104 },
-        { id: "topic_9", title: "9. Попереджувальні сигнали", totalQuestions: 60 },
-        { id: "topic_10", title: "10. Початок руху та зміна його напрямку", totalQuestions: 68 },
-        { id: "topic_11", title: "11. Розташування транспортних засобів на дорозі", totalQuestions: 52 },
-        { id: "topic_12", title: "12. Швидкість руху", totalQuestions: 33 },
-        { id: "topic_13", title: "13. Дистанція, інтервал, зустрічний роз'їзд", totalQuestions: 16 },
-        { id: "topic_14", title: "14. Обгін", totalQuestions: 24 }
-    ];
+    let globalTopics =[]; // Никаких заготовок, только пустой массив
+    let topicsPromise = null; // Сохраняем запрос, чтобы не дублировать его
 
     // 3. ЛОГИКА ПОДПИСКИ
     let totalAnswersGiven = parseInt(localStorage.getItem('pdr_answers_count') || '0');
@@ -326,21 +316,42 @@ document.addEventListener("DOMContentLoaded", () => {
         const grid = document.getElementById('topics-grid');
         if (!grid) return;
         
-        grid.innerHTML = '<div style="text-align:center; width:100%; padding: 20px; color: var(--c-text-soft);">Завантаження розділів...</div>';
+        // КРАСИВАЯ ПЛАШКА ЗАГРУЗКИ (Скелетон-анимация)
+        if (globalTopics.length === 0) {
+            grid.innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+                    ${[1, 2, 3, 4, 5].map(() => `
+                        <div style="height: 84px; border-radius: 16px; background: var(--c-surface); border: 1px solid var(--c-border-soft); animation: pulse 1.5s infinite ease-in-out; display: flex; align-items: center; padding: 16px; gap: 16px;">
+                            <div style="width: 48px; height: 48px; border-radius: 12px; background: var(--c-bg); opacity: 0.7;"></div>
+                            <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                                <div style="height: 14px; width: 70%; background: var(--c-bg); border-radius: 6px; opacity: 0.7;"></div>
+                                <div style="height: 12px; width: 40%; background: var(--c-bg); border-radius: 6px; opacity: 0.5;"></div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <style>
+                    @keyframes pulse {
+                        0% { opacity: 0.5; }
+                        50% { opacity: 1; }
+                        100% { opacity: 0.5; }
+                    }
+                </style>
+            `;
+        }
         
         try {
-            // Сразу очищаем надпись "Завантаження..."
-            grid.innerHTML = "";
+            // УМНОЕ ОЖИДАНИЕ: Если запрос уже пошел при старте приложения, просто ждем его результат!
+            if (globalTopics.length === 0) {
+                if (topicsPromise) {
+                    globalTopics = await topicsPromise;
+                } else {
+                    const response = await fetch('https://pdrua.duckdns.org/api/topics');
+                    globalTopics = await response.json();
+                }
+            }
             
-            // Запускаем фоновое обновление с сервера (не ждем его!)
-            fetch('https://pdrua.duckdns.org/api/topics')
-                .then(res => res.json())
-                .then(data => {
-                    if (data && data.length > 0) {
-                        globalTopics = data; // Обновляем данные
-                    }
-                })
-                .catch(e => console.error("Фонове оновлення не вдалося:", e));
+            grid.innerHTML = ""; // Очищаем скелетоны
 
             const allSavedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
 
