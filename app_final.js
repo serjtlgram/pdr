@@ -71,9 +71,26 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentQuestionIndex = 0;
     let currentScreenName = 'home';
     let questionStates = []; 
-    let globalTopics = []; // Храним разделы с сервера
     let isLoadingQuestions = false; // Флаг загрузки вопросов
     let noMoreQuestionsOnServer = false; // Флаг, если вопросы в базе закончились
+
+    // Резервная копия разделов для моментальной загрузки
+    let globalTopics = [
+        { id: "topic_1", title: "1. Загальні положення", totalQuestions: 79 },
+        { id: "topic_2", title: "2. Обов'язки і права водіїв механічних транспортних засобів", totalQuestions: 39 },
+        { id: "topic_3", title: "3. Рух транспортних засобів із спеціальними сигналами", totalQuestions: 15 },
+        { id: "topic_4", title: "4. Обов'язки і права пішоходів", totalQuestions: 14 },
+        { id: "topic_5", title: "5. Обов'язки і права пасажирів", totalQuestions: 5 },
+        { id: "topic_6", title: "6. Вимоги до велосипедистів", totalQuestions: 14 },
+        { id: "topic_7", title: "7. Вимоги до осіб, які керують гужовим транспортом, і погоничів тварин", totalQuestions: 4 },
+        { id: "topic_8", title: "8. Регулювання дорожнього руху", totalQuestions: 104 },
+        { id: "topic_9", title: "9. Попереджувальні сигнали", totalQuestions: 60 },
+        { id: "topic_10", title: "10. Початок руху та зміна його напрямку", totalQuestions: 68 },
+        { id: "topic_11", title: "11. Розташування транспортних засобів на дорозі", totalQuestions: 52 },
+        { id: "topic_12", title: "12. Швидкість руху", totalQuestions: 33 },
+        { id: "topic_13", title: "13. Дистанція, інтервал, зустрічний роз'їзд", totalQuestions: 16 },
+        { id: "topic_14", title: "14. Обгін", totalQuestions: 24 }
+    ];
 
     // 3. ЛОГИКА ПОДПИСКИ
     let totalAnswersGiven = parseInt(localStorage.getItem('pdr_answers_count') || '0');
@@ -312,13 +329,19 @@ document.addEventListener("DOMContentLoaded", () => {
         grid.innerHTML = '<div style="text-align:center; width:100%; padding: 20px; color: var(--c-text-soft);">Завантаження розділів...</div>';
         
         try {
-            // Если разделы еще не загружены, грузим с сервера
-            if (globalTopics.length === 0) {
-                const response = await fetch('https://pdrua.duckdns.org/api/topics');
-                globalTopics = await response.json();
-            }
-            
+            // Сразу очищаем надпись "Завантаження..."
             grid.innerHTML = "";
+            
+            // Запускаем фоновое обновление с сервера (не ждем его!)
+            fetch('https://pdrua.duckdns.org/api/topics')
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        globalTopics = data; // Обновляем данные
+                    }
+                })
+                .catch(e => console.error("Фонове оновлення не вдалося:", e));
+
             const allSavedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
 
             const filtered = globalTopics.filter(t => 
