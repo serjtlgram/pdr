@@ -315,23 +315,25 @@ document.addEventListener("DOMContentLoaded", () => {
         const grid = document.getElementById('topics-grid');
         if (!grid) return;
         
-       // КРАСИВАЯ ПЛАШКА ЗАГРУЗКИ (Круговий спінер)
-       if (globalTopics.length === 0) {
-        grid.innerHTML = `
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; padding: 60px 0; gap: 16px;">
-                <svg width="44" height="44" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="animation: spin 1s linear infinite;">
-                    <circle cx="12" cy="12" r="10" fill="none" stroke="var(--c-border-soft)" stroke-width="3"></circle>
-                    <path d="M12 2 A 10 10 0 0 1 22 12" fill="none" stroke="#3B82F6" stroke-width="3" stroke-linecap="round"></path>
-                </svg>
-                <div style="color: var(--c-text-soft); font-size: 0.95rem; font-weight: 500;">Завантаження розділів...</div>
-            </div>
-            <style>
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-            </style>
-        `;
+        // КРАСИВАЯ ПЛАШКА ЗАГРУЗКИ (Круговий спінер по центру)
+        if (globalTopics.length === 0) {
+            grid.innerHTML = `
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; width: 100%;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="animation: spin 1s linear infinite;">
+                        <circle cx="12" cy="12" r="10" fill="none" stroke="var(--c-border-soft)" stroke-width="3"></circle>
+                        <path d="M12 2 A 10 10 0 0 1 22 12" fill="none" stroke="#3B82F6" stroke-width="3" stroke-linecap="round"></path>
+                    </svg>
+                    <div style="color: var(--c-text-soft); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 1.05rem; font-weight: 600; letter-spacing: 0.3px; opacity: 0.8;">
+                        Завантаження розділів...
+                    </div>
+                </div>
+                <style>
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                </style>
+            `;
         }
         
         try {
