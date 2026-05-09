@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- ПРЕДЗАГРУЗКА РАЗДЕЛОВ В ФОНЕ ---
     // Начинаем грузить данные сразу при открытии мини-аппа и сохраняем этот процесс
-    topicsPromise = fetch('https://pdrua.duckdns.org/api/topics')
+    let topicsPromise = fetch('https://pdrua.duckdns.org/api/topics')
         .then(res => res.json())
         .catch(e => { console.error(e); return[]; });
         
@@ -80,7 +80,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Резервная копия разделов для моментальной загрузки
     let globalTopics =[]; // Никаких заготовок, только пустой массив
-    let topicsPromise = null; // Сохраняем запрос, чтобы не дублировать его
 
     // 3. ЛОГИКА ПОДПИСКИ
     let totalAnswersGiven = parseInt(localStorage.getItem('pdr_answers_count') || '0');
