@@ -1,5 +1,5 @@
 // ==========================================
-// ИНИЦИАЛИЗАЦИЯ И ЛОГИКА (ПОЛНАЯ ВЕРСИЯ)
+// ИНИЦИАЛИЗАЦИЯ И ЛОГИКА (ПОЛНАЯ ВЕРСИЯ С СЕРВЕРОМ)
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
     
@@ -16,9 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- ИНИЦИАЛИЗАЦИЯ ПОЛЬЗОВАТЕЛЯ НА СЕРВЕРЕ ---
-    
     if (tgUser) {
-        // Отправляем данные на сервер в фоновом режиме
         fetch('https://pdrua.duckdns.org/init-user', {
             method: 'POST',
             headers: {
@@ -49,7 +47,6 @@ document.addEventListener("DOMContentLoaded", () => {
             avatarContainer.innerHTML = tgUser.first_name ? tgUser.first_name.charAt(0).toUpperCase() : '👤';
         }
     } else if (avatarContainer) {
-        // Для тестування в браузері без Telegram
         avatarContainer.style.display = 'flex';
         avatarImg.style.display = 'none';
         avatarContainer.innerHTML = '👤';
@@ -62,14 +59,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const topicsScreen = document.getElementById('topics-screen');
     const quizScreen = document.getElementById('quiz-screen');
     
-    // Состояние теста
+    // Состояние теста и глобальные переменные
     let currentTopic = null; 
     let currentQuestions = [];
     let currentQuestionIndex = 0;
     let currentScreenName = 'home';
     let questionStates = []; 
+    let globalTopics = []; // Храним разделы с сервера
+    let isLoadingQuestions = false; // Флаг загрузки вопросов
 
-    // 3. ЛОГИКА ПОДПИСКИ (Строгая)
+    // 3. ЛОГИКА ПОДПИСКИ
     let totalAnswersGiven = parseInt(localStorage.getItem('pdr_answers_count') || '0');
     let isUserVerified = (totalAnswersGiven < 2); 
     let isCheckingNow = false; 
@@ -114,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
         window.addImpact = function() {}; 
     }
 
-    // --- Переключение тем с сохранением в Telegram CloudStorage ---
+    // --- Переключение тем ---
     const themeToggleBtn = document.getElementById('theme-toggle');
     const themeIcon = document.getElementById('theme-icon');
 
@@ -149,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- Фоновая (тихая) проверка ---
+    // --- Фоновая проверка подписки ---
     async function runSilentVerification() {
         if (!userId || isCheckingNow) return;
         isCheckingNow = true;
@@ -166,7 +165,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // --- Кнопка в модальном окне ---
     const subModal = document.getElementById('sub-modal');
     const btnCheckSub = document.getElementById('btn-check-sub');
     if (btnCheckSub) {
@@ -211,20 +209,16 @@ document.addEventListener("DOMContentLoaded", () => {
     function goBack() {
         addImpact();
         
-        // 1. Перевіряємо, чи відкрите вікно статистики
         const profileModal = document.getElementById('profile-modal');
         if (profileModal && profileModal.classList.contains('active')) {
             profileModal.classList.remove('active');
-            
-            // Повертаємо кнопку Telegram у правильний стан
             if (tg && tg.BackButton) {
                 if (currentScreenName === 'home') tg.BackButton.hide();
                 else tg.BackButton.show();
             }
-            return; // Зупиняємо функцію, щоб не вийти ще далі
+            return; 
         }
 
-        // 2. Стандартна логіка повернення між екранами
         if (currentScreenName === 'quiz') {
             showScreen(topicsScreen, 'topics');
             renderTopics(); 
@@ -254,7 +248,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- Логіка нових карток на головній сторінці ---
     const cardLearning = document.getElementById('card-learning');
     const cardExam = document.getElementById('card-exam');
     const cardHard = document.getElementById('card-hard');
@@ -270,53 +263,30 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cardExam) {
         cardExam.addEventListener('click', () => {
             addImpact();
-            if(tg && tg.showAlert) {
-                tg.showAlert("Режим іспиту знаходиться в розробці! Скоро додамо 🚀");
-            } else {
-                alert("Режим іспиту знаходиться в розробці!");
-            }
+            if(tg && tg.showAlert) tg.showAlert("Режим іспиту знаходиться в розробці! Скоро додамо 🚀");
+            else alert("Режим іспиту знаходиться в розробці!");
         });
     }
 
     if (cardHard) {
         cardHard.addEventListener('click', () => {
             addImpact();
-            if(tg && tg.showAlert) {
-                tg.showAlert("Розділ складних питань знаходиться в розробці! Збираємо вашу статистику 📊");
-            } else {
-                alert("Розділ складних питань знаходиться в розробці!");
-            }
+            if(tg && tg.showAlert) tg.showAlert("Розділ складних питань знаходиться в розробці! Збираємо вашу статистику 📊");
+            else alert("Розділ складних питань знаходиться в розробці!");
         });
     }
 
-    if (cardHard) {
-        cardHard.addEventListener('click', () => {
-            addImpact();
-            if(tg && tg.showAlert) {
-                tg.showAlert("Розділ складних питань знаходиться в розробці! Збираємо вашу статистику 📊");
-            } else {
-                alert("Розділ складних питань знаходиться в розробці!");
-            }
-        });
-    } // <--- ОСЬ ЦЯ ДУЖКА ЗАКРИВАЄ cardHard
-
-    // --- Логіка для неактивних категорій ПДР ---
     const inactiveCategories = document.querySelectorAll('.category-btn.inactive');
     inactiveCategories.forEach(btn => {
         btn.addEventListener('click', () => {
-            addImpact(); // Вібрація
+            addImpact(); 
             const catName = btn.getAttribute('data-cat');
             const msg = `Категорія "${catName}" знаходиться в розробці! 🚧\n\nЗараз для вивчення доступна тільки категорія "B" (Легкові автомобілі).`;
-            
-            if(tg && tg.showAlert) {
-                tg.showAlert(msg);
-            } else {
-                alert(msg);
-            }
+            if(tg && tg.showAlert) tg.showAlert(msg);
+            else alert(msg);
         });
     });
 
-    // --- СЛОВНИК СУЧАСНИХ SVG ІКОНОК ДЛЯ РОЗДІЛІВ ---
     const modernIcons = {
         "topic_1": `<svg viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>`, 
         "topic_2": `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2v10M12 22v-6M4.93 4.93l4.24 4.24M19.07 19.07l-4.24-4.24M19.07 4.93l-4.24 4.24M4.93 19.07l4.24-4.24"/></svg>`, 
@@ -328,87 +298,93 @@ document.addEventListener("DOMContentLoaded", () => {
         "topic_8": `<svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="17" r="2"/></svg>` 
     };
 
-    // --- 4. НОВАЯ ОТРИСОВКА РАЗДЕЛОВ (ПЛИТКА) ---
-    function renderTopics(filter = "") {
+    // --- 4. ОТРИСОВКА РАЗДЕЛОВ (С СЕРВЕРА) ---
+    async function renderTopics(filter = "") {
         const grid = document.getElementById('topics-grid');
         if (!grid) return;
         
-        grid.innerHTML = "";
+        grid.innerHTML = '<div style="text-align:center; width:100%; padding: 20px; color: var(--c-text-soft);">Завантаження розділів...</div>';
         
-        const db = window.pdrData;
-        if (!db || !db.topics) return;
-
-        const allSavedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
-
-        const filtered = db.topics.filter(t => 
-            t.title.toLowerCase().includes(filter.toLowerCase())
-        );
-
-        filtered.forEach((topic, index) => {
-            const totalQ = topic.totalQuestions || 0;
-            const topicStates = allSavedStates[topic.id] || [];
+        try {
+            // Если разделы еще не загружены, грузим с сервера
+            if (globalTopics.length === 0) {
+                const response = await fetch('https://pdrua.duckdns.org/api/topics');
+                globalTopics = await response.json();
+            }
             
-            let answeredCount = 0;
-            let correctCount = 0;
+            grid.innerHTML = "";
+            const allSavedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
 
-            topicStates.forEach(state => {
-                if (state && state.selectedIndex !== null) {
-                    answeredCount++;
-                    if (state.isCorrect) {
-                        correctCount++;
+            const filtered = globalTopics.filter(t => 
+                t.title.toLowerCase().includes(filter.toLowerCase())
+            );
+
+            filtered.forEach((topic, index) => {
+                const totalQ = topic.totalQuestions || 0;
+                const topicStates = allSavedStates[topic.id] || [];
+                
+                let answeredCount = 0;
+                let correctCount = 0;
+
+                topicStates.forEach(state => {
+                    if (state && state.selectedIndex !== null) {
+                        answeredCount++;
+                        if (state.isCorrect) correctCount++;
                     }
-                }
+                });
+
+                const progressPercent = totalQ > 0 ? Math.min(100, Math.round((answeredCount / totalQ) * 100)) : 0;
+                const successRate = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+                const infoText = `${answeredCount}/${totalQ} &bull; ${successRate}% вірно`;
+                const colorClass = `c${(index % 6) + 1}`;
+                const iconHtml = modernIcons[topic.id] || `<span style="font-size: 1.5rem;">${topic.icon || "🚦"}</span>`;
+
+                const card = document.createElement('div');
+                card.className = `topic-card ${colorClass}`;
+                
+                card.innerHTML = `
+                    <div class="topic-header">
+                        <div class="topic-icon-wrapper">${iconHtml}</div>
+                        <div class="topic-chevron">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="topic-title">${topic.title}</div>
+                    <div class="topic-info">
+                        <span>${infoText}</span>
+                        <div class="topic-progress-bg">
+                            <div class="topic-progress-fill" style="width: ${progressPercent}%"></div>
+                        </div>
+                    </div>
+                `;
+                
+                card.onclick = () => {
+                    addImpact();
+                    startQuiz(topic);
+                };
+                
+                grid.appendChild(card);
             });
-
-            const progressPercent = totalQ > 0 ? Math.min(100, Math.round((answeredCount / totalQ) * 100)) : 0;
-            const successRate = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
-            const infoText = `${answeredCount}/${totalQ} &bull; ${successRate}% вірно`;
-            const colorClass = `c${(index % 6) + 1}`;
-            const iconHtml = modernIcons[topic.id] || `<span style="font-size: 1.5rem;">${topic.icon || "🚦"}</span>`;
-
-            const card = document.createElement('div');
-            card.className = `topic-card ${colorClass}`;
-            
-            card.innerHTML = `
-                <div class="topic-header">
-                    <div class="topic-icon-wrapper">${iconHtml}</div>
-                    <div class="topic-chevron">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                    </div>
-                </div>
-                <div class="topic-title">${topic.title}</div>
-                <div class="topic-info">
-                    <span>${infoText}</span>
-                    <div class="topic-progress-bg">
-                        <div class="topic-progress-fill" style="width: ${progressPercent}%"></div>
-                    </div>
-                </div>
-            `;
-            
-            card.onclick = () => {
-                addImpact();
-                startQuiz(topic);
-            };
-            
-            grid.appendChild(card);
-        });
+        } catch (error) {
+            console.error("Помилка завантаження розділів:", error);
+            grid.innerHTML = '<div style="text-align:center; color: var(--c-danger);">Помилка з\'єднання з сервером</div>';
+        }
     }
 
-    // Поиск
     const searchInput = document.getElementById('topic-search');
     if (searchInput) {
         searchInput.addEventListener('input', (e) => renderTopics(e.target.value));
     }
 
-    // --- Логика Теста ---
-    function startQuiz(topic) {
+    // --- 5. ЛОГИКА ТЕСТА (LAZY LOADING) ---
+    async function startQuiz(topic) {
         currentTopic = topic;
         document.getElementById('quiz-topic-name').innerText = topic.title;
-        currentQuestions = window.pdrData.questions.filter(q => q.topicId === topic.id);
         
-        const total = topic.totalQuestions || currentQuestions.length || 79;
+        currentQuestions = []; // Очищаем старые вопросы
+        const total = topic.totalQuestions || 79;
         
         questionStates = Array(total).fill(null).map(() => ({ selectedIndex: null, isCorrect: null }));
         
@@ -422,21 +398,34 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         let firstUnanswered = questionStates.findIndex(state => state.selectedIndex === null);
+        currentQuestionIndex = firstUnanswered !== -1 ? firstUnanswered : 0;
         
-        if (firstUnanswered !== -1 && firstUnanswered < currentQuestions.length) {
-            currentQuestionIndex = firstUnanswered; 
-        } else if (firstUnanswered === -1 && currentQuestions.length > 0) {
-            currentQuestionIndex = currentQuestions.length - 1; 
-        } else {
-            currentQuestionIndex = 0; 
-        }
+        showScreen(quizScreen, 'quiz');
+        document.getElementById('quiz-question-text').innerText = "Завантаження питань...";
+        document.getElementById('quiz-options').innerHTML = "";
         
-        if (currentQuestions.length > 0) {
-            renderQuestion();
-            showScreen(quizScreen, 'quiz');
-        } else {
-            if(tg && tg.showAlert) tg.showAlert("Питання для цього розділу ще не додані!");
-            else alert("Питання для цього розділу ще не додані!");
+        // Загружаем первую партию вопросов
+        const offset = Math.max(0, currentQuestionIndex - 5);
+        await fetchQuestionsChunk(topic.id, offset, 20);
+        
+        renderQuestion();
+    }
+
+    async function fetchQuestionsChunk(topicId, offset, limit = 20) {
+        if (isLoadingQuestions) return;
+        isLoadingQuestions = true;
+
+        try {
+            const response = await fetch(`https://pdrua.duckdns.org/api/questions?topicId=${topicId}&offset=${offset}&limit=${limit}`);
+            const newQuestions = await response.json();
+            
+            newQuestions.forEach((q, i) => {
+                currentQuestions[offset + i] = q;
+            });
+        } catch (error) {
+            console.error("Помилка завантаження питань:", error);
+        } finally {
+            isLoadingQuestions = false;
         }
     }
 
@@ -444,29 +433,29 @@ document.addEventListener("DOMContentLoaded", () => {
         const navBar = document.getElementById('question-nav-bar');
         navBar.innerHTML = '';
 
-        const total = currentTopic.totalQuestions || currentQuestions.length || 79;
+        const total = currentTopic.totalQuestions || 79;
 
         for (let i = 0; i < total; i++) {
             const btn = document.createElement('button');
             btn.className = 'nav-btn';
             btn.innerText = i + 1;
             
-            if (i < currentQuestions.length) {
-                if (i === currentQuestionIndex) btn.classList.add('active');
-                
-                const state = questionStates[i];
-                if (state && state.isCorrect === true) btn.classList.add('correct');
-                else if (state && state.isCorrect === false) btn.classList.add('wrong');
-                
-                btn.addEventListener('click', () => {
-                    addImpact();
-                    currentQuestionIndex = i;
-                    renderQuestion();
-                });
-            } else {
+            if (i === currentQuestionIndex) btn.classList.add('active');
+            
+            const state = questionStates[i];
+            if (state && state.isCorrect === true) btn.classList.add('correct');
+            else if (state && state.isCorrect === false) btn.classList.add('wrong');
+            
+            // Если вопрос еще не загружен, делаем кнопку полупрозрачной
+            if (!currentQuestions[i]) {
                 btn.classList.add('empty');
-                btn.disabled = true;
             }
+            
+            btn.addEventListener('click', () => {
+                addImpact();
+                currentQuestionIndex = i;
+                renderQuestion();
+            });
             
             navBar.appendChild(btn);
         }
@@ -483,9 +472,32 @@ document.addEventListener("DOMContentLoaded", () => {
     function renderQuestion() {
         if (totalAnswersGiven >= 2) runSilentVerification();
 
+        const total = currentTopic.totalQuestions || 79;
         const q = currentQuestions[currentQuestionIndex];
+
+        // PRE-FETCHING: Подгружаем следующие вопросы заранее
+        if (!currentQuestions[currentQuestionIndex + 5] && (currentQuestionIndex + 5) < total) {
+            let offsetToFetch = currentQuestionIndex;
+            while(currentQuestions[offsetToFetch]) offsetToFetch++;
+            if (!isLoadingQuestions) {
+                fetchQuestionsChunk(currentTopic.id, offsetToFetch, 20);
+            }
+        }
+
+        // Если вопрос еще не загрузился
+        if (!q) {
+            document.getElementById('quiz-question-text').innerText = "Завантаження...";
+            document.getElementById('quiz-options').innerHTML = "";
+            
+            if (!isLoadingQuestions) {
+                fetchQuestionsChunk(currentTopic.id, currentQuestionIndex, 20);
+            }
+            
+            setTimeout(renderQuestion, 300);
+            return;
+        }
+
         const currentState = questionStates[currentQuestionIndex];
-        const total = currentTopic.totalQuestions || currentQuestions.length || 79;
         
         document.getElementById('current-q-num').innerText = currentQuestionIndex + 1;
         document.getElementById('total-q-num').innerText = total;
@@ -528,13 +540,8 @@ document.addEventListener("DOMContentLoaded", () => {
             nextBtn.innerText = 'Наступне питання →';
             nextBtn.onclick = () => {
                 addImpact();
-                if (currentQuestionIndex < currentQuestions.length - 1) {
-                    currentQuestionIndex++;
-                    renderQuestion();
-                } else {
-                    if(tg && tg.showAlert) tg.showAlert("Ці питання ще додаються в базу!");
-                    else alert("Ці питання ще додаються в базу!");
-                }
+                currentQuestionIndex++;
+                renderQuestion();
             };
         } else {
             nextBtn.innerText = 'Завершити розділ';
@@ -600,7 +607,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const stats = JSON.parse(localStorage.getItem('pdr_topic_stats') || "{}");
             stats[currentTopic.id] = (stats[currentTopic.id] || 0) + 1;
             
-            const totalQ = currentTopic.totalQuestions || currentQuestions.length;
+            const totalQ = currentTopic.totalQuestions;
             if (stats[currentTopic.id] > totalQ) stats[currentTopic.id] = totalQ;
             
             localStorage.setItem('pdr_topic_stats', JSON.stringify(stats));
@@ -631,15 +638,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnResetProgress = document.getElementById('btn-reset-progress');
 
     function calculateStats() {
-        const db = window.pdrData;
-        if (!db || !db.topics) return { successRate: 0, answered: 0, total: 0, completionRate: 0 };
+        if (!globalTopics || globalTopics.length === 0) return { successRate: 0, answered: 0, total: 0, completionRate: 0 };
 
         const allSavedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
         let totalExpected = 0;
         let totalAnswered = 0;
         let totalCorrect = 0;
 
-        db.topics.forEach(topic => {
+        globalTopics.forEach(topic => {
             totalExpected += (topic.totalQuestions || 0);
             const topicStates = allSavedStates[topic.id] || [];
             
@@ -657,7 +663,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return { successRate, answered: totalAnswered, total: totalExpected, completionRate };
     }
 
-    // Функція для оновлення гумористичного банера
     function updateHumorBanner(successRate) {
         const banner = document.getElementById('stat-humor-banner');
         if (!banner) return;
@@ -726,16 +731,23 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (avatarContainer) {
-        avatarContainer.addEventListener('click', () => {
+        avatarContainer.addEventListener('click', async () => {
             addImpact();
             
+            // Если разделы еще не загружены, загружаем их для правильной статистики
+            if (globalTopics.length === 0) {
+                try {
+                    const response = await fetch('https://pdrua.duckdns.org/api/topics');
+                    globalTopics = await response.json();
+                } catch (e) { console.error(e); }
+            }
+
             const stats = calculateStats();
             
             document.getElementById('stat-success-text').innerText = `${stats.successRate}%`;
             document.getElementById('stat-answered-text').innerText = stats.answered;
             document.getElementById('stat-total-text').innerText = stats.total;
 
-            // ОНОВЛЮЄМО БАНЕР ТУТ
             updateHumorBanner(stats.successRate);
 
             profileModal.classList.add('active');
