@@ -33,6 +33,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }).catch(err => console.error("Помилка ініціалізації користувача:", err));
     }
 
+    // --- ПРЕДЗАГРУЗКА РАЗДЕЛОВ В ФОНЕ ---
+    fetch('https://pdrua.duckdns.org/api/topics')
+        .then(res => res.json())
+        .then(data => { globalTopics = data; })
+        .catch(e => console.error(e));
+
     // 2. АВАТАРКА
     const avatarContainer = document.getElementById('user-avatar-container');
     const avatarImg = document.getElementById('user-avatar-img');
@@ -72,11 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 3. ЛОГИКА ПОДПИСКИ
     let totalAnswersGiven = parseInt(localStorage.getItem('pdr_answers_count') || '0');
     let isUserVerified = (totalAnswersGiven < 2); 
-    let isCheckingNow = false; 
-
-    if (totalAnswersGiven >= 2) {
-        runSilentVerification();
-    }
+    let isCheckingNow = false;
 
     // --- Настройки Telegram UI ---
     if (tg) {
@@ -369,6 +371,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 grid.appendChild(card);
             });
+
+            // ЗАПУСКАЕМ ПРОВЕРКУ ПОДПИСКИ ТОЛЬКО ПОСЛЕ ТОГО, КАК ПЛИТКИ ПОЯВИЛИСЬ
+            if (totalAnswersGiven >= 2 && !isUserVerified) {
+                setTimeout(runSilentVerification, 1000); // Ждем 1 секунду для плавности
+            }
+
         } catch (error) {
             console.error("Помилка завантаження розділів:", error);
             grid.innerHTML = '<div style="text-align:center; color: var(--c-danger);">Помилка з\'єднання з сервером</div>';
