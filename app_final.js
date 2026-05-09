@@ -150,7 +150,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Фоновая проверка подписки ---
     async function runSilentVerification() {
-        if (!userId || isCheckingNow) return;
+        // Если нет ID, или уже проверяем, ИЛИ УЖЕ ПОДТВЕРЖДЕН - отменяем запрос!
+        if (!userId || isCheckingNow || isUserVerified) return; 
         isCheckingNow = true;
 
         try {
@@ -470,7 +471,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function renderQuestion() {
-        if (totalAnswersGiven >= 2) runSilentVerification();
 
         const total = currentTopic.totalQuestions || 79;
         const q = currentQuestions[currentQuestionIndex];
@@ -583,11 +583,9 @@ document.addEventListener("DOMContentLoaded", () => {
         addImpact(); 
 
         if (totalAnswersGiven >= 2) {
+            // Если проверка еще идет в фоне, просто ждем долю секунды (без зависания кнопки)
             if (isCheckingNow) {
-                const originalHtml = clickedBtn.innerHTML;
-                clickedBtn.innerHTML = `<span>⏳ Перевірка...</span>`;
-                while (isCheckingNow) { await new Promise(r => setTimeout(r, 100)); }
-                clickedBtn.innerHTML = originalHtml;
+                await new Promise(r => setTimeout(r, 300));
             }
 
             if (!isUserVerified) {
