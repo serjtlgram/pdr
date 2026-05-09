@@ -153,8 +153,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Фоновая проверка подписки ---
     async function runSilentVerification() {
-        // Если нет ID, или уже проверяем, ИЛИ УЖЕ ПОДТВЕРЖДЕН - отменяем запрос!
-        if (!userId || isCheckingNow || isUserVerified) return; 
+        // Если нет ID или уже проверяем - отменяем запрос!
+        // УБРАЛИ проверку isUserVerified, чтобы проверять каждый раз при старте
+        if (!userId || isCheckingNow) return; 
         isCheckingNow = true;
 
         try {
@@ -163,6 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
             isUserVerified = (data.is_subscribed === true);
         } catch (error) {
             console.error("Помилка бэкенда:", error);
+            // Если сервер упал, пускаем пользователя, чтобы не блокировать приложение
             isUserVerified = true; 
         } finally {
             isCheckingNow = false;
