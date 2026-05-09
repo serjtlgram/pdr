@@ -67,6 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let questionStates = []; 
     let globalTopics = []; // Храним разделы с сервера
     let isLoadingQuestions = false; // Флаг загрузки вопросов
+    let noMoreQuestionsOnServer = false; // Флаг, если вопросы в базе закончились
 
     // 3. ЛОГИКА ПОДПИСКИ
     let totalAnswersGiven = parseInt(localStorage.getItem('pdr_answers_count') || '0');
@@ -385,6 +386,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('quiz-topic-name').innerText = topic.title;
         
         currentQuestions = []; // Очищаем старые вопросы
+        noMoreQuestionsOnServer = false; // Сбрасываем флаг при старте нового раздела
         const total = topic.totalQuestions || 79;
         
         questionStates = Array(total).fill(null).map(() => ({ selectedIndex: null, isCorrect: null }));
@@ -413,16 +415,27 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function fetchQuestionsChunk(topicId, offset, limit = 20) {
-        if (isLoadingQuestions) return;
+        // Если мы уже грузим ИЛИ знаем, что вопросов больше нет - отменяем запрос!
+        if (isLoadingQuestions || noMoreQuestionsOnServer) return;
         isLoadingQuestions = true;
 
         try {
             const response = await fetch(`https://pdrua.duckdns.org/api/questions?topicId=${topicId}&offset=${offset}&limit=${limit}`);
             const newQuestions = await response.json();
             
-            newQuestions.forEach((q, i) => {
-                currentQuestions[offset + i] = q;
-            });
+            if (newQuestions.length === 0) {
+                noMoreQuestionsOnServer = true; // Сервер сказал, что вопросов больше нет
+            } else {
+                newQuestions.forEach((q, i) => {
+                    currentQuestions[offset + i] = q;
+                    
+                    // МАГИЯ: Предзагрузка картинок в кэш браузера!
+                    if (q.image) {
+                        const preloadImg = new Image();
+                        preloadImg.src = q.image;
+                    }
+                });
+            }
         } catch (error) {
             console.error("Помилка завантаження питань:", error);
         } finally {
@@ -486,6 +499,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Если вопрос еще не загрузился
         if (!q) {
+            // Если мы точно знаем, что на сервере больше нет вопросов
+            if (noMoreQuestionsOnServer) {
+                document.getElementById('quiz-question-text').innerText = "Наступні питання будуть додані пізніше 🚧";
+                document.getElementById('quiz-options').innerHTML = "";
+                
+                const imgEl = document.getElementById('quiz-image');
+                if (imgEl) imgEl.parentElement.style.display = 'none';
+                
+                const nextBtn = document.getElementById('btn-next-question');
+                nextBtn.style.display = 'block';
+                nextBtn.innerText = 'Завершити розділ';
+                nextBtn.onclick = () => {
+                    addImpact();
+                    showScreen(topicsScreen, 'topics'); 
+                    renderTopics(); 
+                };
+                return;
+            }
+
+            // Иначе показываем загрузку и ждем
             document.getElementById('quiz-question-text').innerText = "Завантаження...";
             document.getElementById('quiz-options').innerHTML = "";
             
