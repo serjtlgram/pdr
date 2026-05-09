@@ -536,11 +536,25 @@ document.addEventListener("DOMContentLoaded", () => {
             if (noMoreQuestionsOnServer) {
                 // Возвращаем пользователя на последний доступный вопрос
                 currentQuestionIndex = currentQuestions.length - 1;
-                showToast("Наступні питання будуть додані пізніше 🚧");
+                
+                const coneIcon = `
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+                        <div style="width: 72px; height: 72px; border-radius: 50%; background: rgba(245, 158, 11, 0.12); display: flex; align-items: center; justify-content: center;">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4 20H20" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 3L5.5 20H18.5L12 3Z" fill="#F59E0B" fill-opacity="0.2" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8.5 12H15.5" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M7 16H17" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div style="line-height: 1.4; font-size: 1.15rem;">Ой! Наступні питання<br>будуть додані пізніше</div>
+                    </div>
+                `;
+                showToast(coneIcon);
+                
                 renderQuestion();
                 return;
             }
-
             // Иначе показываем загрузку и ждем
             document.getElementById('quiz-question-text').innerText = "Завантаження...";
             document.getElementById('quiz-options').innerHTML = "";
@@ -853,39 +867,50 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!toast) {
             toast = document.createElement('div');
             toast.id = 'app-toast';
+            
+            // Центрируем по центру экрана
             toast.style.position = 'fixed';
-            toast.style.bottom = '100px'; 
+            toast.style.top = '50%'; 
             toast.style.left = '50%';
-            toast.style.transform = 'translateX(-50%)';
+            toast.style.transform = 'translate(-50%, -50%) scale(0.9)';
+            
+            // Делаем дизайн более массивным и заметным
             toast.style.backgroundColor = 'var(--c-surface)';
             toast.style.color = 'var(--c-text)';
             toast.style.border = '1px solid var(--c-border-soft)';
-            toast.style.padding = '12px 24px';
-            toast.style.borderRadius = '100px';
-            toast.style.fontSize = '0.95rem';
+            toast.style.padding = '24px 32px';
+            toast.style.borderRadius = '24px';
+            toast.style.fontSize = '1.1rem';
             toast.style.fontWeight = '600';
             toast.style.zIndex = '10000';
             toast.style.textAlign = 'center';
-            toast.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
-            toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-            toast.style.whiteSpace = 'nowrap';
+            toast.style.boxShadow = '0 20px 40px rgba(0,0,0,0.3)';
+            toast.style.transition = 'opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            
+            // Чтобы текст мог переноситься на новую строку, если он длинный
+            toast.style.whiteSpace = 'normal';
+            toast.style.width = '85%';
+            toast.style.maxWidth = '350px';
+            
             document.body.appendChild(toast);
         }
         
         toast.innerHTML = message;
         toast.style.opacity = '0';
-        toast.style.transform = 'translate(-50%, 10px)';
+        toast.style.transform = 'translate(-50%, -50%) scale(0.9)';
         toast.style.display = 'block';
         
+        // Анимация появления (эффект "выпрыгивания")
         setTimeout(() => {
             toast.style.opacity = '1';
-            toast.style.transform = 'translate(-50%, 0)';
+            toast.style.transform = 'translate(-50%, -50%) scale(1)';
         }, 10);
         
+        // Исчезает через 3 секунды
         clearTimeout(toast.hideTimeout);
         toast.hideTimeout = setTimeout(() => {
             toast.style.opacity = '0';
-            toast.style.transform = 'translate(-50%, 10px)';
+            toast.style.transform = 'translate(-50%, -50%) scale(0.9)';
             setTimeout(() => { toast.style.display = 'none'; }, 300);
         }, 3000);
     }
