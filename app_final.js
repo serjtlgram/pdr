@@ -433,7 +433,7 @@ document.addEventListener("DOMContentLoaded", () => {
         globalTopics.forEach(topic => {
             const topicStates = savedStates[topic.id] ||[];
             topicStates.forEach((state, index) => {
-                if (state && state.isCorrect === false) {
+                if (state && state.selectedIndex !== null && state.isCorrect === false) {
                     hardRefs.push({ topicId: topic.id, originalIndex: index });
                 }
             });
@@ -1017,7 +1017,11 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // 1. Архіватор даних (стискаємо об'єкти в малі масиви)
     function packState(stateArray) {
-        return JSON.stringify(stateArray.map(s => s ?[s.selectedIndex, s.isCorrect ? 1 : 0] : null));
+        return JSON.stringify(stateArray.map(s => {
+            // Якщо питання ще не пройдене, зберігаємо просто null (економимо пам'ять хмари!)
+            if (!s || s.selectedIndex === null) return null;
+            return[s.selectedIndex, s.isCorrect ? 1 : 0];
+        }));
     }
 
     // 2. Розархіватор
