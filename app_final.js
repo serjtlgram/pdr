@@ -281,10 +281,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (cardHard) {
-        cardHard.addEventListener('click', () => {
+        cardHard.addEventListener('click', async () => {
             addImpact();
-            if(tg && tg.showAlert) tg.showAlert("Розділ складних питань знаходиться в розробці! Збираємо вашу статистику 📊");
-            else alert("Розділ складних питань знаходиться в розробці!");
+            
+            // Завантажуємо розділи, якщо їх ще немає в пам'яті
+            if (globalTopics.length === 0) {
+                if(topicsPromise) globalTopics = await topicsPromise;
+                else {
+                    const res = await fetch('https://pdrua.duckdns.org/api/topics');
+                    globalTopics = await res.json();
+                }
+            }
+            
+            startHardMode(); // Запускаємо режим!
         });
     }
 
@@ -422,6 +431,52 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- 5. ЛОГИКА ТЕСТА (LAZY LOADING) ---
     const CHUNK_SIZE = 25; // <--- Управляй количеством загружаемых вопросов здесь
+
+    // --- РЕЖИМ "СКЛАДНІ ПИТАННЯ" (ВИРТУАЛЬНИЙ РОЗДІЛ) ---
+    async function startHardMode() {
+        let hardRefs =[];
+        const savedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
+
+        // Збираємо всі помилки з усіх розділів
+        globalTopics.forEach(topic => {
+            const topicStates = savedStates[topic.id] ||[];
+            topicStates.forEach((state, index) => {
+                if (state && state.isCorrect === false) {
+                    hardRefs.push({ topicId: topic.id, originalIndex: index });
+                }
+            });
+        });
+
+        if (hardRefs.length === 0) {
+            const emptyIcon = `
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+                    <div style="font-size: 3rem;">🎉</div>
+                    <div style="line-height: 1.4; font-size: 1.15rem;">У вас немає складних питань!<br>Ви відповідаєте ідеально.</div>
+                </div>
+            `;
+            showToast(emptyIcon);
+            return;
+        }
+
+        // Створюємо "Віртуальний" розділ
+        currentTopic = {
+            id: 'hard_mode',
+            title: 'Складні питання',
+            isVirtual: true,
+            totalQuestions: hardRefs.length,
+            refs: hardRefs // Тут зберігаємо адреси справжніх питань
+        };
+
+        currentQuestions = Array(hardRefs.length).fill(null); 
+        // Починаємо з чистого аркуша для цього сеансу
+        questionStates = Array(hardRefs.length).fill(null).map(() => ({ selectedIndex: null, isCorrect: null }));
+        currentQuestionIndex = 0;
+
+        document.getElementById('quiz-topic-name').innerText = currentTopic.title;
+        showScreen(quizScreen, 'quiz');
+        renderQuestion();
+    }
+
     async function startQuiz(topic) {
         currentTopic = topic;
         document.getElementById('quiz-topic-name').innerText = topic.title;
@@ -540,29 +595,58 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // Если вопрос еще не загрузился
-        if (!q) {
-            // Если мы точно знаем, что на сервере больше нет вопросов
-            if (noMoreQuestionsOnServer) {
-                // Возвращаем пользователя на последний доступный вопрос
-                currentQuestionIndex = currentQuestions.length - 1;
+        if (!q) {// Если вопрос еще не загрузился
+            if (!q) {
+                if (noMoreQuestionsOnServer && !currentTopic.isVirtual) {
+                    // ... (тут твой старый код с желтым Toast о том, что вопросов больше нет) ...
+                    currentQuestionIndex = currentQuestions.length - 1;
+                    const coneIcon = `<div style="display: flex; flex-direction: column; align-items: center; gap: 16px;"><div style="width: 72px; height: 72px; border-radius: 50%; background: rgba(245, 158, 11, 0.12); display: flex; align-items: center; justify-content: center;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none"><path d="M4 20H20" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 3L5.5 20H18.5L12 3Z" fill="#F59E0B" fill-opacity="0.2" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 12H15.5" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 16H17" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div style="line-height: 1.4; font-size: 1.15rem;">Ой! Наступні питання<br>будуть додані пізніше</div></div>`;
+                    showToast(coneIcon);
+                    renderQuestion();
+                    return;
+                }
                 
-                const coneIcon = `
-                    <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
-                        <div style="width: 72px; height: 72px; border-radius: 50%; background: rgba(245, 158, 11, 0.12); display: flex; align-items: center; justify-content: center;">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M4 20H20" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 3L5.5 20H18.5L12 3Z" fill="#F59E0B" fill-opacity="0.2" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M8.5 12H15.5" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M7 16H17" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </div>
-                        <div style="line-height: 1.4; font-size: 1.15rem;">Ой! Наступні питання<br>будуть додані пізніше</div>
-                    </div>
-                `;
-                showToast(coneIcon);
+                document.getElementById('quiz-question-text').innerText = "Завантаження питання...";
+                document.getElementById('quiz-options').innerHTML = "";
+                const imgEl = document.getElementById('quiz-image');
+                if (imgEl && imgEl.parentElement) imgEl.parentElement.style.display = 'none';
+                const nextBtn = document.getElementById('btn-next-question');
+                if (nextBtn) nextBtn.style.display = 'none';
                 
-                renderQuestion();
+                // Якщо це звичайний тест - вантажимо чанками
+                if (!currentTopic.isVirtual && !isLoadingQuestions) {
+                    fetchQuestionsChunk(currentTopic.id, currentQuestionIndex, CHUNK_SIZE);
+                } 
+                // Якщо це "Складні питання" - вантажимо конкретне питання по його адресі
+                else if (currentTopic.isVirtual && !isLoadingQuestions) {
+                    isLoadingQuestions = true;
+                    const ref = currentTopic.refs[currentQuestionIndex];
+                    fetch(`https://pdrua.duckdns.org/api/questions?topicId=${ref.topicId}&offset=${ref.originalIndex}&limit=1`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data && data.length > 0) currentQuestions[currentQuestionIndex] = data[0];
+                            isLoadingQuestions = false;
+                            renderQuestion();
+                        })
+                        .catch(err => { console.error(err); isLoadingQuestions = false; });
+                    return; // Зупиняємо рендер, поки питання не прилетить
+                }
+                
+                if(!currentTopic.isVirtual) setTimeout(renderQuestion, 300);
                 return;
+            }
+    
+            // --- PRE-FETCHING (Тихе завантаження наступних питань) ---
+            if (!currentTopic.isVirtual && !currentQuestions[currentQuestionIndex + 5] && (currentQuestionIndex + 5) < total) {
+                let offsetToFetch = currentQuestionIndex;
+                while(currentQuestions[offsetToFetch]) offsetToFetch++;
+                if (!isLoadingQuestions) fetchQuestionsChunk(currentTopic.id, offsetToFetch, CHUNK_SIZE);
+            } else if (currentTopic.isVirtual && currentQuestionIndex + 1 < total && !currentQuestions[currentQuestionIndex + 1]) {
+                // У Складних питаннях тихо підвантажуємо +1 наступне питання
+                const nextRef = currentTopic.refs[currentQuestionIndex + 1];
+                fetch(`https://pdrua.duckdns.org/api/questions?topicId=${nextRef.topicId}&offset=${nextRef.originalIndex}&limit=1`)
+                    .then(r => r.json())
+                    .then(d => { if(d[0]) currentQuestions[currentQuestionIndex + 1] = d[0]; });
             }
             
             // Иначе показываем загрузку и ждем
@@ -698,17 +782,43 @@ document.addEventListener("DOMContentLoaded", () => {
         questionStates[currentQuestionIndex] = { selectedIndex: selectedIndex, isCorrect: isCorrect };
         
         const allSavedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
-        allSavedStates[currentTopic.id] = questionStates;
-        localStorage.setItem('pdr_quiz_states', JSON.stringify(allSavedStates));
 
-        if (isCorrect) {
-            const stats = JSON.parse(localStorage.getItem('pdr_topic_stats') || "{}");
-            stats[currentTopic.id] = (stats[currentTopic.id] || 0) + 1;
+        if (currentTopic.isVirtual) {
+            // Якщо ми в "Складних питаннях"
+            const ref = currentTopic.refs[currentQuestionIndex];
             
-            const totalQ = currentTopic.totalQuestions;
-            if (stats[currentTopic.id] > totalQ) stats[currentTopic.id] = totalQ;
+            // Зберігаємо поточний стан для UI
+            questionStates[currentQuestionIndex] = { selectedIndex: selectedIndex, isCorrect: isCorrect };
             
-            localStorage.setItem('pdr_topic_stats', JSON.stringify(stats));
+            // ПЕРЕЗАПИСУЄМО стан у СПРАВЖНЬОМУ розділі
+            if (!allSavedStates[ref.topicId]) allSavedStates[ref.topicId] = [];
+            allSavedStates[ref.topicId][ref.originalIndex] = { selectedIndex: selectedIndex, isCorrect: isCorrect };
+            localStorage.setItem('pdr_quiz_states', JSON.stringify(allSavedStates));
+
+            // Якщо відповів правильно - коригуємо статистику справжнього розділу
+            if (isCorrect) {
+                const stats = JSON.parse(localStorage.getItem('pdr_topic_stats') || "{}");
+                stats[ref.topicId] = (stats[ref.topicId] || 0) + 1;
+                // Знаходимо totalQ справжнього розділу
+                const realTopic = globalTopics.find(t => t.id === ref.topicId);
+                const realTotalQ = realTopic ? realTopic.totalQuestions : 999;
+                if (stats[ref.topicId] > realTotalQ) stats[ref.topicId] = realTotalQ;
+                localStorage.setItem('pdr_topic_stats', JSON.stringify(stats));
+            }
+
+        } else {
+            // Звичайний режим (твій старий код)
+            questionStates[currentQuestionIndex] = { selectedIndex: selectedIndex, isCorrect: isCorrect };
+            allSavedStates[currentTopic.id] = questionStates;
+            localStorage.setItem('pdr_quiz_states', JSON.stringify(allSavedStates));
+
+            if (isCorrect) {
+                const stats = JSON.parse(localStorage.getItem('pdr_topic_stats') || "{}");
+                stats[currentTopic.id] = (stats[currentTopic.id] || 0) + 1;
+                const totalQ = currentTopic.totalQuestions;
+                if (stats[currentTopic.id] > totalQ) stats[currentTopic.id] = totalQ;
+                localStorage.setItem('pdr_topic_stats', JSON.stringify(stats));
+            }
         }
 
         if (totalAnswersGiven < 2) {
