@@ -539,8 +539,10 @@ document.addEventListener("DOMContentLoaded", () => {
             if (i === currentQuestionIndex) btn.classList.add('active');
             
             const state = questionStates[i];
-            if (state && state.isCorrect === true) btn.classList.add('correct');
-            else if (state && state.isCorrect === false) btn.classList.add('wrong');
+            if (state && state.selectedIndex !== null) {
+                if (state.isCorrect === true) btn.classList.add('correct');
+                else if (state.isCorrect === false) btn.classList.add('wrong');
+            }
             
             if (!currentTopic.isVirtual && !currentQuestions[i] && (!state || state.selectedIndex === null)) {
                 btn.classList.add('empty');
@@ -1024,12 +1026,19 @@ document.addEventListener("DOMContentLoaded", () => {
         }));
     }
 
-    // 2. Розархіватор
+    // 2. Розархіватор (з лікуванням битих даних)
     function unpackState(packedStr) {
         try {
             const arr = JSON.parse(packedStr);
-            return arr.map(item => item ? { selectedIndex: item[0], isCorrect: !!item[1] } : null);
-        } catch(e) { return[]; }
+            return arr.map(item => {
+                // Якщо з хмари прилетів мусор типу [null, 0] — стираємо його повністю
+                if (!item || item[0] === null) return null;
+                
+                return { selectedIndex: item[0], isCorrect: !!item[1] };
+            });
+        } catch(e) { 
+            return []; 
+        }
     }
 
     // 3. Відновлення при вході
