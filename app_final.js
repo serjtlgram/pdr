@@ -447,9 +447,10 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('quiz-question-text').innerText = "Завантаження питань...";
         document.getElementById('quiz-options').innerHTML = "";
         
-        // Загружаем первую партию вопросов
-        const offset = Math.max(0, currentQuestionIndex - 5);
-        await fetchQuestionsChunk(topic.id, offset, 20);
+        // Завантажуємо всі питання від початку (0) до поточного + 20 вперед.
+        // Оскільки бекенд кешує дані в RAM, це відпрацює миттєво і без навантаження.
+        const limitToFetch = currentQuestionIndex + 20;
+        await fetchQuestionsChunk(topic.id, 0, limitToFetch);
         
         renderQuestion();
     }
@@ -500,8 +501,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (state && state.isCorrect === true) btn.classList.add('correct');
             else if (state && state.isCorrect === false) btn.classList.add('wrong');
             
-            // Если вопрос еще не загружен, делаем кнопку полупрозрачной
-            if (!currentQuestions[i]) {
+            // Якщо питання ще не завантажено І на нього немає збереженої відповіді
+            if (!currentQuestions[i] && (!state || state.selectedIndex === null)) {
                 btn.classList.add('empty');
             }
             
@@ -562,9 +563,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 renderQuestion();
                 return;
             }
+            
             // Иначе показываем загрузку и ждем
-            document.getElementById('quiz-question-text').innerText = "Завантаження...";
+            document.getElementById('quiz-question-text').innerText = "Завантаження питань...";
             document.getElementById('quiz-options').innerHTML = "";
+            
+            // ПРЯЧЕМ КАРТИНКУ И КНОПКУ, ПОКА ИДЕТ ЗАГРУЗКА
+            const imgEl = document.getElementById('quiz-image');
+            if (imgEl && imgEl.parentElement) imgEl.parentElement.style.display = 'none';
+            const nextBtn = document.getElementById('btn-next-question');
+            if (nextBtn) nextBtn.style.display = 'none';
             
             if (!isLoadingQuestions) {
                 fetchQuestionsChunk(currentTopic.id, currentQuestionIndex, 20);
