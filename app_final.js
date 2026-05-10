@@ -71,10 +71,10 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Состояние теста и глобальные переменные
     let currentTopic = null; 
-    let currentQuestions = [];
+    let currentQuestions =[];
     let currentQuestionIndex = 0;
     let currentScreenName = 'home';
-    let questionStates = []; 
+    let questionStates =[]; 
     let isLoadingQuestions = false; // Флаг загрузки вопросов
     let noMoreQuestionsOnServer = false; // Флаг, если вопросы в базе закончились
 
@@ -159,8 +159,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Фоновая проверка подписки ---
     async function runSilentVerification() {
-        // Если нет ID или уже проверяем - отменяем запрос!
-        // УБРАЛИ проверку isUserVerified, чтобы проверять каждый раз при старте
         if (!userId || isCheckingNow) return; 
         isCheckingNow = true;
 
@@ -170,7 +168,6 @@ document.addEventListener("DOMContentLoaded", () => {
             isUserVerified = (data.is_subscribed === true);
         } catch (error) {
             console.error("Помилка бэкенда:", error);
-            // Если сервер упал, пускаем пользователя, чтобы не блокировать приложение
             isUserVerified = true; 
         } finally {
             isCheckingNow = false;
@@ -284,7 +281,6 @@ document.addEventListener("DOMContentLoaded", () => {
         cardHard.addEventListener('click', async () => {
             addImpact();
             
-            // Завантажуємо розділи, якщо їх ще немає в пам'яті
             if (globalTopics.length === 0) {
                 if(topicsPromise) globalTopics = await topicsPromise;
                 else {
@@ -293,7 +289,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
             
-            startHardMode(); // Запускаємо режим!
+            startHardMode(); 
         });
     }
 
@@ -324,7 +320,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const grid = document.getElementById('topics-grid');
         if (!grid) return;
         
-        // КРАСИВАЯ ПЛАШКА ЗАГРУЗКИ (Круговий спінер по центру)
         if (globalTopics.length === 0) {
             grid.innerHTML = `
                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; width: 100%;">
@@ -346,7 +341,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         
         try {
-            // УМНОЕ ОЖИДАНИЕ: Если запрос уже пошел при старте приложения, просто ждем его результат!
             if (globalTopics.length === 0) {
                 if (topicsPromise) {
                     globalTopics = await topicsPromise;
@@ -356,7 +350,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
             
-            grid.innerHTML = ""; // Очищаем скелетоны
+            grid.innerHTML = ""; 
 
             const allSavedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
 
@@ -366,7 +360,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             filtered.forEach((topic, index) => {
                 const totalQ = topic.totalQuestions || 0;
-                const topicStates = allSavedStates[topic.id] || [];
+                const topicStates = allSavedStates[topic.id] ||[];
                 
                 let answeredCount = 0;
                 let correctCount = 0;
@@ -413,9 +407,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 grid.appendChild(card);
             });
 
-            // ЗАПУСКАЕМ ПРОВЕРКУ ПОДПИСКИ ТОЛЬКО ПОСЛЕ ТОГО, КАК ПЛИТКИ ПОЯВИЛИСЬ
             if (totalAnswersGiven >= 2 && !isUserVerified) {
-                setTimeout(runSilentVerification, 1000); // Ждем 1 секунду для плавности
+                setTimeout(runSilentVerification, 1000); 
             }
 
         } catch (error) {
@@ -430,14 +423,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- 5. ЛОГИКА ТЕСТА (LAZY LOADING) ---
-    const CHUNK_SIZE = 25; // <--- Управляй количеством загружаемых вопросов здесь
+    const CHUNK_SIZE = 25; 
 
     // --- РЕЖИМ "СКЛАДНІ ПИТАННЯ" (ВИРТУАЛЬНИЙ РОЗДІЛ) ---
     async function startHardMode() {
         let hardRefs =[];
         const savedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
 
-        // Збираємо всі помилки з усіх розділів
         globalTopics.forEach(topic => {
             const topicStates = savedStates[topic.id] ||[];
             topicStates.forEach((state, index) => {
@@ -458,17 +450,15 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Створюємо "Віртуальний" розділ
         currentTopic = {
             id: 'hard_mode',
             title: 'Складні питання',
             isVirtual: true,
             totalQuestions: hardRefs.length,
-            refs: hardRefs // Тут зберігаємо адреси справжніх питань
+            refs: hardRefs 
         };
 
         currentQuestions = Array(hardRefs.length).fill(null); 
-        // Починаємо з чистого аркуша для цього сеансу
         questionStates = Array(hardRefs.length).fill(null).map(() => ({ selectedIndex: null, isCorrect: null }));
         currentQuestionIndex = 0;
 
@@ -481,8 +471,8 @@ document.addEventListener("DOMContentLoaded", () => {
         currentTopic = topic;
         document.getElementById('quiz-topic-name').innerText = topic.title;
         
-        currentQuestions = []; // Очищаем старые вопросы
-        noMoreQuestionsOnServer = false; // Сбрасываем флаг при старте нового раздела
+        currentQuestions =[]; 
+        noMoreQuestionsOnServer = false; 
         const total = topic.totalQuestions || 79;
         
         questionStates = Array(total).fill(null).map(() => ({ selectedIndex: null, isCorrect: null }));
@@ -503,8 +493,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('quiz-question-text').innerText = "Завантаження питань...";
         document.getElementById('quiz-options').innerHTML = "";
         
-        // Завантажуємо всі питання від початку (0) до поточного + 20 вперед.
-        // Оскільки бекенд кешує дані в RAM, це відпрацює миттєво і без навантаження.
         const limitToFetch = currentQuestionIndex + 20;
         await fetchQuestionsChunk(topic.id, 0, limitToFetch);
         
@@ -512,7 +500,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function fetchQuestionsChunk(topicId, offset, limit = CHUNK_SIZE) {
-        // Если мы уже грузим ИЛИ знаем, что вопросов больше нет - отменяем запрос!
         if (isLoadingQuestions || noMoreQuestionsOnServer) return;
         isLoadingQuestions = true;
 
@@ -521,12 +508,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const newQuestions = await response.json();
             
             if (newQuestions.length === 0) {
-                noMoreQuestionsOnServer = true; // Сервер сказал, что вопросов больше нет
+                noMoreQuestionsOnServer = true; 
             } else {
                 newQuestions.forEach((q, i) => {
                     currentQuestions[offset + i] = q;
-                    
-                    // МАГИЯ: Предзагрузка картинок в кэш браузера!
                     if (q.image) {
                         const preloadImg = new Image();
                         preloadImg.src = q.image;
@@ -557,7 +542,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (state && state.isCorrect === true) btn.classList.add('correct');
             else if (state && state.isCorrect === false) btn.classList.add('wrong');
             
-            // Якщо питання ще не завантажено І на нього немає збереженої відповіді
             if (!currentTopic.isVirtual && !currentQuestions[i] && (!state || state.selectedIndex === null)) {
                 btn.classList.add('empty');
             }
@@ -585,7 +569,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const total = currentTopic.totalQuestions || 79;
         const q = currentQuestions[currentQuestionIndex];
 
-        // PRE-FETCHING: Подгружаем следующие вопросы заранее
         if (!currentQuestions[currentQuestionIndex + 5] && (currentQuestionIndex + 5) < total) {
             let offsetToFetch = currentQuestionIndex;
             while(currentQuestions[offsetToFetch]) offsetToFetch++;
@@ -594,7 +577,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        // Если вопрос еще не загрузился
         if (!q) {
             if (noMoreQuestionsOnServer && !currentTopic.isVirtual) {
                 currentQuestionIndex = currentQuestions.length - 1;
@@ -611,11 +593,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const nextBtn = document.getElementById('btn-next-question');
             if (nextBtn) nextBtn.style.display = 'none';
             
-            // Якщо це звичайний тест - вантажимо чанками
             if (!currentTopic.isVirtual && !isLoadingQuestions) {
                 fetchQuestionsChunk(currentTopic.id, currentQuestionIndex, CHUNK_SIZE);
             } 
-            // Якщо це "Складні питання" - вантажимо конкретне питання по його адресі
             else if (currentTopic.isVirtual && !isLoadingQuestions) {
                 isLoadingQuestions = true;
                 const ref = currentTopic.refs[currentQuestionIndex];
@@ -625,7 +605,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         if (data && data.length > 0) {
                             currentQuestions[currentQuestionIndex] = data[0];
                         } else {
-                            // Якщо питання видалили з бази - ставимо заглушку, щоб не зависало
                             currentQuestions[currentQuestionIndex] = { text: "Помилка: Питання не знайдено", options: ["Далі"], correctIndex: 0 };
                         }
                         isLoadingQuestions = false;
@@ -637,7 +616,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
             }
             
-            // ЗАПОБІЖНИК: У будь-якому випадку пробуємо оновити екран через 300мс
             setTimeout(renderQuestion, 300);
             return;
         }
@@ -742,7 +720,6 @@ document.addEventListener("DOMContentLoaded", () => {
         addImpact(); 
 
         if (totalAnswersGiven >= 2) {
-            // Если проверка еще идет в фоне, просто ждем долю секунды (без зависания кнопки)
             if (isCheckingNow) {
                 await new Promise(r => setTimeout(r, 300));
             }
@@ -759,22 +736,17 @@ document.addEventListener("DOMContentLoaded", () => {
         const allSavedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
 
         if (currentTopic.isVirtual) {
-            // Якщо ми в "Складних питаннях"
             const ref = currentTopic.refs[currentQuestionIndex];
             
-            // Зберігаємо поточний стан для UI
             questionStates[currentQuestionIndex] = { selectedIndex: selectedIndex, isCorrect: isCorrect };
             
-            // ПЕРЕЗАПИСУЄМО стан у СПРАВЖНЬОМУ розділі
             if (!allSavedStates[ref.topicId]) allSavedStates[ref.topicId] = [];
             allSavedStates[ref.topicId][ref.originalIndex] = { selectedIndex: selectedIndex, isCorrect: isCorrect };
             localStorage.setItem('pdr_quiz_states', JSON.stringify(allSavedStates));
 
-            // Якщо відповів правильно - коригуємо статистику справжнього розділу
             if (isCorrect) {
                 const stats = JSON.parse(localStorage.getItem('pdr_topic_stats') || "{}");
                 stats[ref.topicId] = (stats[ref.topicId] || 0) + 1;
-                // Знаходимо totalQ справжнього розділу
                 const realTopic = globalTopics.find(t => t.id === ref.topicId);
                 const realTotalQ = realTopic ? realTopic.totalQuestions : 999;
                 if (stats[ref.topicId] > realTotalQ) stats[ref.topicId] = realTotalQ;
@@ -782,7 +754,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
         } else {
-            // Звичайний режим (твій старий код)
             questionStates[currentQuestionIndex] = { selectedIndex: selectedIndex, isCorrect: isCorrect };
             allSavedStates[currentTopic.id] = questionStates;
             localStorage.setItem('pdr_quiz_states', JSON.stringify(allSavedStates));
@@ -799,6 +770,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (totalAnswersGiven < 2) {
             totalAnswersGiven++;
             localStorage.setItem('pdr_answers_count', totalAnswersGiven.toString());
+        }
+
+        // Запускаємо тихе збереження у хмару Телеграм
+        if (currentTopic.isVirtual) {
+            scheduleCloudSave(currentTopic.refs[currentQuestionIndex].topicId);
+        } else {
+            scheduleCloudSave(currentTopic.id);
         }
 
         renderQuestion();
@@ -830,7 +808,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         globalTopics.forEach(topic => {
             totalExpected += (topic.totalQuestions || 0);
-            const topicStates = allSavedStates[topic.id] || [];
+            const topicStates = allSavedStates[topic.id] ||[];
             
             topicStates.forEach(state => {
                 if (state && state.selectedIndex !== null) {
@@ -917,7 +895,6 @@ document.addEventListener("DOMContentLoaded", () => {
         avatarContainer.addEventListener('click', async () => {
             addImpact();
             
-            // Если разделы еще не загружены, загружаем их для правильной статистики
             if (globalTopics.length === 0) {
                 try {
                     const response = await fetch('https://pdrua.duckdns.org/api/topics');
@@ -965,6 +942,16 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.removeItem('pdr_topic_stats');
         localStorage.removeItem('pdr_quiz_states');
         
+        // ОЧИЩАЄМО ХМАРУ ТЕЛЕГРАМ ПРИ ОБНУЛЕННІ
+        if (tg && tg.CloudStorage) {
+            tg.CloudStorage.getKeys((err, keys) => {
+                if (!err && keys) {
+                    const topicKeys = keys.filter(k => k.startsWith('topic_'));
+                    if (topicKeys.length > 0) tg.CloudStorage.removeItems(topicKeys);
+                }
+            });
+        }
+        
         renderTopics();
         profileModal.classList.remove('active');
         showScreen(topicsScreen, 'topics');
@@ -976,20 +963,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // --- ФУНКЦІЯ ДЛЯ СПЛИВАЮЧИХ ПОВІДОМЛЕНЬ (TOAST) ---
     function showToast(message) {
         let toast = document.getElementById('app-toast');
         if (!toast) {
             toast = document.createElement('div');
             toast.id = 'app-toast';
             
-            // Центрируем по центру экрана
             toast.style.position = 'fixed';
             toast.style.top = '50%'; 
             toast.style.left = '50%';
             toast.style.transform = 'translate(-50%, -50%) scale(0.9)';
             
-            // Делаем дизайн более массивным и заметным
             toast.style.backgroundColor = 'var(--c-surface)';
             toast.style.color = 'var(--c-text)';
             toast.style.border = '1px solid var(--c-border-soft)';
@@ -1002,7 +986,6 @@ document.addEventListener("DOMContentLoaded", () => {
             toast.style.boxShadow = '0 20px 40px rgba(0,0,0,0.3)';
             toast.style.transition = 'opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
             
-            // Чтобы текст мог переноситься на новую строку, если он длинный
             toast.style.whiteSpace = 'normal';
             toast.style.width = '85%';
             toast.style.maxWidth = '350px';
@@ -1015,13 +998,11 @@ document.addEventListener("DOMContentLoaded", () => {
         toast.style.transform = 'translate(-50%, -50%) scale(0.9)';
         toast.style.display = 'block';
         
-        // Анимация появления (эффект "выпрыгивания")
         setTimeout(() => {
             toast.style.opacity = '1';
             toast.style.transform = 'translate(-50%, -50%) scale(1)';
         }, 10);
         
-        // Исчезает через 3 секунды
         clearTimeout(toast.hideTimeout);
         toast.hideTimeout = setTimeout(() => {
             toast.style.opacity = '0';
@@ -1030,4 +1011,76 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 3000);
     }
 
-});
+    // ==========================================
+    // CLOUD STORAGE (СИНХРОНІЗАЦІЯ ПРОГРЕСУ)
+    // ==========================================
+    
+    // 1. Архіватор даних (стискаємо об'єкти в малі масиви)
+    function packState(stateArray) {
+        return JSON.stringify(stateArray.map(s => s ?[s.selectedIndex, s.isCorrect ? 1 : 0] : null));
+    }
+
+    // 2. Розархіватор
+    function unpackState(packedStr) {
+        try {
+            const arr = JSON.parse(packedStr);
+            return arr.map(item => item ? { selectedIndex: item[0], isCorrect: !!item[1] } : null);
+        } catch(e) { return[]; }
+    }
+
+    // 3. Відновлення при вході
+    function syncFromCloud() {
+        if (!tg || !tg.CloudStorage) return;
+        
+        tg.CloudStorage.getKeys((err, keys) => {
+            if (err || !keys || keys.length === 0) return;
+
+            const topicKeys = keys.filter(k => k.startsWith('topic_'));
+            if (topicKeys.length === 0) return;
+
+            tg.CloudStorage.getItems(topicKeys, (err, values) => {
+                if (err || !values) return;
+
+                const allSavedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
+                const stats = JSON.parse(localStorage.getItem('pdr_topic_stats') || "{}");
+
+                topicKeys.forEach(key => {
+                    if (values[key]) {
+                        const unpacked = unpackState(values[key]);
+                        allSavedStates[key] = unpacked;
+
+                        // Відновлюємо статистику
+                        let correctCount = 0;
+                        unpacked.forEach(s => { if (s && s.isCorrect) correctCount++; });
+                        stats[key] = correctCount;
+                    }
+                });
+
+                localStorage.setItem('pdr_quiz_states', JSON.stringify(allSavedStates));
+                localStorage.setItem('pdr_topic_stats', JSON.stringify(stats));
+
+                if (currentScreenName === 'topics') renderTopics();
+            });
+        });
+    }
+
+    // 4. Тихе збереження (Дебаунс 1 сек)
+    let cloudSaveTimeouts = {};
+    function scheduleCloudSave(topicId) {
+        if (!tg || !tg.CloudStorage || topicId === 'hard_mode') return; 
+        
+        if (cloudSaveTimeouts[topicId]) clearTimeout(cloudSaveTimeouts[topicId]);
+        
+        cloudSaveTimeouts[topicId] = setTimeout(() => {
+            const allSavedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
+            const topicState = allSavedStates[topicId];
+            if (topicState) {
+                tg.CloudStorage.setItem(topicId, packState(topicState));
+            }
+        }, 1000); 
+    }
+
+    // Запускаємо відновлення при старті додатку
+    syncFromCloud();
+
+}); // <-- ВОТ ТА САМАЯ ЗАКРЫВАЮЩАЯ СКОБКА
