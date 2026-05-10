@@ -421,6 +421,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- 5. ЛОГИКА ТЕСТА (LAZY LOADING) ---
+    const CHUNK_SIZE = 25; // <--- Управляй количеством загружаемых вопросов здесь
     async function startQuiz(topic) {
         currentTopic = topic;
         document.getElementById('quiz-topic-name').innerText = topic.title;
@@ -455,7 +456,7 @@ document.addEventListener("DOMContentLoaded", () => {
         renderQuestion();
     }
 
-    async function fetchQuestionsChunk(topicId, offset, limit = 20) {
+    async function fetchQuestionsChunk(topicId, offset, limit = CHUNK_SIZE) {
         // Если мы уже грузим ИЛИ знаем, что вопросов больше нет - отменяем запрос!
         if (isLoadingQuestions || noMoreQuestionsOnServer) return;
         isLoadingQuestions = true;
@@ -534,7 +535,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let offsetToFetch = currentQuestionIndex;
             while(currentQuestions[offsetToFetch]) offsetToFetch++;
             if (!isLoadingQuestions) {
-                fetchQuestionsChunk(currentTopic.id, offsetToFetch, 20);
+                fetchQuestionsChunk(currentTopic.id, offsetToFetch, CHUNK_SIZE);
             }
         }
 
@@ -575,7 +576,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (nextBtn) nextBtn.style.display = 'none';
             
             if (!isLoadingQuestions) {
-                fetchQuestionsChunk(currentTopic.id, currentQuestionIndex, 20);
+                fetchQuestionsChunk(currentTopic.id, currentQuestionIndex, CHUNK_SIZE);
             }
             
             setTimeout(renderQuestion, 300);
