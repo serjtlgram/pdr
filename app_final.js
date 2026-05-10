@@ -558,7 +558,7 @@ document.addEventListener("DOMContentLoaded", () => {
             else if (state && state.isCorrect === false) btn.classList.add('wrong');
             
             // Якщо питання ще не завантажено І на нього немає збереженої відповіді
-            if (!currentQuestions[i] && (!state || state.selectedIndex === null)) {
+            if (!currentTopic.isVirtual && !currentQuestions[i] && (!state || state.selectedIndex === null)) {
                 btn.classList.add('empty');
             }
             
@@ -595,74 +595,49 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // Если вопрос еще не загрузился
-        if (!q) {// Если вопрос еще не загрузился
-            if (!q) {
-                if (noMoreQuestionsOnServer && !currentTopic.isVirtual) {
-                    // ... (тут твой старый код с желтым Toast о том, что вопросов больше нет) ...
-                    currentQuestionIndex = currentQuestions.length - 1;
-                    const coneIcon = `<div style="display: flex; flex-direction: column; align-items: center; gap: 16px;"><div style="width: 72px; height: 72px; border-radius: 50%; background: rgba(245, 158, 11, 0.12); display: flex; align-items: center; justify-content: center;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none"><path d="M4 20H20" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 3L5.5 20H18.5L12 3Z" fill="#F59E0B" fill-opacity="0.2" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 12H15.5" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 16H17" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div style="line-height: 1.4; font-size: 1.15rem;">Ой! Наступні питання<br>будуть додані пізніше</div></div>`;
-                    showToast(coneIcon);
-                    renderQuestion();
-                    return;
-                }
-                
-                document.getElementById('quiz-question-text').innerText = "Завантаження питання...";
-                document.getElementById('quiz-options').innerHTML = "";
-                const imgEl = document.getElementById('quiz-image');
-                if (imgEl && imgEl.parentElement) imgEl.parentElement.style.display = 'none';
-                const nextBtn = document.getElementById('btn-next-question');
-                if (nextBtn) nextBtn.style.display = 'none';
-                
-                // Якщо це звичайний тест - вантажимо чанками
-                if (!currentTopic.isVirtual && !isLoadingQuestions) {
-                    fetchQuestionsChunk(currentTopic.id, currentQuestionIndex, CHUNK_SIZE);
-                } 
-                // Якщо це "Складні питання" - вантажимо конкретне питання по його адресі
-                else if (currentTopic.isVirtual && !isLoadingQuestions) {
-                    isLoadingQuestions = true;
-                    const ref = currentTopic.refs[currentQuestionIndex];
-                    fetch(`https://pdrua.duckdns.org/api/questions?topicId=${ref.topicId}&offset=${ref.originalIndex}&limit=1`)
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data && data.length > 0) currentQuestions[currentQuestionIndex] = data[0];
-                            isLoadingQuestions = false;
-                            renderQuestion();
-                        })
-                        .catch(err => { console.error(err); isLoadingQuestions = false; });
-                    return; // Зупиняємо рендер, поки питання не прилетить
-                }
-                
-                if(!currentTopic.isVirtual) setTimeout(renderQuestion, 300);
+        if (!q) {
+            if (noMoreQuestionsOnServer && !currentTopic.isVirtual) {
+                currentQuestionIndex = currentQuestions.length - 1;
+                const coneIcon = `<div style="display: flex; flex-direction: column; align-items: center; gap: 16px;"><div style="width: 72px; height: 72px; border-radius: 50%; background: rgba(245, 158, 11, 0.12); display: flex; align-items: center; justify-content: center;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none"><path d="M4 20H20" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 3L5.5 20H18.5L12 3Z" fill="#F59E0B" fill-opacity="0.2" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 12H15.5" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 16H17" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div style="line-height: 1.4; font-size: 1.15rem;">Ой! Наступні питання<br>будуть додані пізніше</div></div>`;
+                showToast(coneIcon);
+                renderQuestion();
                 return;
             }
-    
-            // --- PRE-FETCHING (Тихе завантаження наступних питань) ---
-            if (!currentTopic.isVirtual && !currentQuestions[currentQuestionIndex + 5] && (currentQuestionIndex + 5) < total) {
-                let offsetToFetch = currentQuestionIndex;
-                while(currentQuestions[offsetToFetch]) offsetToFetch++;
-                if (!isLoadingQuestions) fetchQuestionsChunk(currentTopic.id, offsetToFetch, CHUNK_SIZE);
-            } else if (currentTopic.isVirtual && currentQuestionIndex + 1 < total && !currentQuestions[currentQuestionIndex + 1]) {
-                // У Складних питаннях тихо підвантажуємо +1 наступне питання
-                const nextRef = currentTopic.refs[currentQuestionIndex + 1];
-                fetch(`https://pdrua.duckdns.org/api/questions?topicId=${nextRef.topicId}&offset=${nextRef.originalIndex}&limit=1`)
-                    .then(r => r.json())
-                    .then(d => { if(d[0]) currentQuestions[currentQuestionIndex + 1] = d[0]; });
-            }
             
-            // Иначе показываем загрузку и ждем
-            document.getElementById('quiz-question-text').innerText = "Завантаження питань...";
+            document.getElementById('quiz-question-text').innerText = "Завантаження питання...";
             document.getElementById('quiz-options').innerHTML = "";
-            
-            // ПРЯЧЕМ КАРТИНКУ И КНОПКУ, ПОКА ИДЕТ ЗАГРУЗКА
             const imgEl = document.getElementById('quiz-image');
             if (imgEl && imgEl.parentElement) imgEl.parentElement.style.display = 'none';
             const nextBtn = document.getElementById('btn-next-question');
             if (nextBtn) nextBtn.style.display = 'none';
             
-            if (!isLoadingQuestions) {
+            // Якщо це звичайний тест - вантажимо чанками
+            if (!currentTopic.isVirtual && !isLoadingQuestions) {
                 fetchQuestionsChunk(currentTopic.id, currentQuestionIndex, CHUNK_SIZE);
+            } 
+            // Якщо це "Складні питання" - вантажимо конкретне питання по його адресі
+            else if (currentTopic.isVirtual && !isLoadingQuestions) {
+                isLoadingQuestions = true;
+                const ref = currentTopic.refs[currentQuestionIndex];
+                fetch(`https://pdrua.duckdns.org/api/questions?topicId=${ref.topicId}&offset=${ref.originalIndex}&limit=1`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data && data.length > 0) {
+                            currentQuestions[currentQuestionIndex] = data[0];
+                        } else {
+                            // Якщо питання видалили з бази - ставимо заглушку, щоб не зависало
+                            currentQuestions[currentQuestionIndex] = { text: "Помилка: Питання не знайдено", options: ["Далі"], correctIndex: 0 };
+                        }
+                        isLoadingQuestions = false;
+                        renderQuestion();
+                    })
+                    .catch(err => { 
+                        console.error("Помилка мережі:", err); 
+                        isLoadingQuestions = false; 
+                    });
             }
             
+            // ЗАПОБІЖНИК: У будь-якому випадку пробуємо оновити екран через 300мс
             setTimeout(renderQuestion, 300);
             return;
         }
