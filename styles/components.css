@@ -830,3 +830,41 @@ body.light-theme .info-icon {
 .category-btn.active svg {
   opacity: 1;
 }
+
+/* Звичайний стан неактивних, але пройдених питань */
+.nav-btn.correct {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: var(--c-success);
+  color: var(--c-success);
+}
+
+.nav-btn.wrong {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: var(--c-danger);
+  color: var(--c-danger);
+}
+
+/* 1. АКТИВНЕ питання (яке ще не проходили) */
+.nav-btn.active {
+  background: var(--c-primary);
+  border-color: var(--c-primary);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(66, 133, 244, 0.4);
+  transform: scale(1.08); /* Робимо її трохи більшою */
+}
+
+/* 2. АКТИВНЕ питання, на яке вже відповіли ПРАВИЛЬНО */
+.nav-btn.active.correct {
+  background: var(--c-success);
+  border-color: var(--c-success);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+}
+
+/* 3. АКТИВНЕ питання, на яке вже відповіли НЕПРАВИЛЬНО */
+.nav-btn.active.wrong {
+  background: var(--c-danger);
+  border-color: var(--c-danger);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+}
