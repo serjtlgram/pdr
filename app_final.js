@@ -850,16 +850,16 @@ document.addEventListener("DOMContentLoaded", () => {
         let iconRight = "";
         let isMax = false;
 
-        if (successRate <= 30) {
+        if (successRate <= 20) {
             text = "Схоже, правила поки що<br>керують вами 😅";
             iconLeft = "🚨"; iconRight = "⚠️";
-        } else if (successRate <= 45) {
+        } else if (successRate <= 40) {
             text = "Ви вже розумієте, що «головна дорога» —<br>це не життєва позиція";
             iconLeft = "🛣️"; iconRight = "🤔";
-        } else if (successRate <= 65) {
+        } else if (successRate <= 60) {
             text = "Дорожні знаки<br>починають вас поважати";
             iconLeft = "🚸"; iconRight = "😎";
-        } else if (successRate <= 85) {
+        } else if (successRate <= 80) {
             text = "Навігатор більше не переживає<br>за ваше майбутнє";
             iconLeft = "📱"; iconRight = "😌";
         } else if (successRate <= 99) {
