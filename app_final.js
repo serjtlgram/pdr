@@ -800,7 +800,46 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnCloseProfile = document.getElementById('btn-close-profile');
     const btnResetProgress = document.getElementById('btn-reset-progress');
 
-    ;
+    function calculateStats() {
+        if (!globalTopics || globalTopics.length === 0) {
+            return { successRate: 0, answered: 0, total: 0, completionRate: 0, correct: 0, incorrect: 0 };
+        }
+
+        const allSavedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
+        let totalExpected = 0;
+        let totalAnswered = 0;
+        let totalCorrect = 0;
+        let totalIncorrect = 0; // Добавили счетчик ошибок
+
+        globalTopics.forEach(topic => {
+            totalExpected += (topic.totalQuestions || 0);
+            const topicStates = allSavedStates[topic.id] || [];
+            
+            topicStates.forEach(state => {
+                if (state && state.selectedIndex !== null) {
+                    totalAnswered++;
+                    if (state.isCorrect) {
+                        totalCorrect++;
+                    } else {
+                        totalIncorrect++; // Считаем ошибки
+                    }
+                }
+            });
+        });
+
+        const successRate = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+        const completionRate = totalExpected > 0 ? (totalAnswered / totalExpected) : 0;
+
+        // Возвращаем расширенный объект со статистикой
+        return { 
+            successRate, 
+            answered: totalAnswered, 
+            total: totalExpected, 
+            completionRate,
+            correct: totalCorrect,
+            incorrect: totalIncorrect
+        };
+    }
 
     function updateHumorBanner(successRate) {
         const banner = document.getElementById('stat-humor-banner');
@@ -886,9 +925,10 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('stat-answered-text').innerText = stats.answered;
             document.getElementById('stat-total-text').innerText = stats.total;
 
-            // Выводим данные в новые мини-карточки
-            document.getElementById('stat-correct-text').innerText = stats.correct;
-            document.getElementById('stat-incorrect-text').innerText = stats.incorrect;
+            const correctEl = document.getElementById('stat-correct-text');
+            const incorrectEl = document.getElementById('stat-incorrect-text');
+            if (correctEl) correctEl.innerText = stats.correct;
+            if (incorrectEl) incorrectEl.innerText = stats.incorrect;
 
             updateHumorBanner(stats.successRate);
 
