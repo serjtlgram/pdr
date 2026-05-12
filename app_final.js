@@ -196,6 +196,12 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // --- НОВИЙ КОД: Запускаємо тиху перевірку відразу при старті додатку ---
+    if (totalAnswersGiven >= 2 && !isUserVerified) {
+        setTimeout(runSilentVerification, 100); // Запускаємо майже миттєво у фоні
+    }
+    // ------------------------------------------------------------------------
+
     // --- SPA Навигация ---
     function showScreen(screenToShow, screenName) {
         homeScreen.classList.remove('active');
