@@ -871,25 +871,26 @@ body.light-theme .info-icon {
 
 /* --- Міні-картки статистики (Правильно/Помилки) --- */
 .stat-mini-cards-row {
-  display: flex;
-  gap: 16px;
+  display: grid; /* Міняємо flex на grid для жорсткого контролю ширини */
+  grid-template-columns: repeat(2, 1fr); /* Рівно 50% на 50% */
+  gap: 12px; /* Трохи зменшили відстань між картками */
   width: 100%;
 }
 
 .stat-mini-card {
-  flex: 1;
   background: var(--c-surface);
   border: 1px solid var(--c-border-soft);
   border-radius: 20px;
-  padding: 16px;
+  padding: 14px 12px; /* Зменшили бокові відступи для вузьких екранів */
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px; /* Зменшили відстань між іконкою та текстом */
+  min-width: 0; /* ВАЖЛИВО: дозволяє блоку стискатися, не ламаючи сітку */
 }
 
 .mini-card-icon {
-  width: 46px;
-  height: 46px;
+  width: 42px; /* Зробили іконку на міліметр меншою */
+  height: 42px;
   border-radius: 14px;
   display: flex;
   align-items: center;
@@ -910,18 +911,23 @@ body.light-theme .info-icon {
 .mini-card-info {
   display: flex;
   flex-direction: column;
+  min-width: 0; /* Дозволяє тексту обрізатися, якщо екран мікроскопічний */
+  overflow: hidden;
 }
 
 .mini-card-value {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 800;
   color: var(--c-text);
   line-height: 1.1;
 }
 
 .mini-card-label {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--c-text-soft);
   font-weight: 600;
   margin-top: 4px;
+  white-space: nowrap; /* Забороняємо перенос тексту на новий рядок */
+  overflow: hidden;
+  text-overflow: ellipsis; /* Додаємо три крапки, якщо текст не влазить */
 }
