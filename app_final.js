@@ -260,6 +260,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const cardLearning = document.getElementById('card-learning');
     const cardExam = document.getElementById('card-exam');
     const cardHard = document.getElementById('card-hard');
+    const cardFavorites = document.getElementById('card-favorites');
 
     if (cardLearning) {
         cardLearning.addEventListener('click', () => {
@@ -290,6 +291,15 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             
             startHardMode(); 
+        });
+    }
+
+    if (cardFavorites) {
+        cardFavorites.addEventListener('click', () => {
+            addImpact(); // Легка вібрація при кліку
+            const msg = "Розділ «Обрані» знаходиться в розробці! 🚧\n\nСкоро ви зможете додавати сюди будь-які питання, щоб швидко повертатися до них перед іспитом.";
+            if(tg && tg.showAlert) tg.showAlert(msg);
+            else alert(msg);
         });
     }
 
