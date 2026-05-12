@@ -176,3 +176,24 @@ body.light-theme .nav-btn.active.wrong {
   border-color: #dc2626;
   color: #fff;
 }
+
+/* Міні-картки (Світла тема) */
+body.light-theme .stat-mini-card {
+  background: #FFFFFF;
+  border-color: #E5E7EB;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+body.light-theme .correct-icon {
+  background: #DCFCE7;
+  color: #16A34A;
+}
+
+body.light-theme .incorrect-icon {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+body.light-theme .mini-card-value {
+  color: #111827;
+}

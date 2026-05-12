@@ -800,31 +800,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnCloseProfile = document.getElementById('btn-close-profile');
     const btnResetProgress = document.getElementById('btn-reset-progress');
 
-    function calculateStats() {
-        if (!globalTopics || globalTopics.length === 0) return { successRate: 0, answered: 0, total: 0, completionRate: 0 };
-
-        const allSavedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
-        let totalExpected = 0;
-        let totalAnswered = 0;
-        let totalCorrect = 0;
-
-        globalTopics.forEach(topic => {
-            totalExpected += (topic.totalQuestions || 0);
-            const topicStates = allSavedStates[topic.id] ||[];
-            
-            topicStates.forEach(state => {
-                if (state && state.selectedIndex !== null) {
-                    totalAnswered++;
-                    if (state.isCorrect) totalCorrect++;
-                }
-            });
-        });
-
-        const successRate = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
-        const completionRate = totalExpected > 0 ? (totalAnswered / totalExpected) : 0;
-
-        return { successRate, answered: totalAnswered, total: totalExpected, completionRate };
-    }
+    ;
 
     function updateHumorBanner(successRate) {
         const banner = document.getElementById('stat-humor-banner');
@@ -909,6 +885,10 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('stat-success-text').innerText = `${stats.successRate}%`;
             document.getElementById('stat-answered-text').innerText = stats.answered;
             document.getElementById('stat-total-text').innerText = stats.total;
+
+            // Выводим данные в новые мини-карточки
+            document.getElementById('stat-correct-text').innerText = stats.correct;
+            document.getElementById('stat-incorrect-text').innerText = stats.incorrect;
 
             updateHumorBanner(stats.successRate);
 
