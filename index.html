@@ -165,7 +165,7 @@
                             </div>
                             <div class="card-text">
                                 <h3>СКЛАДНІ ПИТАННЯ</h3>
-                                <p>коли ви відповісте на 100+ питань, тут з'являться ті, які викликали труднощі</p>
+                                <p>тут питання, які викликали труднощі та ви відповили неправильно</p>
                             </div>
                             <div class="card-arrow">›</div>
                         </div>
@@ -241,7 +241,15 @@
                             </button>
                             <button class="quiz-topic-label" id="quiz-topic-name" aria-label="Повернутися до тем">Розділ</button>
                         </div>
-                        <span class="quiz-progress">Питання <span id="current-q-num">1</span> з <span id="total-q-num">1</span></span>
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <span class="quiz-progress">Питання <span id="current-q-num">1</span> з <span id="total-q-num">1</span></span>
+                            <!-- НОВА КНОПКА: Закладка -->
+                            <button id="btn-bookmark" class="bookmark-btn" aria-label="Додати в обране">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="question-nav-wrapper">

@@ -931,3 +931,42 @@ body.light-theme .info-icon {
   overflow: hidden;
   text-overflow: ellipsis; /* Додаємо три крапки, якщо текст не влазить */
 }
+
+/* --- Кнопка Закладки (Обране) --- */
+.bookmark-btn {
+  background: transparent;
+  border: none;
+  color: var(--c-text-muted);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 0;
+}
+
+.bookmark-btn:active {
+  transform: scale(0.8);
+}
+
+.bookmark-btn svg {
+  transition: all 0.3s ease;
+}
+
+/* Активний стан (Додано в обране) */
+.bookmark-btn.active {
+  color: #EC4899; /* Той самий колір, що й на головному екрані */
+  background: rgba(236, 72, 153, 0.1);
+}
+
+.bookmark-btn.active svg {
+  fill: #EC4899;
+}
+
+/* Світла тема для закладки */
+body.light-theme .bookmark-btn.active {
+  background: #FCE7F3;
+}

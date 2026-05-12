@@ -296,10 +296,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (cardFavorites) {
         cardFavorites.addEventListener('click', () => {
-            addImpact(); // Легка вібрація при кліку
-            const msg = "Розділ «Обрані» знаходиться в розробці! 🚧\n\nСкоро ви зможете додавати сюди будь-які питання, щоб швидко повертатися до них перед іспитом.";
-            if(tg && tg.showAlert) tg.showAlert(msg);
-            else alert(msg);
+            addImpact();
+            if (globalTopics.length === 0) return; // Чекаємо завантаження
+            renderFavoriteTopics();
         });
     }
 
@@ -337,7 +336,7 @@ document.addEventListener("DOMContentLoaded", () => {
         "topic_7": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="2"/><path d="M12 2v8M12 14v8M2 12h8M14 12h8M4.9 4.9l5.7 5.7M13.4 13.4l5.7 5.7M4.9 19.1l5.7-5.7M13.4 10.6l5.7-5.7"/></svg>`, 
         
         // 8. Регулювання дорожнього руху (Світлофор)
-        "topic_8.1": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="17" r="2"/></svg>`,
+        "topic_8": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="17" r="2"/></svg>`,
 
         // 8.2. Регулювання дорожнього руху (Нерегульовані перехрестя / Регулювальник) - Кашкет
         "topic_8.2": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h18"/><path d="M6 14v-3a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v3"/><circle cx="12" cy="10" r="2"/></svg>`,
@@ -385,6 +384,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- 4. ОТРИСОВКА РАЗДЕЛОВ (С СЕРВЕРА) ---
     async function renderTopics(filter = "") {
         const grid = document.getElementById('topics-grid');
+
+        // Повертаємо стандартні заголовки та пошук
+        const titleEl = document.querySelector('#topics-screen .section-title');
+        const subEl = document.querySelector('#topics-screen .screen-subtitle');
+        const searchFooter = document.querySelector('.search-footer');
+        if (titleEl) titleEl.innerText = "Розділи навчання";
+        if (subEl) subEl.innerText = "Оберіть тему для підготовки";
+        if (searchFooter) searchFooter.style.display = 'block';
+
         if (!grid) return;
         
         if (globalTopics.length === 0) {
@@ -530,6 +538,158 @@ document.addEventListener("DOMContentLoaded", () => {
         currentQuestionIndex = 0;
 
         document.getElementById('quiz-topic-name').innerText = currentTopic.title;
+        showScreen(quizScreen, 'quiz');
+        renderQuestion();
+    }
+
+    // --- ЛОГІКА "ОБРАНЕ" ---
+    
+    // Отримуємо реальні координати питання (навіть якщо ми у віртуальному розділі)
+    function getRealQuestionRef() {
+        if (!currentTopic) return null;
+        if (currentTopic.isVirtual) {
+            return currentTopic.refs[currentQuestionIndex];
+        }
+        return { topicId: currentTopic.id, originalIndex: currentQuestionIndex };
+    }
+
+    // Оновлення візуалу кнопки закладки
+    function updateBookmarkUI() {
+        const btn = document.getElementById('btn-bookmark');
+        if (!btn) return;
+        
+        const ref = getRealQuestionRef();
+        if (!ref) return;
+
+        const favs = JSON.parse(localStorage.getItem('pdr_favorites') || "{}");
+        const isFav = favs[ref.topicId] && favs[ref.topicId].includes(ref.originalIndex);
+
+        if (isFav) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    }
+
+    // Клік по закладці
+    const btnBookmark = document.getElementById('btn-bookmark');
+    if (btnBookmark) {
+        btnBookmark.addEventListener('click', () => {
+            addImpact();
+            const ref = getRealQuestionRef();
+            if (!ref) return;
+
+            let favs = JSON.parse(localStorage.getItem('pdr_favorites') || "{}");
+            if (!favs[ref.topicId]) favs[ref.topicId] =[];
+
+            const indexInArray = favs[ref.topicId].indexOf(ref.originalIndex);
+            
+            if (indexInArray === -1) {
+                // Додаємо
+                favs[ref.topicId].push(ref.originalIndex);
+                favs[ref.topicId].sort((a, b) => a - b); // Сортуємо по порядку
+                btnBookmark.classList.add('active');
+            } else {
+                // Видаляємо
+                favs[ref.topicId].splice(indexInArray, 1);
+                if (favs[ref.topicId].length === 0) delete favs[ref.topicId];
+                btnBookmark.classList.remove('active');
+            }
+
+            localStorage.setItem('pdr_favorites', JSON.stringify(favs));
+            
+            // Зберігаємо в хмару Telegram з дебаунсом (захист від спаму кліками)
+            if (tg && tg.CloudStorage) {
+                if (window.favCloudSaveTimeout) clearTimeout(window.favCloudSaveTimeout);
+                window.favCloudSaveTimeout = setTimeout(() => {
+                    tg.CloudStorage.setItem('pdr_favorites', JSON.stringify(favs));
+                }, 1500); // Відправляємо в хмару тільки через 1.5 сек після останнього кліку
+            }
+        });
+    }
+
+    // Відмальовка екрану з розділами Обраного
+    function renderFavoriteTopics() {
+        const favs = JSON.parse(localStorage.getItem('pdr_favorites') || "{}");
+        const favTopicIds = Object.keys(favs);
+
+        if (favTopicIds.length === 0) {
+            const emptyIcon = `
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+                    <div style="width: 72px; height: 72px; border-radius: 50%; background: rgba(236, 72, 153, 0.12); display: flex; align-items: center; justify-content: center; color: #EC4899;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+                    </div>
+                    <div style="line-height: 1.4; font-size: 1.15rem;">У вас поки немає<br>збережених питань</div>
+                </div>
+            `;
+            showToast(emptyIcon);
+            return;
+        }
+
+        const grid = document.getElementById('topics-grid');
+        grid.innerHTML = ""; 
+        
+        // Змінюємо заголовки екрану
+        document.querySelector('#topics-screen .section-title').innerText = "Ваші обрані питання";
+        document.querySelector('#topics-screen .screen-subtitle').innerText = "Згруповані за розділами ПДР";
+        
+        // Ховаємо пошук, він тут не потрібен
+        const searchFooter = document.querySelector('.search-footer');
+        if(searchFooter) searchFooter.style.display = 'none';
+
+        favTopicIds.forEach((topicId, index) => {
+            const topic = globalTopics.find(t => t.id === topicId);
+            if (!topic) return;
+
+            const questionsCount = favs[topicId].length;
+            const colorClass = `c${(index % 6) + 1}`;
+            const iconHtml = modernIcons[topic.id] || `<span style="font-size: 1.5rem;">${topic.icon || "🔖"}</span>`;
+
+            const card = document.createElement('div');
+            card.className = `topic-card ${colorClass}`;
+            
+            card.innerHTML = `
+                <div class="topic-header">
+                    <div class="topic-icon-wrapper">${iconHtml}</div>
+                    <div class="topic-chevron">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </div>
+                </div>
+                <div class="topic-title">${topic.title}</div>
+                <div class="topic-info">
+                    <span style="font-weight: 600;">Збережено питань: ${questionsCount}</span>
+                </div>
+            `;
+            
+            card.onclick = () => {
+                addImpact();
+                startFavoritesQuiz(topic, favs[topicId]);
+            };
+            
+            grid.appendChild(card);
+        });
+
+        showScreen(topicsScreen, 'favorites_list');
+    }
+
+    // Запуск тесту по обраним питанням конкретного розділу
+    function startFavoritesQuiz(originalTopic, questionIndexes) {
+        let refs = questionIndexes.map(idx => ({ topicId: originalTopic.id, originalIndex: idx }));
+
+        currentTopic = {
+            id: 'favorites_mode',
+            title: 'Обране: ' + originalTopic.title,
+            isVirtual: true,
+            totalQuestions: refs.length,
+            refs: refs 
+        };
+
+        currentQuestions = Array(refs.length).fill(null); 
+        // Для обраного ми не зберігаємо прогрес відповідей, просто даємо тренуватись
+        questionStates = Array(refs.length).fill(null).map(() => ({ selectedIndex: null, isCorrect: null }));
+        currentQuestionIndex = 0;
+
+        document.getElementById('quiz-topic-name').innerText = "Обране";
         showScreen(quizScreen, 'quiz');
         renderQuestion();
     }
@@ -707,6 +867,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const optionsContainer = document.getElementById('quiz-options');
+        updateBookmarkUI(); // Оновлюємо стан закладки для поточного питання
         optionsContainer.innerHTML = '';
 
         q.options.forEach((optionText, index) => {
@@ -1132,6 +1293,15 @@ document.addEventListener("DOMContentLoaded", () => {
     function syncFromCloud() {
         if (!tg || !tg.CloudStorage) return;
         
+        // --- НОВЕ: Відновлюємо Обране з хмари Telegram ---
+        tg.CloudStorage.getItem('pdr_favorites', (err, value) => {
+            if (!err && value) {
+                // Якщо в хмарі є збережені закладки, записуємо їх у локальну пам'ять
+                localStorage.setItem('pdr_favorites', value);
+            }
+        });
+        // -------------------------------------------------
+
         tg.CloudStorage.getKeys((err, keys) => {
             if (err || !keys || keys.length === 0) return;
 
