@@ -958,8 +958,8 @@ body.light-theme .info-icon {
 
 /* Активний стан (Додано в обране) */
 .bookmark-btn.active {
-  color: #EC4899; /* Той самий колір, що й на головному екрані */
-  background: rgba(236, 72, 153, 0.1);
+  color: #EC4899; 
+  background: transparent; /* Прибрали рожевий фон */
 }
 
 .bookmark-btn.active svg {
@@ -968,5 +968,5 @@ body.light-theme .info-icon {
 
 /* Світла тема для закладки */
 body.light-theme .bookmark-btn.active {
-  background: #FCE7F3;
+  background: transparent; /* Прибрали рожевий фон у світлій темі */
 }

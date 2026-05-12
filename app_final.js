@@ -229,10 +229,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (currentScreenName === 'quiz') {
-            showScreen(topicsScreen, 'topics');
-            renderTopics(); 
-        } else if (currentScreenName === 'topics') {
-            showScreen(homeScreen, 'home');
+            // Перевіряємо, чи ми в режимі "Обране"
+            if (currentTopic && currentTopic.id === 'favorites_mode') {
+                renderFavoriteTopics(); // Повертаємось до списку обраних розділів
+            } else {
+                showScreen(topicsScreen, 'topics');
+                renderTopics(); // Повертаємось до звичайних розділів
+            }
+        } else if (currentScreenName === 'topics' || currentScreenName === 'favorites_list') {
+            showScreen(homeScreen, 'home'); // Зі списку розділів повертаємось на головну
         }
     }
 
@@ -914,8 +919,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     `;
                     showToast(successIcon);
                 }
-                showScreen(topicsScreen, 'topics'); 
-                renderTopics(); 
+                if (currentTopic && currentTopic.id === 'favorites_mode') {
+                    renderFavoriteTopics();
+                } else {
+                    showScreen(topicsScreen, 'topics'); 
+                    renderTopics(); 
+                }
             };
         }
 
