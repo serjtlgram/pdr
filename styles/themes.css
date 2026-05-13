@@ -197,3 +197,9 @@ body.light-theme .incorrect-icon {
 body.light-theme .mini-card-value {
   color: #111827;
 }
+
+/* Нижня панель (Світла тема) */
+body.light-theme .bottom-nav {
+  background: rgba(255, 255, 255, 0.85);
+  border-top-color: #E5E7EB;
+}

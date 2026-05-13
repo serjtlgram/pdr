@@ -213,12 +213,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
         currentScreenName = screenName;
 
+        // --- НОВЕ: Керування нижньою панеллю ---
+        const bottomNav = document.getElementById('bottom-nav');
+        if (bottomNav) {
+            if (screenName === 'home') {
+                bottomNav.style.display = 'none'; // Ховаємо на головній
+            } else {
+                bottomNav.style.display = 'flex'; // Показуємо на всіх інших
+            }
+        }
+        // ---------------------------------------
+
         if (tg && tg.BackButton) {
             try {
                 if (currentScreenName === 'home') tg.BackButton.hide();
                 else tg.BackButton.show();
             } catch(e){}
         }
+    }
+
+    function updateBottomNav(mode) {
+        document.querySelectorAll('.bottom-nav-item').forEach(item => {
+            if (item.getAttribute('data-mode') === mode) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
     }
 
     function goBack() {
@@ -272,6 +293,54 @@ document.addEventListener("DOMContentLoaded", () => {
     const cardExam = document.getElementById('card-exam');
     const cardHard = document.getElementById('card-hard');
     const cardFavorites = document.getElementById('card-favorites');
+
+    // --- Кліки по нижній панелі навігації ---
+    const navLearning = document.getElementById('nav-learning');
+    const navExam = document.getElementById('nav-exam');
+    const navHard = document.getElementById('nav-hard');
+    const navFavorites = document.getElementById('nav-favorites');
+
+    if (navLearning) {
+        navLearning.addEventListener('click', (e) => {
+            e.preventDefault();
+            addImpact();
+            renderTopics();
+            showScreen(topicsScreen, 'topics');
+        });
+    }
+
+    if (navExam) {
+        navExam.addEventListener('click', (e) => {
+            e.preventDefault();
+            addImpact();
+            if(tg && tg.showAlert) tg.showAlert("Режим іспиту знаходиться в розробці! Скоро додамо 🚀");
+            else alert("Режим іспиту знаходиться в розробці!");
+        });
+    }
+
+    if (navHard) {
+        navHard.addEventListener('click', async (e) => {
+            e.preventDefault();
+            addImpact();
+            if (globalTopics.length === 0) {
+                if(topicsPromise) globalTopics = await topicsPromise;
+                else {
+                    const res = await fetch('https://pdrua.duckdns.org/api/topics');
+                    globalTopics = await res.json();
+                }
+            }
+            startHardMode();
+        });
+    }
+
+    if (navFavorites) {
+        navFavorites.addEventListener('click', (e) => {
+            e.preventDefault();
+            addImpact();
+            if (globalTopics.length === 0) return;
+            renderFavoriteTopics();
+        });
+    }
 
     if (cardLearning) {
         cardLearning.addEventListener('click', () => {
@@ -399,10 +468,13 @@ document.addEventListener("DOMContentLoaded", () => {
         // Повертаємо стандартні заголовки та пошук
         const titleEl = document.querySelector('#topics-screen .section-title');
         const subEl = document.querySelector('#topics-screen .screen-subtitle');
-        const searchFooter = document.querySelector('.search-footer');
+        const searchContainer = document.getElementById('search-container-block');
+        
         if (titleEl) titleEl.innerText = "Розділи навчання";
         if (subEl) subEl.innerText = "Оберіть тему для підготовки";
-        if (searchFooter) searchFooter.style.display = 'block';
+        if (searchContainer) searchContainer.style.display = 'flex';
+        
+        updateBottomNav('learning'); // Підсвічуємо вкладку "Навчання"
 
         if (!grid) return;
         
@@ -509,7 +581,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- РЕЖИМ "СКЛАДНІ ПИТАННЯ" (ВИРТУАЛЬНИЙ РОЗДІЛ) ---
     async function startHardMode() {
-        let hardRefs =[];
+        updateBottomNav('hard'); // Підсвічуємо вкладку "Складні"
+        
+        let hardRefs = [];
         const savedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
 
         globalTopics.forEach(topic => {
@@ -640,9 +714,11 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelector('#topics-screen .section-title').innerText = "Ваші обрані питання";
         document.querySelector('#topics-screen .screen-subtitle').innerText = "Згруповані за розділами ПДР";
         
-        // Ховаємо пошук, він тут не потрібен
-        const searchFooter = document.querySelector('.search-footer');
-        if(searchFooter) searchFooter.style.display = 'none';
+       // Ховаємо пошук, він тут не потрібен
+       const searchContainer = document.getElementById('search-container-block');
+       if(searchContainer) searchContainer.style.display = 'none';
+       
+       updateBottomNav('favorites'); // Підсвічуємо вкладку "Обрані"
 
         favTopicIds.forEach((topicId, index) => {
             const topic = globalTopics.find(t => t.id === topicId);
