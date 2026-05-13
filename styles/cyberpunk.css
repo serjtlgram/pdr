@@ -33,6 +33,7 @@
 body.cyber-theme .logo-icon img {
     /* Замени 'cyber-gerb.webp' на название твоего нового файла */
     content: url("../img/cyber.png");
+    transform: scale(0.5);
 }
 
 /* --- Главная картинка для Киберпанк темы --- */
