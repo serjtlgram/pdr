@@ -862,7 +862,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 addImpact();
                 currentQuestionIndex = i;
                 renderQuestion();
-                window.scrollTo(0, 0); // Возвращаем экран в самый верх
+                window.scrollTo(0, 135); // Возвращаем экран в верх
             });
             
             navBar.appendChild(btn);
@@ -979,7 +979,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 addImpact();
                 currentQuestionIndex++;
                 renderQuestion();
-                window.scrollTo(0, 0); // Возвращаем экран в самый верх
+                window.scrollTo(0, 135); // Возвращаем экран в верх
             };
         } else {
             nextBtn.innerText = 'Завершити розділ';
