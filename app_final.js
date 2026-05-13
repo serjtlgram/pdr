@@ -862,6 +862,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 addImpact();
                 currentQuestionIndex = i;
                 renderQuestion();
+                window.scrollTo(0, 0); // Возвращаем экран в самый верх
             });
             
             navBar.appendChild(btn);
@@ -978,6 +979,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 addImpact();
                 currentQuestionIndex++;
                 renderQuestion();
+                window.scrollTo(0, 0); // Возвращаем экран в самый верх
             };
         } else {
             nextBtn.innerText = 'Завершити розділ';
