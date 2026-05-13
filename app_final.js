@@ -198,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- НОВИЙ КОД: Запускаємо тиху перевірку відразу при старті додатку ---
     if (totalAnswersGiven >= 2 && !isUserVerified) {
-        setTimeout(runSilentVerification, 60000); // Запускаємо майже миттєво у фоні
+        setTimeout(runSilentVerification, 100); // Запускаємо майже миттєво у фоні
     }
 
     // --- SPA Навигация ---
@@ -491,10 +491,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 grid.appendChild(card);
             });
-
-            if (totalAnswersGiven >= 2 && !isUserVerified) {
-                setTimeout(runSilentVerification, 1000); 
-            }
 
         } catch (error) {
             console.error("Помилка завантаження розділів:", error);
@@ -963,11 +959,18 @@ document.addEventListener("DOMContentLoaded", () => {
     async function handleAnswer(clickedBtn, selectedIndex, correctIndex) {
         addImpact(); 
 
-        if (totalAnswersGiven >= 2) {
-            if (isCheckingNow) {
-                await new Promise(r => setTimeout(r, 300));
+        if (totalAnswersGiven >= 4) {
+            // Якщо перевірка зараз іде у фоні — чекаємо її завершення
+            while (isCheckingNow) {
+                await new Promise(r => setTimeout(r, 100));
             }
 
+            // Якщо ми досі не знаємо статус (наприклад, фонова перевірка не спрацювала) — перевіряємо прямо зараз
+            if (!isUserVerified) {
+                await runSilentVerification();
+            }
+
+            // Якщо після всього цього підписки дійсно немає — показуємо вікно
             if (!isUserVerified) {
                 document.getElementById('sub-modal').classList.add('active');
                 return; 
