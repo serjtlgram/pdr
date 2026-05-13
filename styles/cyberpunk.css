@@ -41,8 +41,8 @@ body.cyber-theme .hero-image {
 /* Глобальный фон с легким эффектом сетки */
 body.cyber-theme {
     background-image: 
-        linear-gradient(rgb(34, 107, 110) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 242, 255, 0.223) 1px, transparent 1px);
+        linear-gradient(rgba(34, 107, 110, 0.36) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 242, 255, 0.127) 1px, transparent 1px);
     background-size: 30px 30px;
     background-position: center center;
 }
