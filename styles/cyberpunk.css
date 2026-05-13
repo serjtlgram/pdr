@@ -32,7 +32,7 @@
 /* --- Новая иконка герба для Киберпанк темы --- */
 body.cyber-theme .logo-icon img {
     /* Замени 'cyber-gerb.webp' на название твоего нового файла */
-    content: url("../img/cyber.webp");
+    content: url("../img/cyber.png");
 }
 
 /* --- Главная картинка для Киберпанк темы --- */
