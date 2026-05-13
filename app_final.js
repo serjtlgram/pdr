@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const tg = window.Telegram ? window.Telegram.WebApp : null;
     const tgUser = tg && tg.initDataUnsafe ? tg.initDataUnsafe.user : null;
     const userId = tgUser ? tgUser.id : null; 
-    const FREE_ANSWERS_LIMIT = 5;
+    const FREE_ANSWERS_LIMIT = 10;
 
     // 1. БЛОКИРОВКА ПОЗА TELEGRAM
     if (!tgUser && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
