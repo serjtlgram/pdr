@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const tg = window.Telegram ? window.Telegram.WebApp : null;
     const tgUser = tg && tg.initDataUnsafe ? tg.initDataUnsafe.user : null;
     const userId = tgUser ? tgUser.id : null; 
+    const FREE_ANSWERS_LIMIT = 5;
 
     // 1. БЛОКИРОВКА ПОЗА TELEGRAM
     if (!tgUser && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
@@ -83,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 3. ЛОГИКА ПОДПИСКИ
     let totalAnswersGiven = parseInt(localStorage.getItem('pdr_answers_count') || '0');
-    let isUserVerified = (totalAnswersGiven < 2); 
+    let isUserVerified = (totalAnswersGiven < FREE_ANSWERS_LIMIT); 
     let isCheckingNow = false;
 
     // --- Настройки Telegram UI ---
@@ -197,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- НОВИЙ КОД: Запускаємо тиху перевірку відразу при старті додатку ---
-    if (totalAnswersGiven >= 2 && !isUserVerified) {
+    if (totalAnswersGiven >= FREE_ANSWERS_LIMIT && !isUserVerified) {
         setTimeout(runSilentVerification, 100); // Запускаємо майже миттєво у фоні
     }
 
@@ -959,7 +960,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function handleAnswer(clickedBtn, selectedIndex, correctIndex) {
         addImpact(); 
 
-        if (totalAnswersGiven >= 4) {
+        if (totalAnswersGiven >= FREE_ANSWERS_LIMIT) {
             // Якщо перевірка зараз іде у фоні — чекаємо її завершення
             while (isCheckingNow) {
                 await new Promise(r => setTimeout(r, 100));
@@ -1014,7 +1015,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        if (totalAnswersGiven < 2) {
+        if (totalAnswersGiven < FREE_ANSWERS_LIMIT) {
             totalAnswersGiven++;
             localStorage.setItem('pdr_answers_count', totalAnswersGiven.toString());
         }
