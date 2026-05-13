@@ -77,25 +77,45 @@ body.cyber-theme #cyber-toggle {
 
 /* Главная кнопка (Розпочати навчання) */
 body.cyber-theme .btn-primary {
-    background: transparent;
-    border: 1px solid var(--c-primary);
+    position: relative;
+    background: var(--c-primary); /* Цвет рамки */
+    border: none !important;
     color: var(--c-primary);
     text-transform: uppercase;
     letter-spacing: 1px;
-    
-    /* Внутреннее свечение */
-    box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.2); 
-    
     border-radius: 0 !important;
+    z-index: 1;
+    
     clip-path: polygon(
         12px 0, calc(100% - 12px) 0, 
         100% 12px, 100% calc(100% - 12px), 
         calc(100% - 12px) 100%, 12px 100%, 
         0 calc(100% - 12px), 0 12px
     );
-    
-    /* Внешнее свечение, которое идеально повторяет форму срезанных углов */
-    filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.4));
+    filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.6));
+}
+
+body.cyber-theme .btn-primary::before {
+    content: "";
+    position: absolute;
+    inset: 1px; /* Толщина рамки */
+    background: rgba(5, 5, 10, 0.9); /* Темный фон внутри */
+    z-index: -1;
+    clip-path: polygon(
+        11px 0, calc(100% - 11px) 0, 
+        100% 11px, 100% calc(100% - 11px), 
+        calc(100% - 11px) 100%, 11px 100%, 
+        0 calc(100% - 11px), 0 11px
+    );
+    transition: background 0.2s;
+}
+
+/* Эффект заливки при нажатии */
+body.cyber-theme .btn-primary:active::before {
+    background: var(--c-primary); 
+}
+body.cyber-theme .btn-primary:active {
+    color: #000;
 }
 
 body.cyber-theme .btn-primary:active {
@@ -109,14 +129,13 @@ body.cyber-theme .feature-card,
 body.cyber-theme .stat-card,
 body.cyber-theme .stat-mini-card,
 body.cyber-theme .bottom-banner {
-    background: rgba(10, 10, 18, 0.8);
-    border: 1px solid var(--c-border-soft);
-    backdrop-filter: blur(5px);
+    position: relative;
+    border: none !important; /* Убираем стандартный бордер */
+    background: var(--c-border-soft); /* Теперь фон карточки работает как цвет рамки */
+    border-radius: 0 !important;
+    z-index: 1;
     
-    /* 1. Убираем стандартные круглые углы */
-    border-radius: 0 !important; 
-    
-    /* 2. Магия скошенных углов (срезаем по 16px с каждого угла) */
+    /* Внешний контур (сама рамка) */
     clip-path: polygon(
         16px 0, calc(100% - 16px) 0, 
         100% 16px, 100% calc(100% - 16px), 
@@ -125,19 +144,40 @@ body.cyber-theme .bottom-banner {
     );
 }
 
-/* Специфичные цвета для карточек на главной */
-body.cyber-theme #card-learning { border-color: #00f3ff; box-shadow: inset 0 0 15px rgba(0,243,255,0.1); }
-body.cyber-theme #card-exam { border-color: #b026ff; box-shadow: inset 0 0 15px rgba(176,38,255,0.1); }
-body.cyber-theme #card-hard { border-color: #ff9900; box-shadow: inset 0 0 15px rgba(255,153,0,0.1); }
-body.cyber-theme #card-favorites { border-color: #ff00ff; box-shadow: inset 0 0 15px rgba(255,0,255,0.1); }
+/* Внутренний темный фон карточки */
+body.cyber-theme .feature-card::before,
+body.cyber-theme .stat-card::before,
+body.cyber-theme .stat-mini-card::before,
+body.cyber-theme .bottom-banner::before {
+    content: "";
+    position: absolute;
+    inset: 1px; /* Толщина нашей неоновой линии (1px) */
+    background: rgba(10, 10, 18, 0.95); /* Темный фон внутри */
+    z-index: -1;
+    
+    /* Внутренний контур (чуть меньше внешнего) */
+    clip-path: polygon(
+        15px 0, calc(100% - 15px) 0, 
+        100% 15px, 100% calc(100% - 15px), 
+        calc(100% - 15px) 100%, 15px 100%, 
+        0 calc(100% - 15px), 0 15px
+    );
+}
+
+/* Специфичные цвета для карточек на главной (теперь меняем background, а не border-color) */
+body.cyber-theme #card-learning { background-color: #00f3ff; filter: drop-shadow(0 0 6px rgba(0,243,255,0.5)); }
+body.cyber-theme #card-exam { background-color: #b026ff; filter: drop-shadow(0 0 6px rgba(176,38,255,0.5)); }
+body.cyber-theme #card-hard { background-color: #ff9900; filter: drop-shadow(0 0 6px rgba(255,153,0,0.5)); }
+body.cyber-theme #card-favorites { background-color: #ff00ff; filter: drop-shadow(0 0 6px rgba(255,0,255,0.5)); }
 
 /* --- Сетка разделов (Topics) --- */
 body.cyber-theme .topic-card {
-    background: rgba(5, 5, 10, 0.9);
-    border: 1px solid;
-    
+    position: relative;
+    border: none !important;
+    background: var(--c-border-soft);
     border-radius: 0 !important;
-    /* Здесь срез чуть меньше (12px), так как карточки меньше размером */
+    z-index: 1;
+    
     clip-path: polygon(
         12px 0, calc(100% - 12px) 0, 
         100% 12px, 100% calc(100% - 12px), 
@@ -146,18 +186,28 @@ body.cyber-theme .topic-card {
     );
 }
 
-/* Неоновые цвета для разных разделов */
-body.cyber-theme .topic-card.c1 { border-color: #00f3ff; box-shadow: 0 0 10px rgba(0,243,255,0.2); color: #00f3ff; }
-body.cyber-theme .topic-card.c2 { border-color: #00ff66; box-shadow: 0 0 10px rgba(0,255,102,0.2); color: #00ff66; }
-body.cyber-theme .topic-card.c3 { border-color: #ff9900; box-shadow: 0 0 10px rgba(255,153,0,0.2); color: #ff9900; }
-body.cyber-theme .topic-card.c4 { border-color: #b026ff; box-shadow: 0 0 10px rgba(176,38,255,0.2); color: #b026ff; }
-body.cyber-theme .topic-card.c5 { border-color: #ff00ff; box-shadow: 0 0 10px rgba(255,0,255,0.2); color: #ff00ff; }
-body.cyber-theme .topic-card.c6 { border-color: #ff003c; box-shadow: 0 0 10px rgba(255,0,60,0.2); color: #ff003c; }
-
-body.cyber-theme .topic-title {
-    color: #fff;
-    text-shadow: 0 0 5px rgba(255,255,255,0.3);
+body.cyber-theme .topic-card::before {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    background: rgba(5, 5, 10, 0.95);
+    z-index: -1;
+    
+    clip-path: polygon(
+        11px 0, calc(100% - 11px) 0, 
+        100% 11px, 100% calc(100% - 11px), 
+        calc(100% - 11px) 100%, 11px 100%, 
+        0 calc(100% - 11px), 0 11px
+    );
 }
+
+/* Неоновые цвета для разных разделов */
+body.cyber-theme .topic-card.c1 { background-color: #00f3ff; filter: drop-shadow(0 0 4px rgba(0,243,255,0.5)); color: #00f3ff; }
+body.cyber-theme .topic-card.c2 { background-color: #00ff66; filter: drop-shadow(0 0 4px rgba(0,255,102,0.5)); color: #00ff66; }
+body.cyber-theme .topic-card.c3 { background-color: #ff9900; filter: drop-shadow(0 0 4px rgba(255,153,0,0.5)); color: #ff9900; }
+body.cyber-theme .topic-card.c4 { background-color: #b026ff; filter: drop-shadow(0 0 4px rgba(176,38,255,0.5)); color: #b026ff; }
+body.cyber-theme .topic-card.c5 { background-color: #ff00ff; filter: drop-shadow(0 0 4px rgba(255,0,255,0.5)); color: #ff00ff; }
+body.cyber-theme .topic-card.c6 { background-color: #ff003c; filter: drop-shadow(0 0 4px rgba(255,0,60,0.5)); color: #ff003c; }
 
 /* --- Экран Квиза (Вопросы) --- */
 body.cyber-theme .quiz-container {
