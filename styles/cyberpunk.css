@@ -38,13 +38,23 @@ body.cyber-theme .hero-image {
     /* filter: brightness(0.9) contrast(1.1); */
 }
 
-/* Глобальный фон с легким эффектом сетки */
+/* Глобальный фон с эффектом неоновой сетки и свечением */
 body.cyber-theme {
+    background-color: var(--c-bg);
     background-image: 
-        linear-gradient(rgba(34, 107, 110, 0.36) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 242, 255, 0.127) 1px, transparent 1px);
-    background-size: 30px 30px;
+        /* 1. Горизонтальные линии (сделали ярче: 0.08 вместо 0.03) */
+        linear-gradient(rgba(0, 243, 255, 0.06) 1px, transparent 1px),
+        /* 2. Вертикальные линии */
+        linear-gradient(90deg, rgba(0, 243, 255, 0.06) 1px, transparent 1px),
+        /* 3. Радиальное свечение по центру экрана (эффект голограммы) */
+        radial-gradient(circle at 50% 50%, rgba(0, 243, 255, 0.07) 0%, transparent 70%);
+    
+    /* Размеры: 30px для сетки, 100% для радиального свечения */
+    background-size: 30px 30px, 30px 30px, 100% 100%;
     background-position: center center;
+    
+    /* Фиксируем фон, чтобы сетка стояла на месте при скролле (дает крутой эффект глубины) */
+    background-attachment: fixed; 
 }
 
 /* --- Кнопки и Хедер --- */
@@ -70,10 +80,22 @@ body.cyber-theme .btn-primary {
     background: transparent;
     border: 1px solid var(--c-primary);
     color: var(--c-primary);
-    box-shadow: 0 0 15px rgba(0, 243, 255, 0.3), inset 0 0 10px rgba(0, 243, 255, 0.1);
     text-transform: uppercase;
     letter-spacing: 1px;
-    border-radius: 4px;
+    
+    /* Внутреннее свечение */
+    box-shadow: inset 0 0 15px rgba(0, 243, 255, 0.2); 
+    
+    border-radius: 0 !important;
+    clip-path: polygon(
+        12px 0, calc(100% - 12px) 0, 
+        100% 12px, 100% calc(100% - 12px), 
+        calc(100% - 12px) 100%, 12px 100%, 
+        0 calc(100% - 12px), 0 12px
+    );
+    
+    /* Внешнее свечение, которое идеально повторяет форму срезанных углов */
+    filter: drop-shadow(0 0 8px rgba(0, 243, 255, 0.4));
 }
 
 body.cyber-theme .btn-primary:active {
@@ -89,8 +111,18 @@ body.cyber-theme .stat-mini-card,
 body.cyber-theme .bottom-banner {
     background: rgba(10, 10, 18, 0.8);
     border: 1px solid var(--c-border-soft);
-    box-shadow: 0 0 15px rgba(0, 243, 255, 0.05);
     backdrop-filter: blur(5px);
+    
+    /* 1. Убираем стандартные круглые углы */
+    border-radius: 0 !important; 
+    
+    /* 2. Магия скошенных углов (срезаем по 16px с каждого угла) */
+    clip-path: polygon(
+        16px 0, calc(100% - 16px) 0, 
+        100% 16px, 100% calc(100% - 16px), 
+        calc(100% - 16px) 100%, 16px 100%, 
+        0 calc(100% - 16px), 0 16px
+    );
 }
 
 /* Специфичные цвета для карточек на главной */
@@ -103,6 +135,15 @@ body.cyber-theme #card-favorites { border-color: #ff00ff; box-shadow: inset 0 0 
 body.cyber-theme .topic-card {
     background: rgba(5, 5, 10, 0.9);
     border: 1px solid;
+    
+    border-radius: 0 !important;
+    /* Здесь срез чуть меньше (12px), так как карточки меньше размером */
+    clip-path: polygon(
+        12px 0, calc(100% - 12px) 0, 
+        100% 12px, 100% calc(100% - 12px), 
+        calc(100% - 12px) 100%, 12px 100%, 
+        0 calc(100% - 12px), 0 12px
+    );
 }
 
 /* Неоновые цвета для разных разделов */
