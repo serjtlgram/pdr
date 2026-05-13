@@ -29,6 +29,12 @@
     --radius-sm: 4px;
 }
 
+/* --- Новая иконка герба для Киберпанк темы --- */
+body.cyber-theme .logo-icon img {
+    /* Замени 'cyber-gerb.webp' на название твоего нового файла */
+    content: url("../img/cyber.webp");
+}
+
 /* --- Главная картинка для Киберпанк темы --- */
 body.cyber-theme .hero-image {
     /* Замени 'cyber-hero.webp' на реальное название твоего файла */
