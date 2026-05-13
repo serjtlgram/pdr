@@ -1,0 +1,211 @@
+/* ==========================================
+   CYBERPUNK THEME
+   ========================================== */
+
+   body.cyber-theme {
+    /* Переопределение базовых переменных */
+    --c-bg: #05050a;
+    --c-bg-alt: #0a0a12;
+    --c-surface: #0d0d16;
+    
+    --c-text: #e0f7fa;
+    --c-text-soft: #00f3ff; /* Неоновый циан */
+    --c-text-muted: #6b8299;
+    
+    --c-border-soft: rgba(0, 243, 255, 0.3);
+    --c-border-faint: rgba(0, 243, 255, 0.1);
+    
+    --c-primary: #00f3ff;
+    --c-primary-strong: #ff00ff; /* Неоновая маджента */
+    --c-primary-soft: rgba(0, 243, 255, 0.1);
+    --c-primary-soft-hover: rgba(0, 243, 255, 0.2);
+    
+    --c-success: #00ff66; /* Кислотно-зеленый */
+    --c-danger: #ff003c;  /* Неоновый красный */
+
+    /* Уменьшаем скругления для более "жесткого" техно-вида */
+    --radius-lg: 8px;
+    --radius-md: 6px;
+    --radius-sm: 4px;
+}
+
+/* Глобальный фон с легким эффектом сетки */
+body.cyber-theme {
+    background-image: 
+        linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+    background-size: 30px 30px;
+    background-position: center center;
+}
+
+/* --- Кнопки и Хедер --- */
+body.cyber-theme .logo-icon {
+    border-color: var(--c-primary);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+    background: rgba(0, 0, 0, 0.5);
+}
+
+body.cyber-theme .theme-toggle-btn {
+    border-color: var(--c-primary);
+    color: var(--c-primary);
+    background: rgba(0, 243, 255, 0.05);
+}
+
+body.cyber-theme .theme-toggle-btn:hover,
+body.cyber-theme #cyber-toggle {
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+
+/* Главная кнопка (Розпочати навчання) */
+body.cyber-theme .btn-primary {
+    background: transparent;
+    border: 1px solid var(--c-primary);
+    color: var(--c-primary);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.3), inset 0 0 10px rgba(0, 243, 255, 0.1);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 4px;
+}
+
+body.cyber-theme .btn-primary:active {
+    background: var(--c-primary);
+    color: #000;
+    box-shadow: 0 0 25px var(--c-primary);
+}
+
+/* --- Карточки на главной и статистика --- */
+body.cyber-theme .feature-card,
+body.cyber-theme .stat-card,
+body.cyber-theme .stat-mini-card,
+body.cyber-theme .bottom-banner {
+    background: rgba(10, 10, 18, 0.8);
+    border: 1px solid var(--c-border-soft);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.05);
+    backdrop-filter: blur(5px);
+}
+
+/* Специфичные цвета для карточек на главной */
+body.cyber-theme #card-learning { border-color: #00f3ff; box-shadow: inset 0 0 15px rgba(0,243,255,0.1); }
+body.cyber-theme #card-exam { border-color: #b026ff; box-shadow: inset 0 0 15px rgba(176,38,255,0.1); }
+body.cyber-theme #card-hard { border-color: #ff9900; box-shadow: inset 0 0 15px rgba(255,153,0,0.1); }
+body.cyber-theme #card-favorites { border-color: #ff00ff; box-shadow: inset 0 0 15px rgba(255,0,255,0.1); }
+
+/* --- Сетка разделов (Topics) --- */
+body.cyber-theme .topic-card {
+    background: rgba(5, 5, 10, 0.9);
+    border: 1px solid;
+}
+
+/* Неоновые цвета для разных разделов */
+body.cyber-theme .topic-card.c1 { border-color: #00f3ff; box-shadow: 0 0 10px rgba(0,243,255,0.2); color: #00f3ff; }
+body.cyber-theme .topic-card.c2 { border-color: #00ff66; box-shadow: 0 0 10px rgba(0,255,102,0.2); color: #00ff66; }
+body.cyber-theme .topic-card.c3 { border-color: #ff9900; box-shadow: 0 0 10px rgba(255,153,0,0.2); color: #ff9900; }
+body.cyber-theme .topic-card.c4 { border-color: #b026ff; box-shadow: 0 0 10px rgba(176,38,255,0.2); color: #b026ff; }
+body.cyber-theme .topic-card.c5 { border-color: #ff00ff; box-shadow: 0 0 10px rgba(255,0,255,0.2); color: #ff00ff; }
+body.cyber-theme .topic-card.c6 { border-color: #ff003c; box-shadow: 0 0 10px rgba(255,0,60,0.2); color: #ff003c; }
+
+body.cyber-theme .topic-title {
+    color: #fff;
+    text-shadow: 0 0 5px rgba(255,255,255,0.3);
+}
+
+/* --- Экран Квиза (Вопросы) --- */
+body.cyber-theme .quiz-container {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+body.cyber-theme .option-btn {
+    background: rgba(15, 15, 25, 0.8);
+    border: 1px solid #2a3b4c;
+    color: #fff;
+}
+
+body.cyber-theme .option-number {
+    background: transparent;
+    border: 1px solid var(--c-text-soft);
+    color: var(--c-text-soft);
+}
+
+/* Правильный / Неправильный ответ */
+body.cyber-theme .option-btn.correct {
+    background: rgba(0, 255, 102, 0.1);
+    border-color: var(--c-success);
+    box-shadow: 0 0 15px rgba(0, 255, 102, 0.2), inset 0 0 10px rgba(0, 255, 102, 0.1);
+}
+body.cyber-theme .option-btn.correct .option-number {
+    background: var(--c-success);
+    color: #000;
+    border-color: var(--c-success);
+    box-shadow: 0 0 10px var(--c-success);
+}
+
+body.cyber-theme .option-btn.wrong {
+    background: rgba(255, 0, 60, 0.1);
+    border-color: var(--c-danger);
+    box-shadow: 0 0 15px rgba(255, 0, 60, 0.2), inset 0 0 10px rgba(255, 0, 60, 0.1);
+}
+body.cyber-theme .option-btn.wrong .option-number {
+    background: var(--c-danger);
+    color: #fff;
+    border-color: var(--c-danger);
+    box-shadow: 0 0 10px var(--c-danger);
+}
+
+/* Навигация по вопросам (Верхние квадратики) */
+body.cyber-theme .nav-btn {
+    background: rgba(0, 0, 0, 0.5);
+    border-color: #2a3b4c;
+}
+body.cyber-theme .nav-btn.active {
+    background: transparent;
+    border-color: var(--c-primary);
+    color: var(--c-primary);
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+}
+body.cyber-theme .nav-btn.correct {
+    border-color: var(--c-success);
+    color: var(--c-success);
+    box-shadow: 0 0 8px rgba(0, 255, 102, 0.3);
+}
+body.cyber-theme .nav-btn.wrong {
+    border-color: var(--c-danger);
+    color: var(--c-danger);
+    box-shadow: 0 0 8px rgba(255, 0, 60, 0.3);
+}
+
+/* --- Нижняя панель навигации --- */
+body.cyber-theme .bottom-nav {
+    background: rgba(5, 5, 10, 0.95);
+    border-top: 1px solid var(--c-primary);
+    box-shadow: 0 -5px 20px rgba(0, 243, 255, 0.1);
+}
+
+body.cyber-theme .bottom-nav-item.active {
+    color: var(--c-primary);
+    text-shadow: 0 0 10px var(--c-primary);
+}
+body.cyber-theme .bottom-nav-item.active svg {
+    filter: drop-shadow(0 0 5px var(--c-primary));
+}
+
+/* --- Круговые графики статистики --- */
+body.cyber-theme .stat-bg {
+    stroke: rgba(0, 243, 255, 0.1);
+}
+body.cyber-theme .blue-progress {
+    stroke: var(--c-primary);
+    filter: drop-shadow(0 0 8px var(--c-primary));
+}
+body.cyber-theme .green-progress {
+    stroke: var(--c-success);
+    filter: drop-shadow(0 0 8px var(--c-success));
+}
+
+/* --- Поиск --- */
+body.cyber-theme .search-container {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--c-primary);
+    box-shadow: inset 0 0 10px rgba(0, 243, 255, 0.1);
+}
