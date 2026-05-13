@@ -174,7 +174,7 @@
 }
 
 .quiz-container {
-  padding: 24px 24px 100px 24px;
+  padding: 24px 24px 90px 24px;
 }
 
 .quiz-header {
@@ -360,6 +360,7 @@
   text-align: center;
   cursor: pointer;
   transition: all var(--tr-fast);
+  scroll-margin-bottom: 100px; /* Указываем браузеру не докручивать до самого низа */
 }
 
 .btn-next-action:hover {
@@ -375,6 +376,7 @@
   flex-direction: column;
   gap: 12px;
   margin-top: 24px;
+  scroll-margin-bottom: 90px; /* Указываем браузеру не докручивать до самого низа */
 }
 
 .explanation-details {
