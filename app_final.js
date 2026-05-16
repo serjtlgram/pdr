@@ -150,6 +150,46 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // --- УНІВЕРСАЛЬНА КАСТОМНА МОДАЛКА ПІДТВЕРДЖЕННЯ ---
+    let confirmCallback = null;
+
+    function showCustomConfirm(options) {
+        const iconContainer = document.getElementById('confirm-icon-container');
+        iconContainer.innerHTML = options.icon;
+        iconContainer.style.color = options.color;
+        iconContainer.style.background = options.bgColor;
+        
+        document.getElementById('confirm-title').innerText = options.title;
+        document.getElementById('confirm-desc').innerText = options.desc;
+        
+        const okBtn = document.getElementById('btn-confirm-ok');
+        okBtn.innerText = options.okText || 'ОК';
+        
+        // Якщо це небезпечна дія (видалення, переривання), робимо кнопку червоною
+        if (options.isDanger) {
+            okBtn.style.background = 'var(--c-danger)';
+            okBtn.style.boxShadow = '0 8px 24px rgba(239, 68, 68, 0.3)';
+        } else {
+            okBtn.style.background = ''; // Повертаємо стандартний градієнт
+            okBtn.style.boxShadow = '';
+        }
+
+        confirmCallback = options.onConfirm;
+        document.getElementById('custom-confirm-modal').classList.add('active');
+    }
+
+    document.getElementById('btn-confirm-cancel').addEventListener('click', () => {
+        addImpact();
+        document.getElementById('custom-confirm-modal').classList.remove('active');
+        confirmCallback = null;
+    });
+
+    document.getElementById('btn-confirm-ok').addEventListener('click', () => {
+        addImpact();
+        document.getElementById('custom-confirm-modal').classList.remove('active');
+        if (confirmCallback) confirmCallback();
+    });
+
     // Логика кнопки Киберпанк
     if (cyberToggleBtn) {
         cyberToggleBtn.addEventListener('click', () => {
@@ -626,20 +666,21 @@ document.addEventListener("DOMContentLoaded", () => {
     async function startExamMode() {
         addImpact();
         
-        // Перевірка підписки (якщо потрібно)
         if (totalAnswersGiven >= FREE_ANSWERS_LIMIT && !isUserVerified) {
             document.getElementById('sub-modal').classList.add('active');
             return;
         }
 
-        const confirmMsg = "Розпочати іспит?\n\nУ вас буде 20 хвилин на 20 питань. Допускається не більше 2 помилок.";
-        if (tg && tg.showConfirm) {
-            tg.showConfirm(confirmMsg, (confirmed) => {
-                if (confirmed) initExam();
-            });
-        } else {
-            if (confirm(confirmMsg)) initExam();
-        }
+        showCustomConfirm({
+            icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
+            color: '#8B5CF6', // Фіолетовий
+            bgColor: 'rgba(139, 92, 246, 0.15)',
+            title: 'Розпочати іспит?',
+            desc: 'У вас буде 20 хвилин на 20 питань. Допускається не більше 2 помилок.',
+            okText: 'Розпочати',
+            isDanger: false,
+            onConfirm: () => initExam()
+        });
     }
 
     async function initExam() {
@@ -851,14 +892,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Дострокове завершення
     document.getElementById('btn-exam-finish-early').addEventListener('click', () => {
-        const confirmMsg = "Ви впевнені, що хочете завершити іспит достроково?\nНе всі відповіді збережені.";
-        if (tg && tg.showConfirm) {
-            tg.showConfirm(confirmMsg, (confirmed) => {
-                if (confirmed) finishExam(false);
-            });
-        } else {
-            if (confirm(confirmMsg)) finishExam(false);
-        }
+        showCustomConfirm({
+            icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
+            color: '#EF4444', // Червоний
+            bgColor: 'rgba(239, 68, 68, 0.15)',
+            title: 'Завершити достроково?',
+            desc: 'Ви впевнені, що хочете завершити іспит? Не всі відповіді збережені.',
+            okText: 'Завершити',
+            isDanger: true,
+            onConfirm: () => finishExam(false)
+        });
     });
 
     function finishExam(isTimeout = false) {
@@ -945,23 +988,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const originalGoBack = goBack;
     goBack = function() {
         if (currentScreenName === 'exam' && examState.isActive) {
-            const confirmMsg = "Перервати іспит?\n\nВаш прогрес буде втрачено, а іспит вважатиметься нескладеним.";
-            if (tg && tg.showConfirm) {
-                tg.showConfirm(confirmMsg, (confirmed) => {
-                    if (confirmed) {
-                        examState.isActive = false;
-                        clearInterval(examState.timerInterval);
-                        showScreen(homeScreen, 'home');
-                    }
-                });
-            } else {
-                if (confirm(confirmMsg)) {
+            showCustomConfirm({
+                icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`,
+                color: '#F59E0B', // Оранжевий
+                bgColor: 'rgba(245, 158, 11, 0.15)',
+                title: 'Перервати іспит?',
+                desc: 'Ваш прогрес буде втрачено, а іспит вважатиметься нескладеним.',
+                okText: 'Перервати',
+                isDanger: true,
+                onConfirm: () => {
                     examState.isActive = false;
                     clearInterval(examState.timerInterval);
                     showScreen(homeScreen, 'home');
                 }
-            }
-            return; // Зупиняємо стандартний goBack
+            });
+            return; 
         }
         
         // Виклик оригінальної логіки для інших екранів
@@ -1739,16 +1780,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btnResetProgress) {
         btnResetProgress.addEventListener('click', () => {
             addImpact();
-            
-            const confirmMsg = "Ви впевнені, що хочете скинути поточну статистику?";
-            
-            if (tg && tg.showConfirm) {
-                tg.showConfirm(confirmMsg, (confirmed) => {
-                    if (confirmed) executeReset();
-                });
-            } else {
-                if (confirm(confirmMsg)) executeReset();
-            }
+            showCustomConfirm({
+                icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>`,
+                color: '#EF4444', // Червоний
+                bgColor: 'rgba(239, 68, 68, 0.15)',
+                title: 'Обнулити дані?',
+                desc: 'Ви впевнені, що хочете скинути поточну статистику? Весь прогрес буде втрачено назавжди!',
+                okText: 'Обнулити',
+                isDanger: true,
+                onConfirm: () => executeReset()
+            });
         });
     }
 
