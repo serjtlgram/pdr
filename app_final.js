@@ -379,8 +379,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cardExam) {
         cardExam.addEventListener('click', () => {
             addImpact();
-            if(tg && tg.showAlert) tg.showAlert("Режим іспиту знаходиться в розробці! Скоро додамо 🚀");
-            else alert("Режим іспиту знаходиться в розробці!");
+            startExamMode(); // Запускаем экзамен
         });
     }
 
@@ -622,9 +621,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (navExam) {
         navExam.addEventListener('click', (e) => {
             e.preventDefault();
-            startExamMode();
+            addImpact();
+            startExamMode(); // Запускаем экзамен
         });
     }
+    
     if (cardExam) {
         cardExam.addEventListener('click', startExamMode);
     }
