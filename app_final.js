@@ -613,7 +613,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 card.innerHTML = `
                     <div class="topic-header">
-                        <div class="topic-icon-wrapper">${iconHtml}</div>
+                        <div class="topic-icon-wrapper" style="position: relative;">
+                            ${iconHtml}
+                            ${proBadgeHtml}
+                        </div>
                         <div class="topic-chevron">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="9 18 15 12 9 6"></polyline>
@@ -1200,6 +1203,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const questionsCount = favs[topicId].length;
             const colorClass = `c${(index % 6) + 1}`;
             const iconHtml = modernIcons[topic.id] || `<span style="font-size: 1.5rem;">${topic.icon || "🔖"}</span>`;
+
+            const isProTopic = PRO_TOPICS.includes(topic.id);
+            const proBadgeHtml = (isProTopic && !isUserPro) 
+                ? `<div style="position:absolute; top:-8px; right:-8px; background: linear-gradient(135deg, #F59E0B, #D97706); color: #fff; font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 8px; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4); z-index: 2; letter-spacing: 0.5px;">PRO</div>` 
+                : '';
 
             const card = document.createElement('div');
             card.className = `topic-card ${colorClass}`;
