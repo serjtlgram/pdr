@@ -295,70 +295,72 @@
                 </div>
             </div>
 
-                        <!-- ЕКРАН ІСПИТУ -->
-            <div id="exam-screen" class="screen">
-                <!-- Липка панель статусу іспиту -->
-                <div class="exam-sticky-header">
-                    <div class="exam-timer" id="exam-timer">20:00</div>
-                    <div class="exam-progress-text">Збережено: <span id="exam-saved-count">0</span>/20</div>
-                </div>
+                    <!-- ЕКРАН ІСПИТУ -->
+        <div id="exam-screen" class="screen">
+            <!-- Липка панель статусу іспиту -->
+            <div class="exam-sticky-header">
+                <div class="exam-timer" id="exam-timer">20:00</div>
+                <div class="exam-progress-text">Збережено: <span id="exam-saved-count">0</span>/20</div>
+            </div>
 
-                <div class="quiz-container" style="padding-top: 10px;">
-                    <div class="question-nav-wrapper">
-                        <div class="question-nav-bar" id="exam-nav-bar">
-                            <!-- Квадратики навігації генеруються через JS -->
-                        </div>
+            <div class="quiz-container" style="padding-top: 10px;">
+                <div class="question-nav-wrapper">
+                    <div class="question-nav-bar" id="exam-nav-bar">
+                        <!-- Квадратики навігації генеруються через JS -->
                     </div>
-                    
-                    <h3 class="quiz-question" id="exam-question-text">Завантаження іспиту...</h3>
-                    
-                    <div class="quiz-content-wrapper">
-                        <div class="quiz-image-container">
-                            <img id="exam-image" src="" alt="Ілюстрація">
-                        </div>
+                </div>
+                
+                <h3 class="quiz-question" id="exam-question-text">Завантаження іспиту...</h3>
+                
+                <div class="quiz-content-wrapper">
+                    <div class="quiz-image-container">
+                        <img id="exam-image" src="" alt="Ілюстрація">
+                    </div>
 
-                        <div class="quiz-options-wrapper">
-                            <div class="quiz-options" id="exam-options">
-                                <!-- Варіанти відповідей -->
-                            </div>
-                            
-                            <div class="exam-actions">
-                                <button class="btn-primary" id="btn-exam-save" style="width: 100%; margin-bottom: 12px;">
-                                    Зберегти відповідь
-                                </button>
-                                <button class="btn-next-action" id="btn-exam-next" style="margin: 0;">
-                                    Наступне питання →
-                                </button>
-                            </div>
-                            <button class="btn-danger-outline" id="btn-exam-finish-early" style="width: 100%; margin-top: 24px;">
-                                Завершити іспит достроково
+                    <div class="quiz-options-wrapper">
+                        <div class="quiz-options" id="exam-options">
+                            <!-- Варіанти відповідей -->
+                        </div>
+                        
+                        <!-- ДОБАВЛЕН ОТСТУП margin-top: 24px; -->
+                        <div class="exam-actions" style="margin-top: 24px;">
+                            <button class="btn-primary" id="btn-exam-save" style="width: 100%; margin-bottom: 12px;">
+                                Зберегти відповідь
+                            </button>
+                            <button class="btn-next-action" id="btn-exam-next" style="margin: 0;">
+                                Наступне питання →
                             </button>
                         </div>
+                        
+                        <button class="btn-danger-outline" id="btn-exam-finish-early" style="width: 100%; margin-top: 24px;">
+                            Завершити іспит достроково
+                        </button>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- МОДАЛКА РЕЗУЛЬТАТУ ІСПИТУ -->
-            <div id="exam-result-modal" class="modal-overlay">
-                <div class="modal-content" style="max-width: 350px;">
-                    <div id="exam-result-icon" style="font-size: 4rem; margin-bottom: 16px;">⏱</div>
-                    <h2 id="exam-result-title" style="margin-bottom: 8px;">Час вийшов!</h2>
-                    <p id="exam-result-desc" style="color: var(--c-text-soft); margin-bottom: 24px;">Ви не встигли завершити іспит.</p>
-                    
-                    <div style="display: flex; justify-content: space-around; margin-bottom: 24px; background: var(--c-surface); padding: 16px; border-radius: 16px; border: 1px solid var(--c-border-soft);">
-                        <div style="text-align: center;">
-                            <div style="font-size: 1.5rem; font-weight: 800; color: var(--c-success);" id="exam-res-correct">0</div>
-                            <div style="font-size: 0.75rem; color: var(--c-text-soft);">Правильно</div>
-                        </div>
-                        <div style="text-align: center;">
-                            <div style="font-size: 1.5rem; font-weight: 800; color: var(--c-danger);" id="exam-res-wrong">0</div>
-                            <div style="font-size: 0.75rem; color: var(--c-text-soft);">Помилок</div>
-                        </div>
+        <!-- МОДАЛКА РЕЗУЛЬТАТУ ІСПИТУ -->
+        <div id="exam-result-modal" class="modal-overlay">
+            <div class="modal-content" style="max-width: 350px;">
+                <div id="exam-result-icon" style="font-size: 4rem; margin-bottom: 16px;">⏱</div>
+                <h2 id="exam-result-title" style="margin-bottom: 8px;">Час вийшов!</h2>
+                <p id="exam-result-desc" style="color: var(--c-text-soft); margin-bottom: 24px;">Ви не встигли завершити іспит.</p>
+                
+                <div style="display: flex; justify-content: space-around; margin-bottom: 24px; background: var(--c-surface); padding: 16px; border-radius: 16px; border: 1px solid var(--c-border-soft);">
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.5rem; font-weight: 800; color: var(--c-success);" id="exam-res-correct">0</div>
+                        <div style="font-size: 0.75rem; color: var(--c-text-soft);">Правильно</div>
                     </div>
-
-                    <button class="btn-primary" id="btn-exam-close-result" style="width: 100%;">Повернутися на головну</button>
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.5rem; font-weight: 800; color: var(--c-danger);" id="exam-res-wrong">0</div>
+                        <div style="font-size: 0.75rem; color: var(--c-text-soft);">Помилок</div>
+                    </div>
                 </div>
+
+                <button class="btn-primary" id="btn-exam-close-result" style="width: 100%;">Повернутися на головну</button>
             </div>
+        </div>
 
             <div id="sub-modal" class="modal-overlay">
                 <div class="modal-content">
