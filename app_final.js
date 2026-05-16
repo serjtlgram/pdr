@@ -805,17 +805,32 @@ document.addEventListener("DOMContentLoaded", () => {
             addImpact();
             examState.saved[examState.currentIndex] = true;
             
+            // --- НОВЕ: Додаємо в "Складні питання" якщо відповідь неправильна ---
+            const q = examQuestions[examState.currentIndex];
+            const selectedAns = examState.answers[examState.currentIndex];
+            
+            if (selectedAns !== q.correctIndex) {
+                const allSavedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
+                if (!allSavedStates[q.topicId]) allSavedStates[q.topicId] = [];
+                
+                // Записуємо помилку. Вона автоматично з'явиться в розділі "Складні"
+                allSavedStates[q.topicId][q.originalIndex] = { selectedIndex: selectedAns, isCorrect: false };
+                localStorage.setItem('pdr_quiz_states', JSON.stringify(allSavedStates));
+                
+                // Зберігаємо в хмару
+                if (typeof scheduleCloudSave === 'function') scheduleCloudSave(q.topicId);
+            }
+            // -------------------------------------------------------------------
+
             // Перевіряємо, чи всі питання збережені
             const allSaved = examState.saved.every(s => s === true);
             if (allSaved) {
                 finishExam(false);
             } else {
-                // Автоматично переходимо до наступного НЕЗБЕРЕЖЕНОГО питання
                 let nextUnsaved = examState.saved.findIndex((s, idx) => !s && idx > examState.currentIndex);
                 if (nextUnsaved === -1) {
-                    nextUnsaved = examState.saved.findIndex(s => !s); // Шукаємо з початку
+                    nextUnsaved = examState.saved.findIndex(s => !s);
                 }
-                
                 if (nextUnsaved !== -1) {
                     examState.currentIndex = nextUnsaved;
                 }
@@ -852,6 +867,19 @@ document.addEventListener("DOMContentLoaded", () => {
         let correctCount = 0;
         let wrongCount = 0;
         let unansweredCount = 0;
+
+        // --- НОВЕ: Формуємо список тем для повторення (тільки якщо іспит пройдено повністю) ---
+        if (!isTimeout) {
+            const weakTopicsSet = new Set();
+            examQuestions.forEach((q, i) => {
+                if (examState.answers[i] !== q.correctIndex) {
+                    weakTopicsSet.add(q.topicId);
+                }
+            });
+            // Зберігаємо унікальні ID тем, де були помилки
+            localStorage.setItem('pdr_exam_weak_topics', JSON.stringify(Array.from(weakTopicsSet)));
+        }
+        // --------------------------------------------------------------------------------------
 
         examQuestions.forEach((q, i) => {
             if (!examState.saved[i] || examState.answers[i] === null) {
@@ -1654,6 +1682,45 @@ document.addEventListener("DOMContentLoaded", () => {
                 lastScoreEl.innerText = '-';
                 lastScoreEl.style.color = 'var(--c-text)';
             }
+
+            // --- НОВЕ: Вивід тем для повторення ---
+            const weakTopicsContainer = document.getElementById('weak-topics-container');
+            if (weakTopicsContainer) {
+                const weakTopics = JSON.parse(localStorage.getItem('pdr_exam_weak_topics') || "[]");
+                
+                if (weakTopics.length > 0) {
+                    let html = `<div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--c-border-soft);">
+                                    <h4 style="font-size: 0.85rem; color: var(--c-text-soft); margin-bottom: 10px; font-weight: 600;">Рекомендуємо повторити:</h4>
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">`;
+                    
+                    weakTopics.forEach(tId => {
+                        const topicObj = globalTopics.find(t => t.id === tId);
+                        if (topicObj) {
+                            html += `<button class="weak-topic-chip" data-topic="${tId}">${topicObj.title}</button>`;
+                        }
+                    });
+                    
+                    html += `</div></div>`;
+                    weakTopicsContainer.innerHTML = html;
+                    weakTopicsContainer.style.display = 'block';
+                    
+                    // Додаємо кліки по темам
+                    weakTopicsContainer.querySelectorAll('.weak-topic-chip').forEach(chip => {
+                        chip.addEventListener('click', () => {
+                            addImpact();
+                            const tId = chip.getAttribute('data-topic');
+                            const topicObj = globalTopics.find(t => t.id === tId);
+                            if (topicObj) {
+                                profileModal.classList.remove('active'); // Закриваємо профіль
+                                startQuiz(topicObj); // Запускаємо вибрану тему
+                            }
+                        });
+                    });
+                } else {
+                    weakTopicsContainer.style.display = 'none';
+                }
+            }
+            // --------------------------------------
 
             profileModal.classList.add('active');
 
