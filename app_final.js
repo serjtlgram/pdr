@@ -8,6 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const tgUser = tg && tg.initDataUnsafe ? tg.initDataUnsafe.user : null;
     const userId = tgUser ? tgUser.id : null; 
     const FREE_ANSWERS_LIMIT = 10;
+    let isUserPro = false;
+    const PRO_TOPICS = ["topic_8", "topic_8.2", "topic_16.2", "topic_33.1", "topic_33.2", "topic_33.3", "topic_33.4", "topic_33.5"];
 
     // 1. БЛОКИРОВКА ПОЗА TELEGRAM
     if (!tgUser && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
@@ -38,7 +40,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // Начинаем грузить данные сразу при открытии мини-аппа и сохраняем этот процесс
     let topicsPromise = fetch('https://pdrua.duckdns.org/api/topics')
         .then(res => res.json())
-        .catch(e => { console.error(e); return[]; });
+        .then(data => {
+            if (data && data.is_pro) {
+                isUserPro = true;
+            }
+        })
+        .catch(err => console.error("Помилка ініціалізації користувача:", err));
         
     topicsPromise.then(data => { 
         if (data && data.length > 0) globalTopics = data; 
@@ -594,6 +601,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 const colorClass = `c${(index % 6) + 1}`;
                 const iconHtml = modernIcons[topic.id] || `<span style="font-size: 1.5rem;">${topic.icon || "🚦"}</span>`;
 
+                const isProTopic = PRO_TOPICS.includes(topic.id);
+                const proBadgeHtml = (isProTopic && !isUserPro) 
+                    ? `<div style="position:absolute; top:-8px; right:-8px; background: linear-gradient(135deg, #F59E0B, #D97706); color: #fff; font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 8px; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4); z-index: 2; letter-spacing: 0.5px;">PRO</div>` 
+                    : '';
+
                 const card = document.createElement('div');
                 card.className = `topic-card ${colorClass}`;
                 
@@ -617,6 +629,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 card.onclick = () => {
                     addImpact();
+                    if (isProTopic && !isUserPro) {
+                        showProModal(); // Вызовем окно покупки
+                        return;
+                    }
                     startQuiz(topic);
                 };
                 
@@ -1188,7 +1204,10 @@ document.addEventListener("DOMContentLoaded", () => {
             
             card.innerHTML = `
                 <div class="topic-header">
-                    <div class="topic-icon-wrapper">${iconHtml}</div>
+                    <div class="topic-icon-wrapper" style="position: relative;">
+                    ${iconHtml}
+                    ${proBadgeHtml}
+                </div>
                     <div class="topic-chevron">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
                     </div>
@@ -1269,7 +1288,7 @@ document.addEventListener("DOMContentLoaded", () => {
         isLoadingQuestions = true;
 
         try {
-            const response = await fetch(`https://pdrua.duckdns.org/api/questions?topicId=${topicId}&offset=${offset}&limit=${limit}`);
+            const response = await fetch(`https://pdrua.duckdns.org/api/questions?topicId=${topicId}&user_id=${userId}&offset=${offset}&limit=${limit}`);
             const newQuestions = await response.json();
             
             if (newQuestions.length === 0) {
@@ -1367,7 +1386,7 @@ document.addEventListener("DOMContentLoaded", () => {
             else if (currentTopic.isVirtual && !isLoadingQuestions) {
                 isLoadingQuestions = true;
                 const ref = currentTopic.refs[currentQuestionIndex];
-                fetch(`https://pdrua.duckdns.org/api/questions?topicId=${ref.topicId}&offset=${ref.originalIndex}&limit=1`)
+                fetch(`https://pdrua.duckdns.org/api/questions?topicId=${ref.topicId}&user_id=${userId}&offset=${ref.originalIndex}&limit=1`)
                     .then(res => res.json())
                     .then(data => {
                         if (data && data.length > 0) {
@@ -1572,6 +1591,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 nextBtn.scrollIntoView({ behavior: 'smooth', block: 'end' });
             }
         }, 50);
+    }
+
+    function showProModal() {
+        // Пока просто выводим красивый алерт, позже заменим на модалку с тарифами
+        showCustomConfirm({
+            icon: `⭐`,
+            color: '#F59E0B',
+            bgColor: 'rgba(245, 158, 11, 0.15)',
+            title: 'Преміум розділ',
+            desc: 'Цей розділ доступний лише за підпискою PRO. Отримайте доступ до всіх питань та пояснень!',
+            okText: 'Дізнатися більше',
+            isDanger: false,
+            onConfirm: () => {
+                // Тут в будущем будет логика вызова оплаты Telegram Stars
+                if(tg && tg.showAlert) tg.showAlert("Тут скоро з'являться тарифи за Telegram Stars ⭐️");
+            }
+        });
     }
 
     // --- ПРОФІЛЬ ТА СТАТИСТИКА ---
