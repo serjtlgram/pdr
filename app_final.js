@@ -33,12 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 language_code: tgUser.language_code || null,
                 is_premium: tgUser.is_premium || false
             })
-        }).catch(err => console.error("Помилка ініціалізації користувача:", err));
-    }
-
-    // --- ПРЕДЗАГРУЗКА РАЗДЕЛОВ В ФОНЕ ---
-    // Начинаем грузить данные сразу при открытии мини-аппа и сохраняем этот процесс
-    let topicsPromise = fetch('https://pdrua.duckdns.org/api/topics')
+        })
         .then(res => res.json())
         .then(data => {
             if (data && data.is_pro) {
@@ -46,6 +41,13 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         })
         .catch(err => console.error("Помилка ініціалізації користувача:", err));
+    }
+
+    // --- ПРЕДЗАГРУЗКА РАЗДЕЛОВ В ФОНЕ ---
+    // Начинаем грузить данные сразу при открытии мини-аппа и сохраняем этот процесс
+    let topicsPromise = fetch('https://pdrua.duckdns.org/api/topics')
+        .then(res => res.json())
+        .catch(err => console.error("Помилка завантаження розділів:", err));
         
     topicsPromise.then(data => { 
         if (data && data.length > 0) globalTopics = data; 
