@@ -444,16 +444,23 @@
                         </div>
                     </div>
 
-                    <!-- НОВИЙ БЛОК: Статистика іспитів -->
-                    <div class="stat-card exam-stat-card">
-                        <div class="exam-stat-icon">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg>
-                        </div>
-                        <div class="stat-info" style="flex: 1;">
-                            <h3>Статистика іспитів</h3>
+                        <!-- НОВИЙ БЛОК: Статистика іспитів -->
+                        <div class="stat-card exam-stat-card">
+                            <!-- Верхня частина: Іконка + Заголовок -->
+                            <div class="exam-stat-header">
+                                <div class="exam-stat-icon">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="stat-info">
+                                    <h3>Статистика іспитів</h3>
+                                    <p>Ваші результати тестувань</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Середня частина: Метрики -->
                             <div class="exam-stat-metrics">
                                 <div class="exam-metric">
                                     <span class="exam-metric-val" id="stat-exam-passed">0</span>
@@ -468,12 +475,10 @@
                                     <span class="exam-metric-label">Останній</span>
                                 </div>
                             </div>
-                        </div>
 
-                            <!-- СЮДА БУДУТ ПОДГРУЖАТЬСЯ СЛОЖНЫЕ ТЕМЫ -->
+                            <!-- Нижня частина: Рекомендації (генерується через JS) -->
                             <div id="weak-topics-container" style="display: none; width: 100%;"></div>
-
-                    </div>
+                        </div>
 
                         <!-- Card 3: Reset -->
                         <div class="stat-card reset-card" id="btn-reset-progress">

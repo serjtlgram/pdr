@@ -273,7 +273,10 @@ body.light-theme .nav-btn.saved {
 
 /* --- Картка статистики іспитів --- */
 .exam-stat-card {
-  align-items: flex-start;
+  display: flex;
+  flex-direction: column !important; /* Жорстко задаємо вертикальне розташування */
+  align-items: stretch !important;
+  gap: 0 !important;
   background: linear-gradient(145deg, var(--c-surface) 0%, rgba(139, 92, 246, 0.05) 100%);
   border: 1px solid rgba(139, 92, 246, 0.2);
 }
@@ -281,6 +284,13 @@ body.light-theme .nav-btn.saved {
 body.light-theme .exam-stat-card {
   background: linear-gradient(145deg, #ffffff 0%, #f5f3ff 100%);
   border-color: #ddd6fe;
+}
+
+.exam-stat-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
 }
 
 .exam-stat-icon {
@@ -298,27 +308,32 @@ body.light-theme .exam-stat-card {
 .exam-stat-metrics {
   display: flex;
   justify-content: space-between;
-  margin-top: 12px;
-  padding-top: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
   border-top: 1px solid var(--c-border-soft);
+  width: 100%;
 }
 
 .exam-metric {
   display: flex;
   flex-direction: column;
+  align-items: center; /* Центруємо текст всередині колонки */
+  flex: 1; /* Рівномірно розподіляємо ширину між трьома блоками */
 }
 
 .exam-metric-val {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: 800;
   color: var(--c-text);
+  line-height: 1.2;
 }
 
 .exam-metric-label {
   font-size: 0.75rem;
   color: var(--c-text-soft);
   font-weight: 600;
-  margin-top: 2px;
+  margin-top: 4px;
+  text-align: center;
 }
 
 /* --- Теми для повторення --- */
