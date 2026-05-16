@@ -335,15 +335,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    if (navExam) {
-        navExam.addEventListener('click', (e) => {
-            e.preventDefault();
-            addImpact();
-            if(tg && tg.showAlert) tg.showAlert("Режим іспиту знаходиться в розробці! Скоро додамо 🚀");
-            else alert("Режим іспиту знаходиться в розробці!");
-        });
-    }
-
     if (navHard) {
         navHard.addEventListener('click', async (e) => {
             e.preventDefault();
@@ -874,6 +865,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         const isPassed = wrongCount <= 2;
+
+        // Збереження статистики іспитів
+        const examStats = JSON.parse(localStorage.getItem('pdr_exam_stats') || '{"total":0, "passed":0, "lastWrong":0}');
+        examStats.total += 1;
+        if (isPassed && !isTimeout) examStats.passed += 1;
+        examStats.lastWrong = isTimeout ? 20 : wrongCount; // Якщо час вийшов, вважаємо що все погано
+        localStorage.setItem('pdr_exam_stats', JSON.stringify(examStats));
 
         const modal = document.getElementById('exam-result-modal');
         const iconEl = document.getElementById('exam-result-icon');
@@ -1642,6 +1640,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
             updateHumorBanner(stats.successRate);
 
+            // Вивід статистики іспитів
+            const examStats = JSON.parse(localStorage.getItem('pdr_exam_stats') || '{"total":0, "passed":0, "lastWrong":0}');
+            document.getElementById('stat-exam-passed').innerText = examStats.passed;
+            document.getElementById('stat-exam-total').innerText = examStats.total;
+            
+            const lastScoreEl = document.getElementById('stat-exam-last');
+            if (examStats.total > 0) {
+                lastScoreEl.innerText = `${examStats.lastWrong} пом.`;
+                // Якщо помилок <= 2 (здав) - зелений, інакше - червоний
+                lastScoreEl.style.color = examStats.lastWrong <= 2 ? 'var(--c-success)' : 'var(--c-danger)';
+            } else {
+                lastScoreEl.innerText = '-';
+                lastScoreEl.style.color = 'var(--c-text)';
+            }
+
             profileModal.classList.add('active');
 
             if (tg && tg.BackButton) {
@@ -1693,6 +1706,9 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             alert("Дані успішно обнулено!");
         }
+
+        localStorage.removeItem('pdr_exam_stats');
+
     }
 
     function showToast(message) {
