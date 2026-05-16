@@ -69,6 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const homeScreen = document.getElementById('home-screen');
     const topicsScreen = document.getElementById('topics-screen');
     const quizScreen = document.getElementById('quiz-screen');
+    const examScreen = document.getElementById('exam-screen');
     
     // Состояние теста и глобальные переменные
     let currentTopic = null; 
@@ -233,7 +234,8 @@ document.addEventListener("DOMContentLoaded", () => {
         homeScreen.classList.remove('active');
         topicsScreen.classList.remove('active');
         quizScreen.classList.remove('active');
-        
+        if (examScreen) examScreen.classList.remove('active'); // <--- ДОДАЙ ЦЕЙ РЯДОК
+
         screenToShow.classList.add('active');
         window.scrollTo(0, 0);
 
@@ -595,7 +597,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     // РЕЖИМ "ІСПИТ" (EXAM MODE)
     // ==========================================
-    const examScreen = document.getElementById('exam-screen');
+    
     let examQuestions = [];
     let examState = {
         answers: new Array(20).fill(null), // Вибрані варіанти (індекси)
