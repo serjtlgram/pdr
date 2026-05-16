@@ -602,6 +602,365 @@ document.addEventListener("DOMContentLoaded", () => {
         searchInput.addEventListener('input', (e) => renderTopics(e.target.value));
     }
 
+    // ==========================================
+    // РЕЖИМ "ІСПИТ" (EXAM MODE)
+    // ==========================================
+    const examScreen = document.getElementById('exam-screen');
+    let examQuestions = [];
+    let examState = {
+        answers: new Array(20).fill(null), // Вибрані варіанти (індекси)
+        saved: new Array(20).fill(false),  // Чи натиснув користувач "Зберегти"
+        currentIndex: 0,
+        endTime: null,
+        timerInterval: null,
+        isActive: false
+    };
+
+    const EXAM_DURATION_MS = 20 * 60 * 1000; // 20 хвилин
+
+    // Прив'язка кнопок запуску іспиту
+    if (navExam) {
+        navExam.addEventListener('click', (e) => {
+            e.preventDefault();
+            startExamMode();
+        });
+    }
+    if (cardExam) {
+        cardExam.addEventListener('click', startExamMode);
+    }
+
+    async function startExamMode() {
+        addImpact();
+        
+        // Перевірка підписки (якщо потрібно)
+        if (totalAnswersGiven >= FREE_ANSWERS_LIMIT && !isUserVerified) {
+            document.getElementById('sub-modal').classList.add('active');
+            return;
+        }
+
+        const confirmMsg = "Розпочати іспит?\n\nУ вас буде 20 хвилин на 20 питань. Допускається не більше 2 помилок.";
+        if (tg && tg.showConfirm) {
+            tg.showConfirm(confirmMsg, (confirmed) => {
+                if (confirmed) initExam();
+            });
+        } else {
+            if (confirm(confirmMsg)) initExam();
+        }
+    }
+
+    async function initExam() {
+        showScreen(examScreen, 'exam');
+        document.getElementById('exam-question-text').innerText = "Формування білета...";
+        document.getElementById('exam-options').innerHTML = "";
+        document.getElementById('exam-image').parentElement.style.display = 'none';
+        
+        // Ховаємо нижню панель навігації
+        const bottomNav = document.getElementById('bottom-nav');
+        if (bottomNav) bottomNav.style.display = 'none';
+
+        try {
+            const response = await fetch('https://pdrua.duckdns.org/api/exam-questions');
+            examQuestions = await response.json();
+            
+            if (!examQuestions || examQuestions.length === 0) throw new Error("Empty questions");
+
+            // Скидаємо стан
+            examState.answers = new Array(examQuestions.length).fill(null);
+            examState.saved = new Array(examQuestions.length).fill(false);
+            examState.currentIndex = 0;
+            examState.isActive = true;
+            
+            // Встановлюємо час завершення
+            examState.endTime = Date.now() + EXAM_DURATION_MS;
+            localStorage.setItem('pdr_exam_end_time', examState.endTime); // Захист від згортання додатку
+
+            startExamTimer();
+            renderExamQuestion();
+
+        } catch (error) {
+            console.error("Помилка завантаження іспиту:", error);
+            if(tg && tg.showAlert) tg.showAlert("Помилка сервера. Спробуйте пізніше.");
+            goBack();
+        }
+    }
+
+    function startExamTimer() {
+        if (examState.timerInterval) clearInterval(examState.timerInterval);
+        
+        const timerEl = document.getElementById('exam-timer');
+        
+        examState.timerInterval = setInterval(() => {
+            if (!examState.isActive) {
+                clearInterval(examState.timerInterval);
+                return;
+            }
+
+            const now = Date.now();
+            const timeLeft = examState.endTime - now;
+
+            if (timeLeft <= 0) {
+                clearInterval(examState.timerInterval);
+                timerEl.innerText = "00:00";
+                finishExam(true); // true = час вийшов
+                return;
+            }
+
+            const minutes = Math.floor(timeLeft / 60000);
+            const seconds = Math.floor((timeLeft % 60000) / 1000);
+            
+            timerEl.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            if (timeLeft < 60000) { // Останні 60 секунд
+                timerEl.classList.add('warning');
+            } else {
+                timerEl.classList.remove('warning');
+            }
+        }, 1000);
+    }
+
+    function renderExamNavBar() {
+        const navBar = document.getElementById('exam-nav-bar');
+        navBar.innerHTML = '';
+
+        examQuestions.forEach((_, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'nav-btn';
+            btn.innerText = i + 1;
+            
+            if (i === examState.currentIndex) btn.classList.add('active');
+            if (examState.saved[i]) btn.classList.add('saved'); // Жовтий колір
+            
+            btn.addEventListener('click', () => {
+                addImpact();
+                examState.currentIndex = i;
+                renderExamQuestion();
+            });
+            
+            navBar.appendChild(btn);
+        });
+
+        // Оновлюємо лічильник збережених
+        const savedCount = examState.saved.filter(s => s).length;
+        document.getElementById('exam-saved-count').innerText = savedCount;
+
+        const activeBtn = navBar.querySelector('.active');
+        if (activeBtn) {
+            navBar.scrollTo({
+                left: activeBtn.offsetLeft - (navBar.offsetWidth / 2) + (activeBtn.offsetWidth / 2),
+                behavior: 'smooth'
+            });
+        }
+    }
+
+    function renderExamQuestion() {
+        const q = examQuestions[examState.currentIndex];
+        if (!q) return;
+
+        renderExamNavBar();
+
+        document.getElementById('exam-question-text').innerText = `${examState.currentIndex + 1}. ${q.text}`;
+        
+        const imgEl = document.getElementById('exam-image');
+        if (q.image) {
+            imgEl.src = q.image;
+            imgEl.parentElement.style.display = 'block';
+        } else {
+            imgEl.src = '';
+            imgEl.parentElement.style.display = 'none';
+        }
+
+        const optionsContainer = document.getElementById('exam-options');
+        optionsContainer.innerHTML = '';
+
+        q.options.forEach((optionText, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerHTML = `<span class="option-number">${index + 1}</span> <span>${optionText}</span>`;
+            
+            // Якщо варіант вибраний (навіть якщо ще не збережений)
+            if (examState.answers[examState.currentIndex] === index) {
+                btn.classList.add('selected');
+            }
+            
+            btn.addEventListener('click', () => {
+                addImpact();
+                // Просто виділяємо, але не зберігаємо остаточно
+                examState.answers[examState.currentIndex] = index;
+                renderExamQuestion(); // Перемальовуємо, щоб оновити виділення
+            });
+            
+            optionsContainer.appendChild(btn);
+        });
+
+        // Логіка кнопок "Зберегти" та "Наступне"
+        const btnSave = document.getElementById('btn-exam-save');
+        const btnNext = document.getElementById('btn-exam-next');
+
+        // Кнопка збереження активна тільки якщо вибрано якийсь варіант
+        btnSave.disabled = (examState.answers[examState.currentIndex] === null);
+        
+        if (examState.saved[examState.currentIndex]) {
+            btnSave.innerText = "Оновити відповідь";
+            btnSave.style.background = "var(--c-surface)";
+            btnSave.style.color = "var(--c-text)";
+        } else {
+            btnSave.innerText = "Зберегти відповідь";
+            btnSave.style.background = ""; // Повертаємо дефолтний градієнт
+            btnSave.style.color = "";
+        }
+
+        btnSave.onclick = () => {
+            addImpact();
+            examState.saved[examState.currentIndex] = true;
+            
+            // Перевіряємо, чи всі питання збережені
+            const allSaved = examState.saved.every(s => s === true);
+            if (allSaved) {
+                finishExam(false);
+            } else {
+                // Автоматично переходимо до наступного НЕЗБЕРЕЖЕНОГО питання
+                let nextUnsaved = examState.saved.findIndex((s, idx) => !s && idx > examState.currentIndex);
+                if (nextUnsaved === -1) {
+                    nextUnsaved = examState.saved.findIndex(s => !s); // Шукаємо з початку
+                }
+                
+                if (nextUnsaved !== -1) {
+                    examState.currentIndex = nextUnsaved;
+                }
+                renderExamQuestion();
+            }
+        };
+
+        btnNext.onclick = () => {
+            addImpact();
+            if (examState.currentIndex < examQuestions.length - 1) {
+                examState.currentIndex++;
+                renderExamQuestion();
+            }
+        };
+    }
+
+    // Дострокове завершення
+    document.getElementById('btn-exam-finish-early').addEventListener('click', () => {
+        const confirmMsg = "Ви впевнені, що хочете завершити іспит достроково?\nНе всі відповіді збережені.";
+        if (tg && tg.showConfirm) {
+            tg.showConfirm(confirmMsg, (confirmed) => {
+                if (confirmed) finishExam(false);
+            });
+        } else {
+            if (confirm(confirmMsg)) finishExam(false);
+        }
+    });
+
+    function finishExam(isTimeout = false) {
+        examState.isActive = false;
+        clearInterval(examState.timerInterval);
+        localStorage.removeItem('pdr_exam_end_time');
+
+        let correctCount = 0;
+        let wrongCount = 0;
+        let unansweredCount = 0;
+
+        examQuestions.forEach((q, i) => {
+            if (!examState.saved[i] || examState.answers[i] === null) {
+                unansweredCount++;
+                wrongCount++; // Незбережена відповідь = помилка
+            } else if (examState.answers[i] === q.correctIndex) {
+                correctCount++;
+            } else {
+                wrongCount++;
+            }
+        });
+
+        const isPassed = wrongCount <= 2;
+
+        const modal = document.getElementById('exam-result-modal');
+        const iconEl = document.getElementById('exam-result-icon');
+        const titleEl = document.getElementById('exam-result-title');
+        const descEl = document.getElementById('exam-result-desc');
+        
+        document.getElementById('exam-res-correct').innerText = correctCount;
+        document.getElementById('exam-res-wrong').innerText = wrongCount;
+
+        if (isTimeout) {
+            iconEl.innerText = "⏱";
+            titleEl.innerText = "Час вийшов!";
+            titleEl.style.color = "var(--c-danger)";
+            descEl.innerText = "Іспит не складено. Ви не встигли дати відповіді на всі питання.";
+        } else if (isPassed) {
+            iconEl.innerText = "🏆";
+            titleEl.innerText = "Іспит складено!";
+            titleEl.style.color = "var(--c-success)";
+            descEl.innerText = "Вітаємо! Ви успішно пройшли тестування.";
+            
+            // Запускаємо конфетті, якщо є підтримка в ТГ
+            if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        } else {
+            iconEl.innerText = "🛑";
+            titleEl.innerText = "Іспит не складено";
+            titleEl.style.color = "var(--c-danger)";
+            descEl.innerText = `Ви допустили ${wrongCount} помилок. Допускається не більше 2.`;
+            if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+        }
+
+        modal.classList.add('active');
+    }
+
+    document.getElementById('btn-exam-close-result').addEventListener('click', () => {
+        document.getElementById('exam-result-modal').classList.remove('active');
+        showScreen(homeScreen, 'home');
+    });
+
+    // --- МОДИФІКАЦІЯ ФУНКЦІЇ goBack() ---
+    // Знайди свою існуючу функцію goBack() і додай туди перевірку на іспит:
+    const originalGoBack = goBack;
+    goBack = function() {
+        if (currentScreenName === 'exam' && examState.isActive) {
+            const confirmMsg = "Перервати іспит?\n\nВаш прогрес буде втрачено, а іспит вважатиметься нескладеним.";
+            if (tg && tg.showConfirm) {
+                tg.showConfirm(confirmMsg, (confirmed) => {
+                    if (confirmed) {
+                        examState.isActive = false;
+                        clearInterval(examState.timerInterval);
+                        showScreen(homeScreen, 'home');
+                    }
+                });
+            } else {
+                if (confirm(confirmMsg)) {
+                    examState.isActive = false;
+                    clearInterval(examState.timerInterval);
+                    showScreen(homeScreen, 'home');
+                }
+            }
+            return; // Зупиняємо стандартний goBack
+        }
+        
+        // Виклик оригінальної логіки для інших екранів
+        // (Тут просто встав код зі своєї старої функції goBack, або залиш як є, якщо використовуєш перевизначення)
+        
+        addImpact();
+        const profileModal = document.getElementById('profile-modal');
+        if (profileModal && profileModal.classList.contains('active')) {
+            profileModal.classList.remove('active');
+            if (tg && tg.BackButton) {
+                if (currentScreenName === 'home') tg.BackButton.hide();
+                else tg.BackButton.show();
+            }
+            return; 
+        }
+
+        if (currentScreenName === 'quiz') {
+            if (currentTopic && currentTopic.id === 'favorites_mode') {
+                renderFavoriteTopics();
+            } else {
+                showScreen(topicsScreen, 'topics');
+                renderTopics();
+            }
+        } else if (currentScreenName === 'topics' || currentScreenName === 'favorites_list') {
+            showScreen(homeScreen, 'home');
+        }
+    };
+
     // --- 5. ЛОГИКА ТЕСТА (LAZY LOADING) ---
     const CHUNK_SIZE = 25; 
 
