@@ -346,3 +346,40 @@ body.cyber-theme .category-btn.inactive:active {
     background: rgba(0, 243, 255, 0.05);
     border-color: rgba(0, 243, 255, 0.5);
 }
+
+/* ==========================================
+   ДОПОВНЕННЯ ДЛЯ РЕЖИМУ ІСПИТУ (CYBERPUNK)
+   ========================================== */
+
+/* 1. Кнопка "Оновити відповідь" 
+   (Перехоплюємо інлайн-стилі з JS, щоб повернути неонову рамку) */
+   body.cyber-theme .btn-primary[style*="var(--c-surface)"] {
+    background: #ff9900 !important; /* Оранжева неонова рамка */
+    color: #ff9900 !important;      /* Оранжевий текст */
+    filter: drop-shadow(0 0 8px rgba(255, 153, 0, 0.6));
+}
+
+/* Ефект при натисканні на "Оновити відповідь" */
+body.cyber-theme .btn-primary[style*="var(--c-surface)"]:active {
+    background: #ff9900 !important;
+    color: #000 !important;
+    box-shadow: 0 0 25px #ff9900 !important;
+}
+
+/* 2. Квадратики навігації для ЗБЕРЕЖЕНИХ питань */
+
+/* Просто збережене питання (не активне зараз) */
+body.cyber-theme .nav-btn.saved {
+    background: rgba(255, 153, 0, 0.1);
+    border-color: #ff9900;
+    color: #ff9900;
+    box-shadow: 0 0 8px rgba(255, 153, 0, 0.3);
+}
+
+/* Активне І збережене питання (квадратик, на якому ми стоїмо зараз) */
+body.cyber-theme .nav-btn.active.saved {
+    background: rgba(255, 153, 0, 0.15);
+    border-color: #ff9900;
+    color: #ff9900;
+    box-shadow: 0 0 15px rgba(255, 153, 0, 0.6), inset 0 0 10px rgba(255, 153, 0, 0.2);
+}
