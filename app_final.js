@@ -1582,7 +1582,7 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem('pdr_answers_count', totalAnswersGiven.toString());
         }
 
-        // Запускаємо тихе збереження у хмару Телеграм
+        // Запускаємо тихе збереження у хмару Телеграм.
         if (currentTopic.isVirtual) {
             scheduleCloudSave(currentTopic.refs[currentQuestionIndex].topicId);
         } else {
@@ -1619,13 +1619,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     
                     <div style="display: flex; flex-direction: column; gap: 12px;">
                         <button class="btn-primary" onclick="buyPro('1_month')" style="display: flex; justify-content: space-between; width: 100%; padding: 16px 20px; background: var(--c-surface); color: var(--c-text); border: 1px solid var(--c-border-soft);">
-                            <span style="font-weight: 600;">1 місяць</span> <span style="font-weight: 800; color: #F59E0B;">⭐️ 150</span>
+                            <span style="font-weight: 600;">1 місяць</span> <span style="font-weight: 800; color: #F59E0B;">⭐️ 1</span>
                         </button>
                         <button class="btn-primary" onclick="buyPro('3_months')" style="display: flex; justify-content: space-between; width: 100%; padding: 16px 20px; background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); border: none; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);">
                             <span style="font-weight: 700;">3 місяці (Вигідно)</span> <span style="font-weight: 800;">⭐️ 250</span>
                         </button>
                         <button class="btn-primary" onclick="buyPro('12_months')" style="display: flex; justify-content: space-between; width: 100%; padding: 16px 20px; background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%); border: none; box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);">
-                            <span style="font-weight: 700;">1 рік (Максимум)</span> <span style="font-weight: 800;">⭐️ 800</span>
+                            <span style="font-weight: 700;">1 рік (Максимум)</span> <span style="font-weight: 800;">⭐️ 750</span>
                         </button>
                     </div>
 
