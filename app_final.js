@@ -1604,20 +1604,77 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function showProModal() {
-        // Пока просто выводим красивый алерт, позже заменим на модалку с тарифами
-        showCustomConfirm({
-            icon: `⭐`,
-            color: '#F59E0B',
-            bgColor: 'rgba(245, 158, 11, 0.15)',
-            title: 'Преміум розділ',
-            desc: 'Цей розділ доступний лише за підпискою PRO. Отримайте доступ до всіх питань та пояснень!',
-            okText: 'Дізнатися більше',
-            isDanger: false,
-            onConfirm: () => {
-                // Тут в будущем будет логика вызова оплаты Telegram Stars
-                if(tg && tg.showAlert) tg.showAlert("Тут скоро з'являться тарифи за Telegram Stars ⭐️");
+        let proModal = document.getElementById('pro-modal');
+        if (!proModal) {
+            proModal = document.createElement('div');
+            proModal.id = 'pro-modal';
+            proModal.className = 'modal-overlay';
+            proModal.innerHTML = `
+                <div class="modal-content" style="max-width: 350px; padding: 24px;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 3.5rem; margin-bottom: 10px;">⭐️</div>
+                        <h3 style="font-size: 1.6rem; margin-bottom: 8px; font-weight: 800;">PRO Доступ</h3>
+                        <p style="color: var(--c-text-soft); font-size: 0.95rem; line-height: 1.4;">Відкрийте всі преміум-розділи та детальні пояснення до питань. Оплата безпечно через Telegram Stars.</p>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <button class="btn-primary" onclick="buyPro('1_month')" style="display: flex; justify-content: space-between; width: 100%; padding: 16px 20px; background: var(--c-surface); color: var(--c-text); border: 1px solid var(--c-border-soft);">
+                            <span style="font-weight: 600;">1 місяць</span> <span style="font-weight: 800; color: #F59E0B;">⭐️ 1</span>
+                        </button>
+                        <button class="btn-primary" onclick="buyPro('3_months')" style="display: flex; justify-content: space-between; width: 100%; padding: 16px 20px; background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); border: none; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);">
+                            <span style="font-weight: 700;">3 місяці (Вигідно)</span> <span style="font-weight: 800;">⭐️ 2</span>
+                        </button>
+                        <button class="btn-primary" onclick="buyPro('12_months')" style="display: flex; justify-content: space-between; width: 100%; padding: 16px 20px; background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%); border: none; box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);">
+                            <span style="font-weight: 700;">1 рік (Максимум)</span> <span style="font-weight: 800;">⭐️ 3</span>
+                        </button>
+                    </div>
+                    <button class="btn-danger-outline" onclick="document.getElementById('pro-modal').classList.remove('active')" style="width: 100%; margin-top: 16px; border: none; color: var(--c-text-soft);">Скасувати</button>
+                </div>
+            `;
+            document.body.appendChild(proModal);
+        }
+        proModal.classList.add('active');
+    }
+
+    // Глобальная функция для вызова из HTML
+    window.buyPro = async function(tierId) {
+        addImpact();
+        const btn = event.currentTarget;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `<span style="margin: 0 auto;">Завантаження...</span>`;
+        btn.disabled = true;
+
+        try {
+            const res = await fetch('https://pdrua.duckdns.org/api/create-invoice', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ user_id: userId, tier_id: tierId })
+            });
+            const data = await res.json();
+            
+            if (data.invoice_url) {
+                // Вызываем нативное окно оплаты Telegram
+                tg.openInvoice(data.invoice_url, (status) => {
+                    if (status === 'paid') {
+                        document.getElementById('pro-modal').classList.remove('active');
+                        isUserPro = true;
+                        renderTopics(); // Перерисовываем меню, чтобы убрать плашки PRO
+                        if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                        showCustomConfirm({
+                            icon: '🎉', color: '#10B981', bgColor: 'rgba(16, 185, 129, 0.15)',
+                            title: 'Оплата успішна!', desc: 'Дякуємо! PRO доступ активовано. Всі розділи відкрито.',
+                            okText: 'Супер!', isDanger: false
+                        });
+                    }
+                });
+            } else {
+                alert("Помилка створення рахунку: " + data.error);
             }
-        });
+        } catch (e) {
+            alert("Помилка з'єднання з сервером");
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
     }
 
     // --- ПРОФІЛЬ ТА СТАТИСТИКА ---
