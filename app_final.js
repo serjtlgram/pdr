@@ -70,8 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- ПРЕДЗАГРУЗКА РАЗДЕЛОВ В ФОНЕ ---
-
-    // --- ПРЕДЗАГРУЗКА РАЗДЕЛОВ В ФОНЕ ---
     // Начинаем грузить данные сразу при открытии мини-аппа и сохраняем этот процесс
     let topicsPromise = fetch('https://pdrua.duckdns.org/api/topics')
         .then(res => res.json())
@@ -721,6 +719,39 @@ document.addEventListener("DOMContentLoaded", () => {
     async function startExamMode() {
         addImpact();
         
+        // --- НОВА ЛОГІКА: Обмеження іспиту (1 раз на тиждень) ---
+        if (!isUserPro) {
+            const lastExamTime = parseInt(localStorage.getItem('pdr_last_exam_time') || '0');
+            const now = Date.now();
+            const oneWeekMs = 7 * 24 * 60 * 60 * 1000; // 7 днів у мілісекундах
+
+            if (lastExamTime > 0 && (now - lastExamTime) < oneWeekMs) {
+                // Рахуємо скільки днів залишилось
+                const timeLeftMs = oneWeekMs - (now - lastExamTime);
+                const daysLeft = Math.ceil(timeLeftMs / (1000 * 60 * 60 * 24));
+                
+                // Правильне закінчення для слова "день"
+                let timeStr = '';
+                if (daysLeft === 1) timeStr = '1 день';
+                else if (daysLeft >= 2 && daysLeft <= 4) timeStr = `${daysLeft} дні`;
+                else timeStr = `${daysLeft} днів`;
+
+                // Показуємо красиве вікно з пропозицією PRO
+                showCustomConfirm({
+                    icon: '⏳',
+                    color: '#F59E0B',
+                    bgColor: 'rgba(245, 158, 11, 0.15)',
+                    title: 'Іспит раз на тиждень',
+                    desc: `Безкоштовна спроба оновиться через ${timeStr}. Отримайте PRO-доступ, щоб складати іспити без жодних обмежень!`,
+                    okText: '⭐️ Отримати PRO',
+                    isDanger: false,
+                    onConfirm: () => showProModal() // Відкриваємо вікно покупки
+                });
+                return; // Блокуємо подальший запуск іспиту
+            }
+        }
+        // ---------------------------------------------------------
+
         if (totalAnswersGiven >= FREE_ANSWERS_LIMIT && !isUserVerified) {
             document.getElementById('sub-modal').classList.add('active');
             return;
@@ -753,6 +784,12 @@ document.addEventListener("DOMContentLoaded", () => {
             examQuestions = await response.json();
             
             if (!examQuestions || examQuestions.length === 0) throw new Error("Empty questions");
+
+            // --- НОВЕ: Записуємо час початку іспиту для безкоштовних користувачів ---
+            if (!isUserPro) {
+                localStorage.setItem('pdr_last_exam_time', Date.now().toString());
+            }
+            // ------------------------------------------------------------------------
 
             // Скидаємо стан
             examState.answers = new Array(examQuestions.length).fill(null);
