@@ -18,6 +18,29 @@ document.addEventListener("DOMContentLoaded", () => {
         return; 
     }
 
+    // --- НОВА ФУНКЦІЯ: Плашки PRO на головному екрані ---
+    function updateHomeScreenProBadges() {
+        const hardIcon = document.querySelector('#card-hard .card-icon');
+        const favIcon = document.querySelector('#card-favorites .card-icon');
+        
+        // Видаляємо старі плашки, якщо вони є
+        document.querySelectorAll('.home-pro-badge').forEach(el => el.remove());
+
+        // Якщо юзер НЕ Pro, вішаємо плашки
+        if (!isUserPro) {
+            const badgeHTML = `<div class="home-pro-badge" style="position:absolute; top:-8px; right:-8px; background: linear-gradient(135deg, #F59E0B, #D97706); color: #fff; font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 8px; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4); z-index: 2; letter-spacing: 0.5px;">PRO</div>`;
+            
+            if (hardIcon) {
+                hardIcon.style.position = 'relative';
+                hardIcon.insertAdjacentHTML('beforeend', badgeHTML);
+            }
+            if (favIcon) {
+                favIcon.style.position = 'relative';
+                favIcon.insertAdjacentHTML('beforeend', badgeHTML);
+            }
+        }
+    }
+
     // --- ИНИЦИАЛИЗАЦИЯ ПОЛЬЗОВАТЕЛЯ НА СЕРВЕРЕ ---
     if (tgUser) {
         fetch('https://pdrua.duckdns.org/init-user', {
@@ -39,9 +62,14 @@ document.addEventListener("DOMContentLoaded", () => {
             if (data && data.is_pro) {
                 isUserPro = true;
             }
+            updateHomeScreenProBadges();
         })
         .catch(err => console.error("Помилка ініціалізації користувача:", err));
+    } else {
+        updateHomeScreenProBadges();
     }
+
+    // --- ПРЕДЗАГРУЗКА РАЗДЕЛОВ В ФОНЕ ---
 
     // --- ПРЕДЗАГРУЗКА РАЗДЕЛОВ В ФОНЕ ---
     // Начинаем грузить данные сразу при открытии мини-аппа и сохраняем этот процесс
@@ -390,6 +418,8 @@ document.addEventListener("DOMContentLoaded", () => {
         navHard.addEventListener('click', async (e) => {
             e.preventDefault();
             addImpact();
+            if (!isUserPro) { showProModal(); return; } // <--- ДОДАЛИ
+            
             if (globalTopics.length === 0) {
                 if(topicsPromise) globalTopics = await topicsPromise;
                 else {
@@ -405,6 +435,8 @@ document.addEventListener("DOMContentLoaded", () => {
         navFavorites.addEventListener('click', (e) => {
             e.preventDefault();
             addImpact();
+            if (!isUserPro) { showProModal(); return; } // <--- ДОДАЛИ
+            
             if (globalTopics.length === 0) return;
             renderFavoriteTopics();
         });
@@ -428,6 +460,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cardHard) {
         cardHard.addEventListener('click', async () => {
             addImpact();
+            if (!isUserPro) { showProModal(); return; } // <--- ДОДАЛИ
             
             if (globalTopics.length === 0) {
                 if(topicsPromise) globalTopics = await topicsPromise;
@@ -436,7 +469,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     globalTopics = await res.json();
                 }
             }
-            
             startHardMode(); 
         });
     }
@@ -444,6 +476,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cardFavorites) {
         cardFavorites.addEventListener('click', () => {
             addImpact();
+            if (!isUserPro) { showProModal(); return; } // <--- ДОДАЛИ
+            
             if (globalTopics.length === 0) return; // Чекаємо завантаження
             renderFavoriteTopics();
         });
@@ -1668,6 +1702,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         document.getElementById('pro-modal').classList.remove('active');
                         isUserPro = true;
                         renderTopics(); // Перерисовываем меню, чтобы убрать плашки PRO
+                        updateHomeScreenProBadges(); // <--- ДОДАЛИ: прибираємо плашки з головного екрану
                         if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                         showCustomConfirm({
                             icon: '🎉', color: '#10B981', bgColor: 'rgba(16, 185, 129, 0.15)',
