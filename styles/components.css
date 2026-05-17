@@ -972,3 +972,8 @@ body.light-theme .info-icon {
 body.light-theme .bookmark-btn.active {
   background: transparent; /* Прибрали рожевий фон у світлій темі */
 }
+
+/* Универсальная модалка подтверждения всегда должна быть поверх других окон */
+#custom-confirm-modal {
+  z-index: 10005 !important;
+}
