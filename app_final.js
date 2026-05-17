@@ -1633,7 +1633,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <div style="margin-top: 20px; padding: 14px; background: rgba(66, 133, 244, 0.1); border: 1px solid rgba(66, 133, 244, 0.2); border-radius: 12px; text-align: left;">
                         <div style="font-size: 0.85rem; color: var(--c-text-soft); line-height: 1.4;">
                             <span style="font-weight: 700; color: var(--c-primary); display: block; margin-bottom: 4px;">💡 Як поповнити зірки?</span>
-                            Якщо при оплаті виникає помилка банку, ви можете заздалегідь придбати зірки через офіційного бота <a href="https://t.me/PremiumBot" target="_blank" style="color: var(--c-primary); text-decoration: none; font-weight: 600;">@PremiumBot</a> або в налаштуваннях Telegram.
+                            Якщо при оплаті виникає помилка - придбайте зірки через офіційного бота Telegram <a href="https://t.me/PremiumBot" target="_blank" style="color: var(--c-primary); text-decoration: none; font-weight: 600;">@PremiumBot</a> або в налаштуваннях Telegram.
                         </div>
                     </div>
 
