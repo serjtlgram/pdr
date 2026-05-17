@@ -1614,19 +1614,29 @@ document.addEventListener("DOMContentLoaded", () => {
                     <div style="text-align: center; margin-bottom: 20px;">
                         <div style="font-size: 3.5rem; margin-bottom: 10px;">⭐️</div>
                         <h3 style="font-size: 1.6rem; margin-bottom: 8px; font-weight: 800;">PRO Доступ</h3>
-                        <p style="color: var(--c-text-soft); font-size: 0.95rem; line-height: 1.4;">Відкрийте всі преміум-розділи та детальні пояснення до питань. Оплата безпечно через Telegram Stars.</p>
+                        <p style="color: var(--c-text-soft); font-size: 0.95rem; line-height: 1.4;">Відкрийте всі преміум-розділи та детальні пояснення до питань.</p>
                     </div>
+                    
                     <div style="display: flex; flex-direction: column; gap: 12px;">
                         <button class="btn-primary" onclick="buyPro('1_month')" style="display: flex; justify-content: space-between; width: 100%; padding: 16px 20px; background: var(--c-surface); color: var(--c-text); border: 1px solid var(--c-border-soft);">
-                            <span style="font-weight: 600;">1 місяць</span> <span style="font-weight: 800; color: #F59E0B;">⭐️ 1</span>
+                            <span style="font-weight: 600;">1 місяць</span> <span style="font-weight: 800; color: #F59E0B;">⭐️ 150</span>
                         </button>
                         <button class="btn-primary" onclick="buyPro('3_months')" style="display: flex; justify-content: space-between; width: 100%; padding: 16px 20px; background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); border: none; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);">
-                            <span style="font-weight: 700;">3 місяці (Вигідно)</span> <span style="font-weight: 800;">⭐️ 2</span>
+                            <span style="font-weight: 700;">3 місяці (Вигідно)</span> <span style="font-weight: 800;">⭐️ 250</span>
                         </button>
                         <button class="btn-primary" onclick="buyPro('12_months')" style="display: flex; justify-content: space-between; width: 100%; padding: 16px 20px; background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%); border: none; box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);">
-                            <span style="font-weight: 700;">1 рік (Максимум)</span> <span style="font-weight: 800;">⭐️ 3</span>
+                            <span style="font-weight: 700;">1 рік (Максимум)</span> <span style="font-weight: 800;">⭐️ 800</span>
                         </button>
                     </div>
+
+                    <!-- НОВЫЙ БЛОК С ПОДСКАЗКОЙ -->
+                    <div style="margin-top: 20px; padding: 14px; background: rgba(66, 133, 244, 0.1); border: 1px solid rgba(66, 133, 244, 0.2); border-radius: 12px; text-align: left;">
+                        <div style="font-size: 0.85rem; color: var(--c-text-soft); line-height: 1.4;">
+                            <span style="font-weight: 700; color: var(--c-primary); display: block; margin-bottom: 4px;">💡 Як поповнити зірки?</span>
+                            Якщо при оплаті виникає помилка банку, ви можете заздалегідь придбати зірки через офіційного бота <a href="https://t.me/PremiumBot" target="_blank" style="color: var(--c-primary); text-decoration: none; font-weight: 600;">@PremiumBot</a> або в налаштуваннях Telegram.
+                        </div>
+                    </div>
+
                     <button class="btn-danger-outline" onclick="document.getElementById('pro-modal').classList.remove('active')" style="width: 100%; margin-top: 16px; border: none; color: var(--c-text-soft);">Скасувати</button>
                 </div>
             `;
