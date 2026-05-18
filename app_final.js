@@ -1698,7 +1698,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     
                     <div style="display: flex; flex-direction: column; gap: 12px;">
                         <button class="btn-primary" onclick="buyPro('1_month')" style="display: flex; justify-content: space-between; width: 100%; padding: 16px 20px; background: var(--c-surface); color: var(--c-text); border: 1px solid var(--c-border-soft);">
-                            <span style="font-weight: 600;">1 місяць</span> <span style="font-weight: 800; color: #F59E0B;">⭐️ 1</span>
+                            <span style="font-weight: 600;">1 місяць</span> <span style="font-weight: 800; color: #F59E0B;">⭐️ 50 (SALE)</span>
                         </button>
                         <button class="btn-primary" onclick="buyPro('3_months')" style="display: flex; justify-content: space-between; width: 100%; padding: 16px 20px; background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); border: none; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);">
                             <span style="font-weight: 700;">3 місяці (Вигідно)</span> <span style="font-weight: 800;">⭐️ 250</span>
