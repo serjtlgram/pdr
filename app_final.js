@@ -2154,4 +2154,90 @@ document.addEventListener("DOMContentLoaded", () => {
     // Запускаємо відновлення при старті додатку
     syncFromCloud();
 
+// ==========================================
+    // ЛОГІКА ПОВНОЕКРАННОГО ЗУМУ КАРТИНОК
+    // ==========================================
+    
+    function setupImageZoom(sourceImgId) {
+        const sourceImg = document.getElementById(sourceImgId);
+        if (!sourceImg) return;
+
+        sourceImg.style.cursor = 'zoom-in';
+        
+        sourceImg.addEventListener('click', () => {
+            if (typeof addImpact === 'function') addImpact();
+            const viewer = document.getElementById('image-viewer-modal');
+            const viewerImg = document.getElementById('viewer-img');
+            
+            if (viewer && viewerImg && sourceImg.src) {
+                viewerImg.src = sourceImg.src;
+                viewerImg.style.transform = 'scale(1)';
+                viewer.style.display = 'flex';
+                // Невелика затримка для плавного проявлення (fade-in)
+                setTimeout(() => { viewer.style.opacity = '1'; }, 10);
+            }
+        });
+    }
+
+    // Вішаємо кліки на картинки в звичайному тесті та в іспиті
+    setupImageZoom('quiz-image');
+    setupImageZoom('exam-image');
+
+    const viewer = document.getElementById('image-viewer-modal');
+    const viewerImg = document.getElementById('viewer-img');
+    const closeBtn = document.getElementById('close-image-viewer');
+
+    if (viewer && viewerImg) {
+        // Функція закриття
+        const closeViewer = () => {
+            viewer.style.opacity = '0';
+            setTimeout(() => { viewer.style.display = 'none'; }, 200);
+        };
+        
+        closeBtn.addEventListener('click', closeViewer);
+        viewer.addEventListener('click', (e) => {
+            // Закриваємо, якщо клікнули повз саму картинку (на темний фон)
+            if (e.target === viewer) closeViewer();
+        });
+
+        // Логіка жестів (Pinch-to-zoom)
+        let initialDist = 0;
+        let currentScale = 1;
+
+        viewer.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                // Вираховуємо відстань між двома пальцями
+                initialDist = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                viewerImg.style.transition = 'none'; // Вимикаємо анімацію для плавності руху
+            }
+        }, { passive: true });
+
+        viewer.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2) {
+                e.preventDefault(); // Блокуємо скрол екрану під час зуму
+                const currentDist = Math.hypot(
+                    e.touches[0].pageX - e.touches[1].pageX,
+                    e.touches[0].pageY - e.touches[1].pageY
+                );
+                
+                // Рахуємо масштаб
+                const distChange = currentDist / initialDist;
+                currentScale = Math.max(1, Math.min(distChange, 4)); // Обмеження: не менше 1x і не більше 4x
+                viewerImg.style.transform = `scale(${currentScale})`;
+            }
+        }, { passive: false });
+
+        viewer.addEventListener('touchend', (e) => {
+            if (e.touches.length < 2) {
+                // Як в Instagram: коли відпускаєш пальці, картинка "відстрибує" на місце
+                viewerImg.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
+                viewerImg.style.transform = 'scale(1)';
+                currentScale = 1;
+            }
+        });
+    }
+
 }); // <-- ВОТ ТА САМАЯ ЗАКРЫВАЮЩАЯ СКОБКА

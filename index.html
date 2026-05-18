@@ -536,5 +536,15 @@
 
     <!-- ОСЬ ЦІ РЯДКИ БУЛИ ВТРАЧЕНІ -->
     <script src="app_final.js"></script>
+
+    <!-- МОДАЛКА ДЛЯ ПОВНОЕКРАННОГО ПЕРЕГЛЯДУ КАРТИНОК -->
+    <div id="image-viewer-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(8, 11, 18, 0.95); z-index: 100000; align-items: center; justify-content: center; flex-direction: column; opacity: 0; transition: opacity 0.2s ease;">
+        <div id="close-image-viewer" style="position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; cursor: pointer;">
+            &times;
+        </div>
+        <img id="viewer-img" src="" style="max-width: 95vw; max-height: 80vh; object-fit: contain; border-radius: 12px; transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);">
+        <div style="color: rgba(255,255,255,0.5); margin-top: 16px; font-size: 0.9rem; font-weight: 600;">Розсуньте двома пальцями</div>
+    </div>
+
 </body>
 </html>
