@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const userId = tgUser ? tgUser.id : null; 
     const FREE_ANSWERS_LIMIT = 10;
     let isUserPro = false;
-    const PRO_TOPICS = ["topic_8", "topic_8.2", "topic_16.2", "topic_33.1", "topic_33.2", "topic_33.3", "topic_33.4", "topic_33.5"];
+    const PRO_TOPICS = ["topic_8", "topic_8.2", "topic_16.1", "topic_16.2", "topic_18", "topic_20", "topic_21", "topic_27", "topic_33.1", "topic_33.2", "topic_33.3", "topic_33.4", "topic_33.5", "topic_33.6", "topic_33.7", "topic_33.8", "topic_37"];
 
     // 1. БЛОКИРОВКА ПОЗА TELEGRAM
     if (!tgUser && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
