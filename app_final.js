@@ -1564,22 +1564,30 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const explanationWrapper = document.getElementById('quiz-explanation-wrapper');
-        if (currentState && currentState.selectedIndex !== null && explanationWrapper && (q.ruleText || q.explanationText)) {
+        
+        // Учитываем все возможные форматы названий полей, которые может прислать бекенд
+        const currentRuleText = q.ruleText || q.rule_text || q.rule;
+        const currentExpText = q.explanationText || q.explanation_text || q.explanation;
+
+        if (currentState && currentState.selectedIndex !== null && explanationWrapper && (currentRuleText || currentExpText)) {
             const detailsRule = document.getElementById('details-rule');
             const detailsExplanation = document.getElementById('details-explanation');
             
+            // Включаем отображение (flex-direction: column ставим чтобы кнопки красиво шли друг под другом)
             explanationWrapper.style.display = 'flex';
+            explanationWrapper.style.flexDirection = 'column';
+            explanationWrapper.style.gap = '12px';
             
-            if (q.ruleText && detailsRule) {
-                document.getElementById('quiz-rule-text').innerHTML = q.ruleText;
+            if (currentRuleText && detailsRule) {
+                document.getElementById('quiz-rule-text').innerHTML = currentRuleText;
                 detailsRule.style.display = 'block';
                 detailsRule.removeAttribute('open'); 
             } else if (detailsRule) {
                 detailsRule.style.display = 'none';
             }
             
-            if (q.explanationText && detailsExplanation) {
-                document.getElementById('quiz-explanation-text').innerHTML = q.explanationText;
+            if (currentExpText && detailsExplanation) {
+                document.getElementById('quiz-explanation-text').innerHTML = currentExpText;
                 detailsExplanation.style.display = 'block';
                 detailsExplanation.removeAttribute('open'); 
             } else if (detailsExplanation) {
