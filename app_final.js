@@ -1339,14 +1339,14 @@ document.addEventListener("DOMContentLoaded", () => {
         currentQuestions =[]; 
         noMoreQuestionsOnServer = false; 
         const total = topic.totalQuestions || 79;
-        const actualTotal = topic.actualQuestions || total; // Скільки питань реально є в БД зараз
         
-        questionStates = Array(actualTotal).fill(null).map(() => ({ selectedIndex: null, isCorrect: null }));
+        // questionStates — для всіх запланованих питань, щоб уникнути помилок при кліку
+        questionStates = Array(total).fill(null).map(() => ({ selectedIndex: null, isCorrect: null }));
         
         const savedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
         if (savedStates[topic.id]) {
             savedStates[topic.id].forEach((savedState, idx) => {
-                if (idx < actualTotal && savedState) {
+                if (idx < total && savedState) {
                     questionStates[idx] = savedState;
                 }
             });
@@ -1396,9 +1396,9 @@ document.addEventListener("DOMContentLoaded", () => {
         navBar.innerHTML = '';
 
         const total = currentTopic.totalQuestions || 79;
-        const navTotal = currentTopic.actualQuestions || total; // для навбару - реальна кількість
+        const actualTotal = currentTopic.actualQuestions || total; // скільки реально є в БД
 
-        for (let i = 0; i < navTotal; i++) {
+        for (let i = 0; i < total; i++) {
             const btn = document.createElement('button');
             btn.className = 'nav-btn';
             btn.innerText = i + 1;
@@ -1411,16 +1411,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 else if (state.isCorrect === false) btn.classList.add('wrong');
             }
             
-            if (!currentTopic.isVirtual && !currentQuestions[i] && (!state || state.selectedIndex === null)) {
+            if (!currentTopic.isVirtual && i >= actualTotal) {
+                // Питання ще не додано в БД — напівпрозоре, некліктабельне
                 btn.classList.add('empty');
+                btn.style.pointerEvents = 'none';
+            } else {
+                btn.addEventListener('click', () => {
+                    addImpact();
+                    currentQuestionIndex = i;
+                    renderQuestion();
+                    window.scrollTo(0, 70);
+                });
             }
-            
-            btn.addEventListener('click', () => {
-                addImpact();
-                currentQuestionIndex = i;
-                renderQuestion();
-                window.scrollTo(0, 70); // Возвращаем экран в верх
-            });
             
             navBar.appendChild(btn);
         }
