@@ -301,7 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const response = await fetch(`https://pdrua.duckdns.org/check-sub?user_id=${userId}`);
             const data = await response.json();
-            isUserVerified = (data.is_subscribed === true);
+            isUserVerified = (data.is_subscribed === true || data.is_subbed === true);
         } catch (error) {
             console.error("Помилка бэкенда:", error);
             isUserVerified = false; // FAIL-CLOSED
