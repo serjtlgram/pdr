@@ -9,13 +9,21 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // --- АВТОМАТИЧНЕ ДОДАВАННЯ АВТОРИЗАЦІЇ ДО ВСІХ ЗАПИТІВ ---
     const originalFetch = window.fetch;
-    window.fetch = function() {
-        let [resource, config] = arguments;
+    window.fetch = function(resource, config) {
         if (typeof resource === 'string' && resource.startsWith('https://pdrua.duckdns.org')) {
             config = config || {};
-            config.headers = config.headers || {};
+            // Перетворюємо Headers-об'єкт у звичайний об'єкт, якщо потрібно
+            if (config.headers instanceof Headers) {
+                const plainHeaders = {};
+                config.headers.forEach((value, key) => { plainHeaders[key] = value; });
+                config.headers = plainHeaders;
+            } else {
+                config.headers = config.headers || {};
+            }
             if (tg && tg.initData) {
                 config.headers['Authorization'] = 'tma ' + tg.initData;
+            } else {
+                console.warn('[Auth] tg.initData відсутній — запит без авторизації:', resource);
             }
         }
         return originalFetch(resource, config);
