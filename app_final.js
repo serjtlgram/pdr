@@ -6,6 +6,21 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- Настройка Telegram WebApp ---
     const tg = window.Telegram ? window.Telegram.WebApp : null;
     const tgUser = tg && tg.initDataUnsafe ? tg.initDataUnsafe.user : null;
+    
+    // --- АВТОМАТИЧНЕ ДОДАВАННЯ АВТОРИЗАЦІЇ ДО ВСІХ ЗАПИТІВ ---
+    const originalFetch = window.fetch;
+    window.fetch = function() {
+        let [resource, config] = arguments;
+        if (typeof resource === 'string' && resource.startsWith('https://pdrua.duckdns.org')) {
+            config = config || {};
+            config.headers = config.headers || {};
+            if (tg && tg.initData) {
+                config.headers['Authorization'] = 'tma ' + tg.initData;
+            }
+        }
+        return originalFetch(resource, config);
+    };
+
     const userId = tgUser ? tgUser.id : null; 
     const FREE_ANSWERS_LIMIT = 10;
     let isUserPro = false;
