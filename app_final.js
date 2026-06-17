@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             if (data && typeof data.answers_count !== 'undefined') {
                 totalAnswersGiven = data.answers_count;
-                isUserVerified = (totalAnswersGiven < FREE_ANSWERS_LIMIT); 
+                // removed invalid verification check
             }
             if (data && typeof data.last_exam_time !== 'undefined') {
                 lastExamTimeFromServer = data.last_exam_time;
@@ -153,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 3. ЛОГИКА ПОДПИСКИ
     let totalAnswersGiven = parseInt(localStorage.getItem('pdr_answers_count') || '0');
-    let isUserVerified = (totalAnswersGiven < FREE_ANSWERS_LIMIT); 
+    let isUserVerified = false; 
     let isCheckingNow = false;
 
     // --- Настройки Telegram UI ---
@@ -785,7 +785,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         // ---------------------------------------------------------
 
-        if (totalAnswersGiven >= FREE_ANSWERS_LIMIT && !isUserVerified) {
+        if (totalAnswersGiven >= FREE_ANSWERS_LIMIT && !isUserPro && !isUserVerified) {
             document.getElementById('sub-modal').classList.add('active');
             return;
         }
@@ -1639,7 +1639,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function handleAnswer(clickedBtn, selectedIndex, correctIndex) {
         addImpact(); 
 
-        if (totalAnswersGiven >= FREE_ANSWERS_LIMIT) {
+        if (totalAnswersGiven >= FREE_ANSWERS_LIMIT && !isUserPro) {
             // Якщо перевірка зараз іде у фоні — чекаємо її завершення
             while (isCheckingNow) {
                 await new Promise(r => setTimeout(r, 100));
