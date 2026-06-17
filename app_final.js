@@ -64,6 +64,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Зберігаємо час останнього іспиту в глобальну змінну для клієнта
+    let lastExamTimeFromServer = 0;
+
     // --- ИНИЦИАЛИЗАЦИЯ ПОЛЬЗОВАТЕЛЯ НА СЕРВЕРЕ ---
     if (tgUser) {
         fetch('https://pdrua.duckdns.org/init-user', {
@@ -84,6 +87,13 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(data => {
             if (data && data.is_pro) {
                 isUserPro = true;
+            }
+            if (data && typeof data.answers_count !== 'undefined') {
+                totalAnswersGiven = data.answers_count;
+                isUserVerified = (totalAnswersGiven < FREE_ANSWERS_LIMIT); 
+            }
+            if (data && typeof data.last_exam_time !== 'undefined') {
+                lastExamTimeFromServer = data.last_exam_time;
             }
             updateHomeScreenProBadges();
         })
@@ -294,7 +304,7 @@ document.addEventListener("DOMContentLoaded", () => {
             isUserVerified = (data.is_subscribed === true);
         } catch (error) {
             console.error("Помилка бэкенда:", error);
-            isUserVerified = true; 
+            isUserVerified = false; // FAIL-CLOSED
         } finally {
             isCheckingNow = false;
         }
@@ -744,7 +754,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // --- НОВА ЛОГІКА: Обмеження іспиту (1 раз на тиждень) ---
         if (!isUserPro) {
-            const lastExamTime = parseInt(localStorage.getItem('pdr_last_exam_time') || '0');
+            const lastExamTime = lastExamTimeFromServer;
             const now = Date.now();
             const oneWeekMs = 7 * 24 * 60 * 60 * 1000; // 7 днів у мілісекундах
 
@@ -810,7 +820,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // --- НОВЕ: Записуємо час початку іспиту для безкоштовних користувачів ---
             if (!isUserPro) {
-                localStorage.setItem('pdr_last_exam_time', Date.now().toString());
+                lastExamTimeFromServer = Date.now();
             }
             // ------------------------------------------------------------------------
 
@@ -1684,9 +1694,17 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        if (totalAnswersGiven < FREE_ANSWERS_LIMIT) {
+        if (totalAnswersGiven < FREE_ANSWERS_LIMIT && !isUserVerified) {
+            fetch('https://pdrua.duckdns.org/api/record-answer', {
+                method: 'POST'
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.answers_count) totalAnswersGiven = data.answers_count;
+            })
+            .catch(err => console.error("Error recording answer", err));
+            
             totalAnswersGiven++;
-            localStorage.setItem('pdr_answers_count', totalAnswersGiven.toString());
         }
 
         // Запускаємо тихе збереження у хмару Телеграм.
