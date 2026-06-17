@@ -299,7 +299,7 @@ document.addEventListener("DOMContentLoaded", () => {
         isCheckingNow = true;
 
         try {
-            const response = await fetch(`https://pdrua.duckdns.org/check-sub?user_id=${userId}`);
+            const response = await fetch(`https://pdrua.duckdns.org/check-sub?user_id=${userId}&t=${Date.now()}`);
             const data = await response.json();
             isUserVerified = (data.is_subscribed === true || data.is_subbed === true);
         } catch (error) {
