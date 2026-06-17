@@ -1339,13 +1339,14 @@ document.addEventListener("DOMContentLoaded", () => {
         currentQuestions =[]; 
         noMoreQuestionsOnServer = false; 
         const total = topic.totalQuestions || 79;
+        const actualTotal = topic.actualQuestions || total; // Скільки питань реально є в БД зараз
         
-        questionStates = Array(total).fill(null).map(() => ({ selectedIndex: null, isCorrect: null }));
+        questionStates = Array(actualTotal).fill(null).map(() => ({ selectedIndex: null, isCorrect: null }));
         
         const savedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
         if (savedStates[topic.id]) {
             savedStates[topic.id].forEach((savedState, idx) => {
-                if (idx < total && savedState) {
+                if (idx < actualTotal && savedState) {
                     questionStates[idx] = savedState;
                 }
             });
@@ -1395,8 +1396,9 @@ document.addEventListener("DOMContentLoaded", () => {
         navBar.innerHTML = '';
 
         const total = currentTopic.totalQuestions || 79;
+        const navTotal = currentTopic.actualQuestions || total; // для навбару - реальна кількість
 
-        for (let i = 0; i < total; i++) {
+        for (let i = 0; i < navTotal; i++) {
             const btn = document.createElement('button');
             btn.className = 'nav-btn';
             btn.innerText = i + 1;
@@ -1435,9 +1437,10 @@ document.addEventListener("DOMContentLoaded", () => {
     function renderQuestion() {
 
         const total = currentTopic.totalQuestions || 79;
+        const actualTotal = currentTopic.actualQuestions || total; // реальна кількість в БД
         const q = currentQuestions[currentQuestionIndex];
 
-        if (!currentQuestions[currentQuestionIndex + 5] && (currentQuestionIndex + 5) < total) {
+        if (!currentQuestions[currentQuestionIndex + 5] && (currentQuestionIndex + 5) < actualTotal) {
             let offsetToFetch = currentQuestionIndex;
             while(currentQuestions[offsetToFetch]) offsetToFetch++;
             if (!isLoadingQuestions) {
