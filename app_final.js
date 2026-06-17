@@ -332,10 +332,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- НОВИЙ КОД: Запускаємо тиху перевірку відразу при старті додатку ---
-    if (totalAnswersGiven >= FREE_ANSWERS_LIMIT && !isUserVerified) {
-        setTimeout(runSilentVerification, 100); // Запускаємо майже миттєво у фоні
-    }
+    // --- НОВИЙ КОД: Запускаємо тиху перевірку відразу при старті додатку для всіх ---
+    setTimeout(runSilentVerification, 100); // Запускаємо майже миттєво у фоні
 
     // --- SPA Навигация ---
     function showScreen(screenToShow, screenName) {
@@ -785,9 +783,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         // ---------------------------------------------------------
 
-        if (totalAnswersGiven >= FREE_ANSWERS_LIMIT && !isUserPro && !isUserVerified) {
-            document.getElementById('sub-modal').classList.add('active');
-            return;
+        if (totalAnswersGiven >= FREE_ANSWERS_LIMIT && !isUserPro) {
+            if (!isUserVerified) {
+                document.getElementById('sub-modal').classList.add('active');
+                return;
+            } else {
+                runSilentVerification(); // Перевіряємо підписку у фоні перед іспитом
+            }
         }
 
         showCustomConfirm({
@@ -1654,6 +1656,9 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!isUserVerified) {
                 document.getElementById('sub-modal').classList.add('active');
                 return; 
+            } else if (totalAnswersGiven > 0 && totalAnswersGiven % 10 === 0) {
+                // Кожні 10 відповідей тихо перевіряємо підписку у фоні
+                runSilentVerification();
             }
         }
 
