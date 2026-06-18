@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- РРќРР¦РРђР›РР—РђР¦РРЇ РџРћР›Р¬Р—РћР’РђРўР•Р›РЇ РќРђ РЎР•Р Р’Р•Р Р• ---
     if (tgUser) {
-        fetch(`${API_BASE}/init-user', {
+        fetch(`${API_BASE}/init-user`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- РџР Р•Р”Р—РђР“Р РЈР—РљРђ Р РђР—Р”Р•Р›РћР’ Р’ Р¤РћРќР• ---
     // РќР°С‡РёРЅР°РµРј РіСЂСѓР·РёС‚СЊ РґР°РЅРЅС‹Рµ СЃСЂР°Р·Сѓ РїСЂРё РѕС‚РєСЂС‹С‚РёРё РјРёРЅРё-Р°РїРїР° Рё СЃРѕС…СЂР°РЅСЏРµРј СЌС‚РѕС‚ РїСЂРѕС†РµСЃСЃ
-    let topicsPromise = fetch(`${API_BASE}/api/topics')
+    let topicsPromise = fetch(`${API_BASE}/api/topics`)
         .then(res => res.json())
         .catch(err => console.error("РџРѕРјРёР»РєР° Р·Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ СЂРѕР·РґС–Р»С–РІ:", err));
         
@@ -456,7 +456,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (globalTopics.length === 0) {
                 if(topicsPromise) globalTopics = await topicsPromise;
                 else {
-                    const res = await fetch(`${API_BASE}/api/topics');
+                    const res = await fetch(`${API_BASE}/api/topics`);
                     globalTopics = await res.json();
                 }
             }
@@ -498,7 +498,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (globalTopics.length === 0) {
                 if(topicsPromise) globalTopics = await topicsPromise;
                 else {
-                    const res = await fetch(`${API_BASE}/api/topics');
+                    const res = await fetch(`${API_BASE}/api/topics`);
                     globalTopics = await res.json();
                 }
             }
@@ -637,7 +637,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (topicsPromise) {
                     globalTopics = await topicsPromise;
                 } else {
-                    const response = await fetch(`${API_BASE}/api/topics');
+                    const response = await fetch(`${API_BASE}/api/topics`);
                     globalTopics = await response.json();
                 }
             }
@@ -819,7 +819,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (bottomNav) bottomNav.style.display = 'none';
 
         try {
-            const response = await fetch(`${API_BASE}/api/exam-questions');
+            const response = await fetch(`${API_BASE}/api/exam-questions`);
             examQuestions = await response.json();
             
             if (!examQuestions || examQuestions.length === 0) throw new Error("Empty questions");
@@ -1704,7 +1704,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (totalAnswersGiven < FREE_ANSWERS_LIMIT && !isUserVerified) {
-            fetch(`${API_BASE}/api/record-answer', {
+            fetch(`${API_BASE}/api/record-answer`, {
                 method: 'POST'
             })
             .then(res => res.json())
@@ -1788,7 +1788,7 @@ document.addEventListener("DOMContentLoaded", () => {
         btn.disabled = true;
 
         try {
-            const res = await fetch(`${API_BASE}/api/create-invoice', {
+            const res = await fetch(`${API_BASE}/api/create-invoice`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ user_id: userId, tier_id: tierId })
@@ -1941,7 +1941,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             if (globalTopics.length === 0) {
                 try {
-                    const response = await fetch(`${API_BASE}/api/topics');
+                    const response = await fetch(`${API_BASE}/api/topics`);
                     globalTopics = await response.json();
                 } catch (e) { console.error(e); }
             }
