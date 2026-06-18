@@ -1,4 +1,4 @@
-﻿// ==========================================
+// ==========================================
 // ИНИЦИАЛИЗАЦИЯ И ЛОГИКА (ПОЛНАЯ ВЕРСИЯ С СЕРВЕРОМ).
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
@@ -1703,17 +1703,21 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        if (totalAnswersGiven < FREE_ANSWERS_LIMIT && !isUserVerified) {
+        if (!isUserPro) {
             fetch(`${API_BASE}/api/record-answer`, {
                 method: 'POST'
             })
             .then(res => res.json())
             .then(data => {
-                if (data.answers_count) totalAnswersGiven = data.answers_count;
+                if (data.answers_count) {
+                    totalAnswersGiven = data.answers_count;
+                    localStorage.setItem('pdr_answers_count', totalAnswersGiven.toString());
+                }
             })
             .catch(err => console.error("Error recording answer", err));
             
             totalAnswersGiven++;
+            localStorage.setItem('pdr_answers_count', totalAnswersGiven.toString());
         }
 
         // Запускаємо тихе збереження у хмару Телеграм.
