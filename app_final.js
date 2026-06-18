@@ -1,18 +1,21 @@
 // ==========================================
-// ИНИЦИАЛИЗАЦИЯ И ЛОГИКА (ПОЛНАЯ ВЕРСИЯ С СЕРВЕРОМ).
+// РРќРР¦РРђР›РР—РђР¦РРЇ Р Р›РћР“РРљРђ (РџРћР›РќРђРЇ Р’Р•Р РЎРРЇ РЎ РЎР•Р Р’Р•Р РћРњ).
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
     
-    // --- Настройка Telegram WebApp ---
+    // --- Р‘Р°Р·РѕРІРёР№ URL Р±РµРєРµРЅРґСѓ: Р·РјС–РЅСЋРІР°С‚Рё РўР†Р›Р¬РљР РўРЈРў РїСЂРё Р·РјС–РЅС– С…РѕСЃС‚Р° ---
+    const API_BASE = 'https://pdrua.duckdns.org';
+
+    // --- РќР°СЃС‚СЂРѕР№РєР° Telegram WebApp ---
     const tg = window.Telegram ? window.Telegram.WebApp : null;
     const tgUser = tg && tg.initDataUnsafe ? tg.initDataUnsafe.user : null;
     
-    // --- АВТОМАТИЧНЕ ДОДАВАННЯ АВТОРИЗАЦІЇ ДО ВСІХ ЗАПИТІВ ---
+    // --- РђР’РўРћРњРђРўРР§РќР• Р”РћР”РђР’РђРќРќРЇ РђР’РўРћР РР—РђР¦Р†Р‡ Р”Рћ Р’РЎР†РҐ Р—РђРџРРўР†Р’ ---
     const originalFetch = window.fetch;
     window.fetch = function(resource, config) {
-        if (typeof resource === 'string' && resource.startsWith('https://pdrua.duckdns.org')) {
+        if (typeof resource === 'string' && resource.startsWith(API_BASE)) {
             config = config || {};
-            // Перетворюємо Headers-об'єкт у звичайний об'єкт, якщо потрібно
+            // РџРµСЂРµС‚РІРѕСЂСЋС”РјРѕ Headers-РѕР±'С”РєС‚ Сѓ Р·РІРёС‡Р°Р№РЅРёР№ РѕР±'С”РєС‚, СЏРєС‰Рѕ РїРѕС‚СЂС–Р±РЅРѕ
             if (config.headers instanceof Headers) {
                 const plainHeaders = {};
                 config.headers.forEach((value, key) => { plainHeaders[key] = value; });
@@ -23,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (tg && tg.initData) {
                 config.headers['Authorization'] = 'tma ' + tg.initData;
             } else {
-                console.warn('[Auth] tg.initData відсутній — запит без авторизації:', resource);
+                console.warn('[Auth] tg.initData РІС–РґСЃСѓС‚РЅС–Р№ вЂ” Р·Р°РїРёС‚ Р±РµР· Р°РІС‚РѕСЂРёР·Р°С†С–С—:', resource);
             }
         }
         return originalFetch(resource, config);
@@ -34,22 +37,23 @@ document.addEventListener("DOMContentLoaded", () => {
     let isUserPro = false;
     const PRO_TOPICS = ["topic_8", "topic_8.2", "topic_16.1", "topic_16.2", "topic_18", "topic_20", "topic_21", "topic_27", "topic_33.1", "topic_33.2", "topic_33.3", "topic_33.4", "topic_33.5", "topic_33.6", "topic_33.7", "topic_33.8", "topic_37"];
 
-    // 1. БЛОКИРОВКА ПОЗА TELEGRAM
+
+    // 1. Р‘Р›РћРљРР РћР’РљРђ РџРћР—Рђ TELEGRAM
     if (!tgUser && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
         document.getElementById('not-tg-blocker').classList.add('active');
         document.getElementById('app-container').style.display = 'none';
         return; 
     }
 
-    // --- НОВА ФУНКЦІЯ: Плашки PRO на головному екрані ---
+    // --- РќРћР’Рђ Р¤РЈРќРљР¦Р†РЇ: РџР»Р°С€РєРё PRO РЅР° РіРѕР»РѕРІРЅРѕРјСѓ РµРєСЂР°РЅС– ---
     function updateHomeScreenProBadges() {
         const hardIcon = document.querySelector('#card-hard .card-icon');
         const favIcon = document.querySelector('#card-favorites .card-icon');
         
-        // Видаляємо старі плашки, якщо вони є
+        // Р’РёРґР°Р»СЏС”РјРѕ СЃС‚Р°СЂС– РїР»Р°С€РєРё, СЏРєС‰Рѕ РІРѕРЅРё С”
         document.querySelectorAll('.home-pro-badge').forEach(el => el.remove());
 
-        // Якщо юзер НЕ Pro, вішаємо плашки
+        // РЇРєС‰Рѕ СЋР·РµСЂ РќР• Pro, РІС–С€Р°С”РјРѕ РїР»Р°С€РєРё
         if (!isUserPro) {
             const badgeHTML = `<div class="home-pro-badge" style="position:absolute; top:-8px; right:-8px; background: linear-gradient(135deg, #F59E0B, #D97706); color: #fff; font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 8px; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.4); z-index: 2; letter-spacing: 0.5px;">PRO</div>`;
             
@@ -64,12 +68,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Зберігаємо час останнього іспиту в глобальну змінну для клієнта
+    // Р—Р±РµСЂС–РіР°С”РјРѕ С‡Р°СЃ РѕСЃС‚Р°РЅРЅСЊРѕРіРѕ С–СЃРїРёС‚Сѓ РІ РіР»РѕР±Р°Р»СЊРЅСѓ Р·РјС–РЅРЅСѓ РґР»СЏ РєР»С–С”РЅС‚Р°
     let lastExamTimeFromServer = 0;
 
-    // --- ИНИЦИАЛИЗАЦИЯ ПОЛЬЗОВАТЕЛЯ НА СЕРВЕРЕ ---
+    // --- РРќРР¦РРђР›РР—РђР¦РРЇ РџРћР›Р¬Р—РћР’РђРўР•Р›РЇ РќРђ РЎР•Р Р’Р•Р Р• ---
     if (tgUser) {
-        fetch('https://pdrua.duckdns.org/init-user', {
+        fetch(`${API_BASE}/init-user', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -97,22 +101,22 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             updateHomeScreenProBadges();
         })
-        .catch(err => console.error("Помилка ініціалізації користувача:", err));
+        .catch(err => console.error("РџРѕРјРёР»РєР° С–РЅС–С†С–Р°Р»С–Р·Р°С†С–С— РєРѕСЂРёСЃС‚СѓРІР°С‡Р°:", err));
     } else {
         updateHomeScreenProBadges();
     }
 
-    // --- ПРЕДЗАГРУЗКА РАЗДЕЛОВ В ФОНЕ ---
-    // Начинаем грузить данные сразу при открытии мини-аппа и сохраняем этот процесс
-    let topicsPromise = fetch('https://pdrua.duckdns.org/api/topics')
+    // --- РџР Р•Р”Р—РђР“Р РЈР—РљРђ Р РђР—Р”Р•Р›РћР’ Р’ Р¤РћРќР• ---
+    // РќР°С‡РёРЅР°РµРј РіСЂСѓР·РёС‚СЊ РґР°РЅРЅС‹Рµ СЃСЂР°Р·Сѓ РїСЂРё РѕС‚РєСЂС‹С‚РёРё РјРёРЅРё-Р°РїРїР° Рё СЃРѕС…СЂР°РЅСЏРµРј СЌС‚РѕС‚ РїСЂРѕС†РµСЃСЃ
+    let topicsPromise = fetch(`${API_BASE}/api/topics')
         .then(res => res.json())
-        .catch(err => console.error("Помилка завантаження розділів:", err));
+        .catch(err => console.error("РџРѕРјРёР»РєР° Р·Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ СЂРѕР·РґС–Р»С–РІ:", err));
         
     topicsPromise.then(data => { 
         if (data && data.length > 0) globalTopics = data; 
     });
 
-    // 2. АВАТАРКА
+    // 2. РђР’РђРўРђР РљРђ
     const avatarContainer = document.getElementById('user-avatar-container');
     const avatarImg = document.getElementById('user-avatar-img');
     
@@ -123,15 +127,15 @@ document.addEventListener("DOMContentLoaded", () => {
             avatarImg.style.display = 'block';
         } else {
             avatarImg.style.display = 'none';
-            avatarContainer.innerHTML = tgUser.first_name ? tgUser.first_name.charAt(0).toUpperCase() : '👤';
+            avatarContainer.innerHTML = tgUser.first_name ? tgUser.first_name.charAt(0).toUpperCase() : 'рџ‘¤';
         }
     } else if (avatarContainer) {
         avatarContainer.style.display = 'flex';
         avatarImg.style.display = 'none';
-        avatarContainer.innerHTML = '👤';
+        avatarContainer.innerHTML = 'рџ‘¤';
     }
 
-    // Основные переменные интерфейса
+    // РћСЃРЅРѕРІРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ РёРЅС‚РµСЂС„РµР№СЃР°
     const btnStart = document.getElementById('btn-start-learning');
     const btnBackHome = document.getElementById('btn-back-home');
     const homeScreen = document.getElementById('home-screen');
@@ -139,24 +143,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const quizScreen = document.getElementById('quiz-screen');
     const examScreen = document.getElementById('exam-screen');
     
-    // Состояние теста и глобальные переменные
+    // РЎРѕСЃС‚РѕСЏРЅРёРµ С‚РµСЃС‚Р° Рё РіР»РѕР±Р°Р»СЊРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ
     let currentTopic = null; 
     let currentQuestions =[];
     let currentQuestionIndex = 0;
     let currentScreenName = 'home';
     let questionStates =[]; 
-    let isLoadingQuestions = false; // Флаг загрузки вопросов
-    let noMoreQuestionsOnServer = false; // Флаг, если вопросы в базе закончились
+    let isLoadingQuestions = false; // Р¤Р»Р°Рі Р·Р°РіСЂСѓР·РєРё РІРѕРїСЂРѕСЃРѕРІ
+    let noMoreQuestionsOnServer = false; // Р¤Р»Р°Рі, РµСЃР»Рё РІРѕРїСЂРѕСЃС‹ РІ Р±Р°Р·Рµ Р·Р°РєРѕРЅС‡РёР»РёСЃСЊ
 
-    // Резервная копия разделов для моментальной загрузки
-    let globalTopics =[]; // Никаких заготовок, только пустой массив
+    // Р РµР·РµСЂРІРЅР°СЏ РєРѕРїРёСЏ СЂР°Р·РґРµР»РѕРІ РґР»СЏ РјРѕРјРµРЅС‚Р°Р»СЊРЅРѕР№ Р·Р°РіСЂСѓР·РєРё
+    let globalTopics =[]; // РќРёРєР°РєРёС… Р·Р°РіРѕС‚РѕРІРѕРє, С‚РѕР»СЊРєРѕ РїСѓСЃС‚РѕР№ РјР°СЃСЃРёРІ
 
-    // 3. ЛОГИКА ПОДПИСКИ
+    // 3. Р›РћР“РРљРђ РџРћР”РџРРЎРљР
     let totalAnswersGiven = parseInt(localStorage.getItem('pdr_answers_count') || '0');
     let isUserVerified = false; 
     let isCheckingNow = false;
 
-    // --- Настройки Telegram UI ---
+    // --- РќР°СЃС‚СЂРѕР№РєРё Telegram UI ---
     if (tg) {
         try { tg.ready(); } catch(e) {}
         try { tg.expand(); } catch(e) {}
@@ -192,15 +196,15 @@ document.addEventListener("DOMContentLoaded", () => {
         window.addImpact = function() {}; 
     }
 
-    // --- Переключение тем ---
+    // --- РџРµСЂРµРєР»СЋС‡РµРЅРёРµ С‚РµРј ---
     const themeToggleBtn = document.getElementById('theme-toggle');
-    const cyberToggleBtn = document.getElementById('cyber-toggle'); // Новая кнопка
+    const cyberToggleBtn = document.getElementById('cyber-toggle'); // РќРѕРІР°СЏ РєРЅРѕРїРєР°
     const themeIcon = document.getElementById('theme-icon');
 
     const iconMoon = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
     const iconSun = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
 
-    // Восстановление темы при загрузке
+    // Р’РѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ С‚РµРјС‹ РїСЂРё Р·Р°РіСЂСѓР·РєРµ
     if (tg && tg.CloudStorage) {
         tg.CloudStorage.getItem('app_theme', (err, savedTheme) => {
             if (!err && savedTheme) {
@@ -218,7 +222,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- УНІВЕРСАЛЬНА КАСТОМНА МОДАЛКА ПІДТВЕРДЖЕННЯ ---
+    // --- РЈРќР†Р’Р•Р РЎРђР›Р¬РќРђ РљРђРЎРўРћРњРќРђ РњРћР”РђР›РљРђ РџР†Р”РўР’Р•Р Р”Р–Р•РќРќРЇ ---
     let confirmCallback = null;
 
     function showCustomConfirm(options) {
@@ -231,14 +235,14 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('confirm-desc').innerText = options.desc;
         
         const okBtn = document.getElementById('btn-confirm-ok');
-        okBtn.innerText = options.okText || 'ОК';
+        okBtn.innerText = options.okText || 'РћРљ';
         
-        // Якщо це небезпечна дія (видалення, переривання), робимо кнопку червоною
+        // РЇРєС‰Рѕ С†Рµ РЅРµР±РµР·РїРµС‡РЅР° РґС–СЏ (РІРёРґР°Р»РµРЅРЅСЏ, РїРµСЂРµСЂРёРІР°РЅРЅСЏ), СЂРѕР±РёРјРѕ РєРЅРѕРїРєСѓ С‡РµСЂРІРѕРЅРѕСЋ
         if (options.isDanger) {
             okBtn.style.background = 'var(--c-danger)';
             okBtn.style.boxShadow = '0 8px 24px rgba(239, 68, 68, 0.3)';
         } else {
-            okBtn.style.background = ''; // Повертаємо стандартний градієнт
+            okBtn.style.background = ''; // РџРѕРІРµСЂС‚Р°С”РјРѕ СЃС‚Р°РЅРґР°СЂС‚РЅРёР№ РіСЂР°РґС–С”РЅС‚
             okBtn.style.boxShadow = '';
         }
 
@@ -258,30 +262,30 @@ document.addEventListener("DOMContentLoaded", () => {
         if (confirmCallback) confirmCallback();
     });
 
-    // Логика кнопки Киберпанк
+    // Р›РѕРіРёРєР° РєРЅРѕРїРєРё РљРёР±РµСЂРїР°РЅРє
     if (cyberToggleBtn) {
         cyberToggleBtn.addEventListener('click', () => {
             addImpact();
             const isCyber = document.body.classList.contains('cyber-theme');
             
-            document.body.classList.remove('light-theme'); // Выключаем светлую в любом случае
-            themeIcon.innerHTML = iconSun; // Возвращаем иконку солнца для базовой темной
+            document.body.classList.remove('light-theme'); // Р’С‹РєР»СЋС‡Р°РµРј СЃРІРµС‚Р»СѓСЋ РІ Р»СЋР±РѕРј СЃР»СѓС‡Р°Рµ
+            themeIcon.innerHTML = iconSun; // Р’РѕР·РІСЂР°С‰Р°РµРј РёРєРѕРЅРєСѓ СЃРѕР»РЅС†Р° РґР»СЏ Р±Р°Р·РѕРІРѕР№ С‚РµРјРЅРѕР№
 
             if (isCyber) {
-                document.body.classList.remove('cyber-theme'); // Возврат к обычной темной
+                document.body.classList.remove('cyber-theme'); // Р’РѕР·РІСЂР°С‚ Рє РѕР±С‹С‡РЅРѕР№ С‚РµРјРЅРѕР№
                 if (tg && tg.CloudStorage) tg.CloudStorage.setItem('app_theme', 'dark');
             } else {
-                document.body.classList.add('cyber-theme'); // Включаем киберпанк
+                document.body.classList.add('cyber-theme'); // Р’РєР»СЋС‡Р°РµРј РєРёР±РµСЂРїР°РЅРє
                 if (tg && tg.CloudStorage) tg.CloudStorage.setItem('app_theme', 'cyber');
             }
         });
     }
 
-    // Логика обычной кнопки (Светлая/Темная)
+    // Р›РѕРіРёРєР° РѕР±С‹С‡РЅРѕР№ РєРЅРѕРїРєРё (РЎРІРµС‚Р»Р°СЏ/РўРµРјРЅР°СЏ)
     if (themeToggleBtn) {
         themeToggleBtn.addEventListener('click', () => {
             addImpact();
-            document.body.classList.remove('cyber-theme'); // При клике сюда киберпанк всегда выключается
+            document.body.classList.remove('cyber-theme'); // РџСЂРё РєР»РёРєРµ СЃСЋРґР° РєРёР±РµСЂРїР°РЅРє РІСЃРµРіРґР° РІС‹РєР»СЋС‡Р°РµС‚СЃСЏ
             
             document.body.classList.toggle('light-theme');
             const isLightNow = document.body.classList.contains('light-theme');
@@ -293,17 +297,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- Фоновая проверка подписки ---
+    // --- Р¤РѕРЅРѕРІР°СЏ РїСЂРѕРІРµСЂРєР° РїРѕРґРїРёСЃРєРё ---
     async function runSilentVerification() {
         if (!userId || isCheckingNow) return; 
         isCheckingNow = true;
 
         try {
-            const response = await fetch(`https://pdrua.duckdns.org/check-sub?user_id=${userId}&t=${Date.now()}`);
+            const response = await fetch(`${API_BASE}/check-sub?user_id=${userId}&t=${Date.now()}`);
             const data = await response.json();
             isUserVerified = (data.is_subscribed === true || data.is_subbed === true);
         } catch (error) {
-            console.error("Помилка бэкенда:", error);
+            console.error("РџРѕРјРёР»РєР° Р±СЌРєРµРЅРґР°:", error);
             isUserVerified = false; // FAIL-CLOSED
         } finally {
             isCheckingNow = false;
@@ -315,7 +319,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btnCheckSub) {
         btnCheckSub.addEventListener('click', async () => {
             addImpact();
-            btnCheckSub.innerText = "Перевіряю...";
+            btnCheckSub.innerText = "РџРµСЂРµРІС–СЂСЏСЋ...";
             btnCheckSub.disabled = true;
 
             await runSilentVerification();
@@ -323,37 +327,37 @@ document.addEventListener("DOMContentLoaded", () => {
             if (isUserVerified) {
                 subModal.classList.remove('active'); 
             } else {
-                if(tg && tg.showAlert) tg.showAlert("Ви ще не підписані! Перейдіть за посиланням та підпишіться.");
-                else alert("Ви ще не підписані!");
+                if(tg && tg.showAlert) tg.showAlert("Р’Рё С‰Рµ РЅРµ РїС–РґРїРёСЃР°РЅС–! РџРµСЂРµР№РґС–С‚СЊ Р·Р° РїРѕСЃРёР»Р°РЅРЅСЏРј С‚Р° РїС–РґРїРёС€С–С‚СЊСЃСЏ.");
+                else alert("Р’Рё С‰Рµ РЅРµ РїС–РґРїРёСЃР°РЅС–!");
             }
 
-            btnCheckSub.innerText = "Я підписався! Перевірити";
+            btnCheckSub.innerText = "РЇ РїС–РґРїРёСЃР°РІСЃСЏ! РџРµСЂРµРІС–СЂРёС‚Рё";
             btnCheckSub.disabled = false;
         });
     }
 
-    // --- НОВИЙ КОД: Запускаємо тиху перевірку відразу при старті додатку для всіх ---
-    setTimeout(runSilentVerification, 100); // Запускаємо майже миттєво у фоні
+    // --- РќРћР’РР™ РљРћР”: Р—Р°РїСѓСЃРєР°С”РјРѕ С‚РёС…Сѓ РїРµСЂРµРІС–СЂРєСѓ РІС–РґСЂР°Р·Сѓ РїСЂРё СЃС‚Р°СЂС‚С– РґРѕРґР°С‚РєСѓ РґР»СЏ РІСЃС–С… ---
+    setTimeout(runSilentVerification, 100); // Р—Р°РїСѓСЃРєР°С”РјРѕ РјР°Р№Р¶Рµ РјРёС‚С‚С”РІРѕ Сѓ С„РѕРЅС–
 
-    // --- SPA Навигация ---
+    // --- SPA РќР°РІРёРіР°С†РёСЏ ---
     function showScreen(screenToShow, screenName) {
         homeScreen.classList.remove('active');
         topicsScreen.classList.remove('active');
         quizScreen.classList.remove('active');
-        if (examScreen) examScreen.classList.remove('active'); // <--- ДОДАЙ ЦЕЙ РЯДОК
+        if (examScreen) examScreen.classList.remove('active'); // <--- Р”РћР”РђР™ Р¦Р•Р™ Р РЇР”РћРљ
 
         screenToShow.classList.add('active');
         window.scrollTo(0, 0);
 
         currentScreenName = screenName;
 
-        // --- НОВЕ: Керування нижньою панеллю ---
+        // --- РќРћР’Р•: РљРµСЂСѓРІР°РЅРЅСЏ РЅРёР¶РЅСЊРѕСЋ РїР°РЅРµР»Р»СЋ ---
         const bottomNav = document.getElementById('bottom-nav');
         if (bottomNav) {
             if (screenName === 'home') {
-                bottomNav.style.display = 'none'; // Ховаємо на головній
+                bottomNav.style.display = 'none'; // РҐРѕРІР°С”РјРѕ РЅР° РіРѕР»РѕРІРЅС–Р№
             } else {
-                bottomNav.style.display = 'flex'; // Показуємо на всіх інших
+                bottomNav.style.display = 'flex'; // РџРѕРєР°Р·СѓС”РјРѕ РЅР° РІСЃС–С… С–РЅС€РёС…
             }
         }
         // ---------------------------------------
@@ -390,15 +394,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (currentScreenName === 'quiz') {
-            // Перевіряємо, чи ми в режимі "Обране"
+            // РџРµСЂРµРІС–СЂСЏС”РјРѕ, С‡Рё РјРё РІ СЂРµР¶РёРјС– "РћР±СЂР°РЅРµ"
             if (currentTopic && currentTopic.id === 'favorites_mode') {
-                renderFavoriteTopics(); // Повертаємось до списку обраних розділів
+                renderFavoriteTopics(); // РџРѕРІРµСЂС‚Р°С”РјРѕСЃСЊ РґРѕ СЃРїРёСЃРєСѓ РѕР±СЂР°РЅРёС… СЂРѕР·РґС–Р»С–РІ
             } else {
                 showScreen(topicsScreen, 'topics');
-                renderTopics(); // Повертаємось до звичайних розділів
+                renderTopics(); // РџРѕРІРµСЂС‚Р°С”РјРѕСЃСЊ РґРѕ Р·РІРёС‡Р°Р№РЅРёС… СЂРѕР·РґС–Р»С–РІ
             }
         } else if (currentScreenName === 'topics' || currentScreenName === 'favorites_list') {
-            showScreen(homeScreen, 'home'); // Зі списку розділів повертаємось на головну
+            showScreen(homeScreen, 'home'); // Р—С– СЃРїРёСЃРєСѓ СЂРѕР·РґС–Р»С–РІ РїРѕРІРµСЂС‚Р°С”РјРѕСЃСЊ РЅР° РіРѕР»РѕРІРЅСѓ
         }
     }
 
@@ -428,7 +432,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const cardHard = document.getElementById('card-hard');
     const cardFavorites = document.getElementById('card-favorites');
 
-    // --- Кліки по нижній панелі навігації ---
+    // --- РљР»С–РєРё РїРѕ РЅРёР¶РЅС–Р№ РїР°РЅРµР»С– РЅР°РІС–РіР°С†С–С— ---
     const navLearning = document.getElementById('nav-learning');
     const navExam = document.getElementById('nav-exam');
     const navHard = document.getElementById('nav-hard');
@@ -447,12 +451,12 @@ document.addEventListener("DOMContentLoaded", () => {
         navHard.addEventListener('click', async (e) => {
             e.preventDefault();
             addImpact();
-            if (!isUserPro) { showProModal(); return; } // <--- ДОДАЛИ
+            if (!isUserPro) { showProModal(); return; } // <--- Р”РћР”РђР›Р
             
             if (globalTopics.length === 0) {
                 if(topicsPromise) globalTopics = await topicsPromise;
                 else {
-                    const res = await fetch('https://pdrua.duckdns.org/api/topics');
+                    const res = await fetch(`${API_BASE}/api/topics');
                     globalTopics = await res.json();
                 }
             }
@@ -464,7 +468,7 @@ document.addEventListener("DOMContentLoaded", () => {
         navFavorites.addEventListener('click', (e) => {
             e.preventDefault();
             addImpact();
-            if (!isUserPro) { showProModal(); return; } // <--- ДОДАЛИ
+            if (!isUserPro) { showProModal(); return; } // <--- Р”РћР”РђР›Р
             
             if (globalTopics.length === 0) return;
             renderFavoriteTopics();
@@ -482,19 +486,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cardExam) {
         cardExam.addEventListener('click', () => {
             addImpact();
-            startExamMode(); // Запускаем экзамен
+            startExamMode(); // Р—Р°РїСѓСЃРєР°РµРј СЌРєР·Р°РјРµРЅ
         });
     }
 
     if (cardHard) {
         cardHard.addEventListener('click', async () => {
             addImpact();
-            if (!isUserPro) { showProModal(); return; } // <--- ДОДАЛИ
+            if (!isUserPro) { showProModal(); return; } // <--- Р”РћР”РђР›Р
             
             if (globalTopics.length === 0) {
                 if(topicsPromise) globalTopics = await topicsPromise;
                 else {
-                    const res = await fetch('https://pdrua.duckdns.org/api/topics');
+                    const res = await fetch(`${API_BASE}/api/topics');
                     globalTopics = await res.json();
                 }
             }
@@ -505,9 +509,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cardFavorites) {
         cardFavorites.addEventListener('click', () => {
             addImpact();
-            if (!isUserPro) { showProModal(); return; } // <--- ДОДАЛИ
+            if (!isUserPro) { showProModal(); return; } // <--- Р”РћР”РђР›Р
             
-            if (globalTopics.length === 0) return; // Чекаємо завантаження
+            if (globalTopics.length === 0) return; // Р§РµРєР°С”РјРѕ Р·Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ
             renderFavoriteTopics();
         });
     }
@@ -517,94 +521,94 @@ document.addEventListener("DOMContentLoaded", () => {
         btn.addEventListener('click', () => {
             addImpact(); 
             const catName = btn.getAttribute('data-cat');
-            const msg = `Категорія "${catName}" знаходиться в розробці! 🚧\n\nЗараз для вивчення доступна тільки категорія "B" (Легкові автомобілі).`;
+            const msg = `РљР°С‚РµРіРѕСЂС–СЏ "${catName}" Р·РЅР°С…РѕРґРёС‚СЊСЃСЏ РІ СЂРѕР·СЂРѕР±С†С–! рџљ§\n\nР—Р°СЂР°Р· РґР»СЏ РІРёРІС‡РµРЅРЅСЏ РґРѕСЃС‚СѓРїРЅР° С‚С–Р»СЊРєРё РєР°С‚РµРіРѕСЂС–СЏ "B" (Р›РµРіРєРѕРІС– Р°РІС‚РѕРјРѕР±С–Р»С–).`;
             if(tg && tg.showAlert) tg.showAlert(msg);
             else alert(msg);
         });
     });
 
     const modernIcons = {
-        // 1. Загальні положення (Книга)
+        // 1. Р—Р°РіР°Р»СЊРЅС– РїРѕР»РѕР¶РµРЅРЅСЏ (РљРЅРёРіР°)
         "topic_1": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>`, 
         
-        // 2. Обов'язки і права водіїв (Кермо)
+        // 2. РћР±РѕРІ'СЏР·РєРё С– РїСЂР°РІР° РІРѕРґС–С—РІ (РљРµСЂРјРѕ)
         "topic_2": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2v10M12 22v-6M4.93 4.93l4.24 4.24M19.07 19.07l-4.24-4.24M19.07 4.93l-4.24 4.24M4.93 19.07l4.24-4.24"/></svg>`, 
         
-        // 3. Спецсигнали (Маячок/Дзвінок)
+        // 3. РЎРїРµС†СЃРёРіРЅР°Р»Рё (РњР°СЏС‡РѕРє/Р”Р·РІС–РЅРѕРє)
         "topic_3": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2M5.3 5.3l1.4 1.4M18.7 5.3l-1.4 1.4M12 22H7a5 5 0 0 1 5-5h0a5 5 0 0 1 5 5h-5z"/></svg>`, 
         
-        // 4. Пішоходи (Людина)
+        // 4. РџС–С€РѕС…РѕРґРё (Р›СЋРґРёРЅР°)
         "topic_4": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><path d="M12 7v7M9 18l3-4 3 4M8 11h8"/></svg>`, 
         
-        // 5. Пасажири (Люди в авто)
+        // 5. РџР°СЃР°Р¶РёСЂРё (Р›СЋРґРё РІ Р°РІС‚Рѕ)
         "topic_5": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`, 
         
-        // 6. Велосипедисти (Велосипед)
+        // 6. Р’РµР»РѕСЃРёРїРµРґРёСЃС‚Рё (Р’РµР»РѕСЃРёРїРµРґ)
         "topic_6": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2"/></svg>`, 
         
-        // 7. Гужовий транспорт (Колесо воза)
+        // 7. Р“СѓР¶РѕРІРёР№ С‚СЂР°РЅСЃРїРѕСЂС‚ (РљРѕР»РµСЃРѕ РІРѕР·Р°)
         "topic_7": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="2"/><path d="M12 2v8M12 14v8M2 12h8M14 12h8M4.9 4.9l5.7 5.7M13.4 13.4l5.7 5.7M4.9 19.1l5.7-5.7M13.4 10.6l5.7-5.7"/></svg>`, 
         
-        // 8. Регулювання дорожнього руху (Світлофор)
+        // 8. Р РµРіСѓР»СЋРІР°РЅРЅСЏ РґРѕСЂРѕР¶РЅСЊРѕРіРѕ СЂСѓС…Сѓ (РЎРІС–С‚Р»РѕС„РѕСЂ)
         "topic_8": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="7" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="17" r="2"/></svg>`,
 
-        // 8.2. Регулювання дорожнього руху (Нерегульовані перехрестя / Регулювальник) - Кашкет
+        // 8.2. Р РµРіСѓР»СЋРІР°РЅРЅСЏ РґРѕСЂРѕР¶РЅСЊРѕРіРѕ СЂСѓС…Сѓ (РќРµСЂРµРіСѓР»СЊРѕРІР°РЅС– РїРµСЂРµС…СЂРµСЃС‚СЏ / Р РµРіСѓР»СЋРІР°Р»СЊРЅРёРє) - РљР°С€РєРµС‚
         "topic_8.2": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h18"/><path d="M6 14v-3a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v3"/><circle cx="12" cy="10" r="2"/></svg>`,
 
-        // 9. Попереджувальні сигнали (Знак оклику в трикутнику)
+        // 9. РџРѕРїРµСЂРµРґР¶СѓРІР°Р»СЊРЅС– СЃРёРіРЅР°Р»Рё (Р—РЅР°Рє РѕРєР»РёРєСѓ РІ С‚СЂРёРєСѓС‚РЅРёРєСѓ)
         "topic_9": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
 
-        // 10. Початок руху та зміна напрямку (Стрілка маневру)
+        // 10. РџРѕС‡Р°С‚РѕРє СЂСѓС…Сѓ С‚Р° Р·РјС–РЅР° РЅР°РїСЂСЏРјРєСѓ (РЎС‚СЂС–Р»РєР° РјР°РЅРµРІСЂСѓ)
         "topic_10": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 1 4-4h12"/></svg>`,
 
-        // 11. Розташування ТЗ на дорозі (Смуги руху / Дорога в перспективі)
+        // 11. Р РѕР·С‚Р°С€СѓРІР°РЅРЅСЏ РўР— РЅР° РґРѕСЂРѕР·С– (РЎРјСѓРіРё СЂСѓС…Сѓ / Р”РѕСЂРѕРіР° РІ РїРµСЂСЃРїРµРєС‚РёРІС–)
         "topic_11": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22L8 2"/><path d="M20 22L16 2"/><path d="M12 6v2"/><path d="M12 12v2"/><path d="M12 18v2"/></svg>`,
 
-        // 12. Швидкість руху (Спідометр)
+        // 12. РЁРІРёРґРєС–СЃС‚СЊ СЂСѓС…Сѓ (РЎРїС–РґРѕРјРµС‚СЂ)
         "topic_12": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/><path d="M12 12l3-3"/><path d="M19.4 15a9 9 0 1 0-14.8 0"/></svg>`,
 
-        // 13. Дистанція, інтервал (Стрілки відстані)
+        // 13. Р”РёСЃС‚Р°РЅС†С–СЏ, С–РЅС‚РµСЂРІР°Р» (РЎС‚СЂС–Р»РєРё РІС–РґСЃС‚Р°РЅС–)
         "topic_13": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12H2"/><path d="M18 8l4 4-4 4"/><path d="M6 8l-4 4 4 4"/></svg>`,
 
-        // 14. Обгін (Стрілка випередження)
+        // 14. РћР±РіС–РЅ (РЎС‚СЂС–Р»РєР° РІРёРїРµСЂРµРґР¶РµРЅРЅСЏ)
         "topic_14": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21V3"/><polyline points="4 7 8 3 12 7"/><path d="M16 21v-8a4 4 0 0 0-4-4"/><polyline points="9 12 12 9 15 12"/></svg>`,
 
-        // 15. Зупинка і стоянка (Знак Паркування "P")
+        // 15. Р—СѓРїРёРЅРєР° С– СЃС‚РѕСЏРЅРєР° (Р—РЅР°Рє РџР°СЂРєСѓРІР°РЅРЅСЏ "P")
         "topic_15": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/></svg>`,
 
-        // 16. Проїзд перехресть (Перетин доріг)
+        // 16. РџСЂРѕС—Р·Рґ РїРµСЂРµС…СЂРµСЃС‚СЊ (РџРµСЂРµС‚РёРЅ РґРѕСЂС–Рі)
         "topic_16.1": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12H3"/><path d="M12 21V3"/><path d="M16 8l-4-4-4 4"/><path d="M8 16l4 4 4-4"/></svg>`,
 
-        // 16.2. Проїзд перехресть (Нерегульовані перехрестя) - Знак "Головна дорога"
+        // 16.2. РџСЂРѕС—Р·Рґ РїРµСЂРµС…СЂРµСЃС‚СЊ (РќРµСЂРµРіСѓР»СЊРѕРІР°РЅС– РїРµСЂРµС…СЂРµСЃС‚СЏ) - Р—РЅР°Рє "Р“РѕР»РѕРІРЅР° РґРѕСЂРѕРіР°"
         "topic_16.2": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="2" transform="rotate(45 12 12)"/><rect x="8.5" y="8.5" width="7" height="7" rx="1" transform="rotate(45 12 12)"/></svg>`,
 
-        // 17. Переваги маршрутних ТЗ (Автобус)
+        // 17. РџРµСЂРµРІР°РіРё РјР°СЂС€СЂСѓС‚РЅРёС… РўР— (РђРІС‚РѕР±СѓСЃ)
         "topic_17": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 18v2"/><path d="M18 18v2"/><path d="M2 12h20"/><path d="M6 12v-2"/><path d="M10 12v-2"/><path d="M14 12v-2"/><path d="M18 12v-2"/></svg>`,
 
-        // 18. Проїзд пішохідних переходів (Людина на зебрі)
+        // 18. РџСЂРѕС—Р·Рґ РїС–С€РѕС…С–РґРЅРёС… РїРµСЂРµС…РѕРґС–РІ (Р›СЋРґРёРЅР° РЅР° Р·РµР±СЂС–)
         "topic_18": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="2"/><path d="M12 6v6"/><path d="M10 17l2-5 2 5"/><path d="M8 10h8"/><path d="M3 20h18"/><path d="M3 16h18"/></svg>`,
 
-        // 19. Користування світловими приладами (Фара / Світло)
+        // 19. РљРѕСЂРёСЃС‚СѓРІР°РЅРЅСЏ СЃРІС–С‚Р»РѕРІРёРјРё РїСЂРёР»Р°РґР°РјРё (Р¤Р°СЂР° / РЎРІС–С‚Р»Рѕ)
         "topic_19": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/><circle cx="12" cy="12" r="4"/></svg>`,
 
-        // 20. Рух через залізничні переїзди (Потяг)
+        // 20. Р СѓС… С‡РµСЂРµР· Р·Р°Р»С–Р·РЅРёС‡РЅС– РїРµСЂРµС—Р·РґРё (РџРѕС‚СЏРі)
         "topic_20": `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/><path d="M8 17l-2 4"/><path d="M16 17l2 4"/><circle cx="8" cy="11" r="1"/><circle cx="16" cy="11" r="1"/><path d="M4 7h16"/></svg>`
     };
 
-    // --- 4. ОТРИСОВКА РАЗДЕЛОВ (С СЕРВЕРА) ---
+    // --- 4. РћРўР РРЎРћР’РљРђ Р РђР—Р”Р•Р›РћР’ (РЎ РЎР•Р Р’Р•Р Рђ) ---
     async function renderTopics(filter = "") {
         const grid = document.getElementById('topics-grid');
 
-        // Повертаємо стандартні заголовки та пошук
+        // РџРѕРІРµСЂС‚Р°С”РјРѕ СЃС‚Р°РЅРґР°СЂС‚РЅС– Р·Р°РіРѕР»РѕРІРєРё С‚Р° РїРѕС€СѓРє
         const titleEl = document.querySelector('#topics-screen .section-title');
         const subEl = document.querySelector('#topics-screen .screen-subtitle');
         const searchContainer = document.getElementById('search-container-block');
         
-        if (titleEl) titleEl.innerText = "Розділи навчання";
-        if (subEl) subEl.innerText = "Оберіть тему для підготовки";
+        if (titleEl) titleEl.innerText = "Р РѕР·РґС–Р»Рё РЅР°РІС‡Р°РЅРЅСЏ";
+        if (subEl) subEl.innerText = "РћР±РµСЂС–С‚СЊ С‚РµРјСѓ РґР»СЏ РїС–РґРіРѕС‚РѕРІРєРё";
         if (searchContainer) searchContainer.style.display = 'flex';
         
-        updateBottomNav('learning'); // Підсвічуємо вкладку "Навчання"
+        updateBottomNav('learning'); // РџС–РґСЃРІС–С‡СѓС”РјРѕ РІРєР»Р°РґРєСѓ "РќР°РІС‡Р°РЅРЅСЏ"
 
         if (!grid) return;
         
@@ -616,7 +620,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <path d="M12 2 A 10 10 0 0 1 22 12" fill="none" stroke="#3B82F6" stroke-width="3" stroke-linecap="round"></path>
                     </svg>
                     <div style="color: var(--c-text-soft); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 1.05rem; font-weight: 600; letter-spacing: 0.3px; opacity: 0.8;">
-                        Завантаження розділів...
+                        Р—Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ СЂРѕР·РґС–Р»С–РІ...
                     </div>
                 </div>
                 <style>
@@ -633,7 +637,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (topicsPromise) {
                     globalTopics = await topicsPromise;
                 } else {
-                    const response = await fetch('https://pdrua.duckdns.org/api/topics');
+                    const response = await fetch(`${API_BASE}/api/topics');
                     globalTopics = await response.json();
                 }
             }
@@ -662,9 +666,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const progressPercent = totalQ > 0 ? Math.min(100, Math.round((answeredCount / totalQ) * 100)) : 0;
                 const successRate = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
-                const infoText = `${answeredCount}/${totalQ} &bull; ${successRate}% вірно`;
+                const infoText = `${answeredCount}/${totalQ} &bull; ${successRate}% РІС–СЂРЅРѕ`;
                 const colorClass = `c${(index % 6) + 1}`;
-                const iconHtml = modernIcons[topic.id] || `<span style="font-size: 1.5rem;">${topic.icon || "🚦"}</span>`;
+                const iconHtml = modernIcons[topic.id] || `<span style="font-size: 1.5rem;">${topic.icon || "рџљ¦"}</span>`;
 
                 const isProTopic = PRO_TOPICS.includes(topic.id);
                 const proBadgeHtml = (isProTopic && !isUserPro) 
@@ -698,7 +702,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 card.onclick = () => {
                     addImpact();
                     if (isProTopic && !isUserPro) {
-                        showProModal(); // Вызовем окно покупки
+                        showProModal(); // Р’С‹Р·РѕРІРµРј РѕРєРЅРѕ РїРѕРєСѓРїРєРё
                         return;
                     }
                     startQuiz(topic);
@@ -708,8 +712,8 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
         } catch (error) {
-            console.error("Помилка завантаження розділів:", error);
-            grid.innerHTML = '<div style="text-align:center; color: var(--c-danger);">Помилка з\'єднання з сервером</div>';
+            console.error("РџРѕРјРёР»РєР° Р·Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ СЂРѕР·РґС–Р»С–РІ:", error);
+            grid.innerHTML = '<div style="text-align:center; color: var(--c-danger);">РџРѕРјРёР»РєР° Р·\'С”РґРЅР°РЅРЅСЏ Р· СЃРµСЂРІРµСЂРѕРј</div>';
         }
     }
 
@@ -719,27 +723,27 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // РЕЖИМ "ІСПИТ" (EXAM MODE)
+    // Р Р•Р–РРњ "Р†РЎРџРРў" (EXAM MODE)
     // ==========================================
     
     let examQuestions = [];
     let examState = {
-        answers: new Array(20).fill(null), // Вибрані варіанти (індекси)
-        saved: new Array(20).fill(false),  // Чи натиснув користувач "Зберегти"
+        answers: new Array(20).fill(null), // Р’РёР±СЂР°РЅС– РІР°СЂС–Р°РЅС‚Рё (С–РЅРґРµРєСЃРё)
+        saved: new Array(20).fill(false),  // Р§Рё РЅР°С‚РёСЃРЅСѓРІ РєРѕСЂРёСЃС‚СѓРІР°С‡ "Р—Р±РµСЂРµРіС‚Рё"
         currentIndex: 0,
         endTime: null,
         timerInterval: null,
         isActive: false
     };
 
-    const EXAM_DURATION_MS = 20 * 60 * 1000; // 20 хвилин
+    const EXAM_DURATION_MS = 20 * 60 * 1000; // 20 С…РІРёР»РёРЅ
 
-    // Прив'язка кнопок запуску іспиту
+    // РџСЂРёРІ'СЏР·РєР° РєРЅРѕРїРѕРє Р·Р°РїСѓСЃРєСѓ С–СЃРїРёС‚Сѓ
     if (navExam) {
         navExam.addEventListener('click', (e) => {
             e.preventDefault();
             addImpact();
-            startExamMode(); // Запускаем экзамен
+            startExamMode(); // Р—Р°РїСѓСЃРєР°РµРј СЌРєР·Р°РјРµРЅ
         });
     }
     
@@ -750,35 +754,35 @@ document.addEventListener("DOMContentLoaded", () => {
     async function startExamMode() {
         addImpact();
         
-        // --- НОВА ЛОГІКА: Обмеження іспиту (1 раз на тиждень) ---
+        // --- РќРћР’Рђ Р›РћР“Р†РљРђ: РћР±РјРµР¶РµРЅРЅСЏ С–СЃРїРёС‚Сѓ (1 СЂР°Р· РЅР° С‚РёР¶РґРµРЅСЊ) ---
         if (!isUserPro) {
             const lastExamTime = lastExamTimeFromServer;
             const now = Date.now();
-            const oneWeekMs = 7 * 24 * 60 * 60 * 1000; // 7 днів у мілісекундах
+            const oneWeekMs = 7 * 24 * 60 * 60 * 1000; // 7 РґРЅС–РІ Сѓ РјС–Р»С–СЃРµРєСѓРЅРґР°С…
 
             if (lastExamTime > 0 && (now - lastExamTime) < oneWeekMs) {
-                // Рахуємо скільки днів залишилось
+                // Р Р°С…СѓС”РјРѕ СЃРєС–Р»СЊРєРё РґРЅС–РІ Р·Р°Р»РёС€РёР»РѕСЃСЊ
                 const timeLeftMs = oneWeekMs - (now - lastExamTime);
                 const daysLeft = Math.ceil(timeLeftMs / (1000 * 60 * 60 * 24));
                 
-                // Правильне закінчення для слова "день"
+                // РџСЂР°РІРёР»СЊРЅРµ Р·Р°РєС–РЅС‡РµРЅРЅСЏ РґР»СЏ СЃР»РѕРІР° "РґРµРЅСЊ"
                 let timeStr = '';
-                if (daysLeft === 1) timeStr = '1 день';
-                else if (daysLeft >= 2 && daysLeft <= 4) timeStr = `${daysLeft} дні`;
-                else timeStr = `${daysLeft} днів`;
+                if (daysLeft === 1) timeStr = '1 РґРµРЅСЊ';
+                else if (daysLeft >= 2 && daysLeft <= 4) timeStr = `${daysLeft} РґРЅС–`;
+                else timeStr = `${daysLeft} РґРЅС–РІ`;
 
-                // Показуємо красиве вікно з пропозицією PRO
+                // РџРѕРєР°Р·СѓС”РјРѕ РєСЂР°СЃРёРІРµ РІС–РєРЅРѕ Р· РїСЂРѕРїРѕР·РёС†С–С”СЋ PRO
                 showCustomConfirm({
-                    icon: '⏳',
+                    icon: 'вЏі',
                     color: '#F59E0B',
                     bgColor: 'rgba(245, 158, 11, 0.15)',
-                    title: 'Іспит раз на тиждень',
-                    desc: `Безкоштовна спроба оновиться через ${timeStr}. Отримайте PRO-доступ, щоб складати іспити без жодних обмежень!`,
-                    okText: '⭐️ Отримати PRO',
+                    title: 'Р†СЃРїРёС‚ СЂР°Р· РЅР° С‚РёР¶РґРµРЅСЊ',
+                    desc: `Р‘РµР·РєРѕС€С‚РѕРІРЅР° СЃРїСЂРѕР±Р° РѕРЅРѕРІРёС‚СЊСЃСЏ С‡РµСЂРµР· ${timeStr}. РћС‚СЂРёРјР°Р№С‚Рµ PRO-РґРѕСЃС‚СѓРї, С‰РѕР± СЃРєР»Р°РґР°С‚Рё С–СЃРїРёС‚Рё Р±РµР· Р¶РѕРґРЅРёС… РѕР±РјРµР¶РµРЅСЊ!`,
+                    okText: 'в­ђпёЏ РћС‚СЂРёРјР°С‚Рё PRO',
                     isDanger: false,
-                    onConfirm: () => showProModal() // Відкриваємо вікно покупки
+                    onConfirm: () => showProModal() // Р’С–РґРєСЂРёРІР°С”РјРѕ РІС–РєРЅРѕ РїРѕРєСѓРїРєРё
                 });
-                return; // Блокуємо подальший запуск іспиту
+                return; // Р‘Р»РѕРєСѓС”РјРѕ РїРѕРґР°Р»СЊС€РёР№ Р·Р°РїСѓСЃРє С–СЃРїРёС‚Сѓ
             }
         }
         // ---------------------------------------------------------
@@ -788,17 +792,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById('sub-modal').classList.add('active');
                 return;
             } else {
-                runSilentVerification(); // Перевіряємо підписку у фоні перед іспитом
+                runSilentVerification(); // РџРµСЂРµРІС–СЂСЏС”РјРѕ РїС–РґРїРёСЃРєСѓ Сѓ С„РѕРЅС– РїРµСЂРµРґ С–СЃРїРёС‚РѕРј
             }
         }
 
         showCustomConfirm({
             icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
-            color: '#8B5CF6', // Фіолетовий
+            color: '#8B5CF6', // Р¤С–РѕР»РµС‚РѕРІРёР№
             bgColor: 'rgba(139, 92, 246, 0.15)',
-            title: 'Розпочати іспит?',
-            desc: 'У вас буде 20 хвилин на 20 питань. Допускається не більше 2 помилок.',
-            okText: 'Розпочати',
+            title: 'Р РѕР·РїРѕС‡Р°С‚Рё С–СЃРїРёС‚?',
+            desc: 'РЈ РІР°СЃ Р±СѓРґРµ 20 С…РІРёР»РёРЅ РЅР° 20 РїРёС‚Р°РЅСЊ. Р”РѕРїСѓСЃРєР°С”С‚СЊСЃСЏ РЅРµ Р±С–Р»СЊС€Рµ 2 РїРѕРјРёР»РѕРє.',
+            okText: 'Р РѕР·РїРѕС‡Р°С‚Рё',
             isDanger: false,
             onConfirm: () => initExam()
         });
@@ -806,42 +810,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function initExam() {
         showScreen(examScreen, 'exam');
-        document.getElementById('exam-question-text').innerText = "Формування білета...";
+        document.getElementById('exam-question-text').innerText = "Р¤РѕСЂРјСѓРІР°РЅРЅСЏ Р±С–Р»РµС‚Р°...";
         document.getElementById('exam-options').innerHTML = "";
         document.getElementById('exam-image').parentElement.style.display = 'none';
         
-        // Ховаємо нижню панель навігації
+        // РҐРѕРІР°С”РјРѕ РЅРёР¶РЅСЋ РїР°РЅРµР»СЊ РЅР°РІС–РіР°С†С–С—
         const bottomNav = document.getElementById('bottom-nav');
         if (bottomNav) bottomNav.style.display = 'none';
 
         try {
-            const response = await fetch('https://pdrua.duckdns.org/api/exam-questions');
+            const response = await fetch(`${API_BASE}/api/exam-questions');
             examQuestions = await response.json();
             
             if (!examQuestions || examQuestions.length === 0) throw new Error("Empty questions");
 
-            // --- НОВЕ: Записуємо час початку іспиту для безкоштовних користувачів ---
+            // --- РќРћР’Р•: Р—Р°РїРёСЃСѓС”РјРѕ С‡Р°СЃ РїРѕС‡Р°С‚РєСѓ С–СЃРїРёС‚Сѓ РґР»СЏ Р±РµР·РєРѕС€С‚РѕРІРЅРёС… РєРѕСЂРёСЃС‚СѓРІР°С‡С–РІ ---
             if (!isUserPro) {
                 lastExamTimeFromServer = Date.now();
             }
             // ------------------------------------------------------------------------
 
-            // Скидаємо стан
+            // РЎРєРёРґР°С”РјРѕ СЃС‚Р°РЅ
             examState.answers = new Array(examQuestions.length).fill(null);
             examState.saved = new Array(examQuestions.length).fill(false);
             examState.currentIndex = 0;
             examState.isActive = true;
             
-            // Встановлюємо час завершення
+            // Р’СЃС‚Р°РЅРѕРІР»СЋС”РјРѕ С‡Р°СЃ Р·Р°РІРµСЂС€РµРЅРЅСЏ
             examState.endTime = Date.now() + EXAM_DURATION_MS;
-            localStorage.setItem('pdr_exam_end_time', examState.endTime); // Захист від згортання додатку
+            localStorage.setItem('pdr_exam_end_time', examState.endTime); // Р—Р°С…РёСЃС‚ РІС–Рґ Р·РіРѕСЂС‚Р°РЅРЅСЏ РґРѕРґР°С‚РєСѓ
 
             startExamTimer();
             renderExamQuestion();
 
         } catch (error) {
-            console.error("Помилка завантаження іспиту:", error);
-            if(tg && tg.showAlert) tg.showAlert("Помилка сервера. Спробуйте пізніше.");
+            console.error("РџРѕРјРёР»РєР° Р·Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ С–СЃРїРёС‚Сѓ:", error);
+            if(tg && tg.showAlert) tg.showAlert("РџРѕРјРёР»РєР° СЃРµСЂРІРµСЂР°. РЎРїСЂРѕР±СѓР№С‚Рµ РїС–Р·РЅС–С€Рµ.");
             goBack();
         }
     }
@@ -863,7 +867,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (timeLeft <= 0) {
                 clearInterval(examState.timerInterval);
                 timerEl.innerText = "00:00";
-                finishExam(true); // true = час вийшов
+                finishExam(true); // true = С‡Р°СЃ РІРёР№С€РѕРІ
                 return;
             }
 
@@ -872,7 +876,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             timerEl.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-            if (timeLeft < 60000) { // Останні 60 секунд
+            if (timeLeft < 60000) { // РћСЃС‚Р°РЅРЅС– 60 СЃРµРєСѓРЅРґ
                 timerEl.classList.add('warning');
             } else {
                 timerEl.classList.remove('warning');
@@ -890,7 +894,7 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.innerText = i + 1;
             
             if (i === examState.currentIndex) btn.classList.add('active');
-            if (examState.saved[i]) btn.classList.add('saved'); // Жовтий колір
+            if (examState.saved[i]) btn.classList.add('saved'); // Р–РѕРІС‚РёР№ РєРѕР»С–СЂ
             
             btn.addEventListener('click', () => {
                 addImpact();
@@ -901,7 +905,7 @@ document.addEventListener("DOMContentLoaded", () => {
             navBar.appendChild(btn);
         });
 
-        // Оновлюємо лічильник збережених
+        // РћРЅРѕРІР»СЋС”РјРѕ Р»С–С‡РёР»СЊРЅРёРє Р·Р±РµСЂРµР¶РµРЅРёС…
         const savedCount = examState.saved.filter(s => s).length;
         document.getElementById('exam-saved-count').innerText = savedCount;
 
@@ -939,35 +943,35 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.className = 'option-btn';
             btn.innerHTML = `<span class="option-number">${index + 1}</span> <span>${optionText}</span>`;
             
-            // Якщо варіант вибраний (навіть якщо ще не збережений)
+            // РЇРєС‰Рѕ РІР°СЂС–Р°РЅС‚ РІРёР±СЂР°РЅРёР№ (РЅР°РІС–С‚СЊ СЏРєС‰Рѕ С‰Рµ РЅРµ Р·Р±РµСЂРµР¶РµРЅРёР№)
             if (examState.answers[examState.currentIndex] === index) {
                 btn.classList.add('selected');
             }
             
             btn.addEventListener('click', () => {
                 addImpact();
-                // Просто виділяємо, але не зберігаємо остаточно
+                // РџСЂРѕСЃС‚Рѕ РІРёРґС–Р»СЏС”РјРѕ, Р°Р»Рµ РЅРµ Р·Р±РµСЂС–РіР°С”РјРѕ РѕСЃС‚Р°С‚РѕС‡РЅРѕ
                 examState.answers[examState.currentIndex] = index;
-                renderExamQuestion(); // Перемальовуємо, щоб оновити виділення
+                renderExamQuestion(); // РџРµСЂРµРјР°Р»СЊРѕРІСѓС”РјРѕ, С‰РѕР± РѕРЅРѕРІРёС‚Рё РІРёРґС–Р»РµРЅРЅСЏ
             });
             
             optionsContainer.appendChild(btn);
         });
 
-        // Логіка кнопок "Зберегти" та "Наступне"
+        // Р›РѕРіС–РєР° РєРЅРѕРїРѕРє "Р—Р±РµСЂРµРіС‚Рё" С‚Р° "РќР°СЃС‚СѓРїРЅРµ"
         const btnSave = document.getElementById('btn-exam-save');
         const btnNext = document.getElementById('btn-exam-next');
 
-        // Кнопка збереження активна тільки якщо вибрано якийсь варіант
+        // РљРЅРѕРїРєР° Р·Р±РµСЂРµР¶РµРЅРЅСЏ Р°РєС‚РёРІРЅР° С‚С–Р»СЊРєРё СЏРєС‰Рѕ РІРёР±СЂР°РЅРѕ СЏРєРёР№СЃСЊ РІР°СЂС–Р°РЅС‚
         btnSave.disabled = (examState.answers[examState.currentIndex] === null);
         
         if (examState.saved[examState.currentIndex]) {
-            btnSave.innerText = "Оновити відповідь";
+            btnSave.innerText = "РћРЅРѕРІРёС‚Рё РІС–РґРїРѕРІС–РґСЊ";
             btnSave.style.background = "var(--c-surface)";
             btnSave.style.color = "var(--c-text)";
         } else {
-            btnSave.innerText = "Зберегти відповідь";
-            btnSave.style.background = ""; // Повертаємо дефолтний градієнт
+            btnSave.innerText = "Р—Р±РµСЂРµРіС‚Рё РІС–РґРїРѕРІС–РґСЊ";
+            btnSave.style.background = ""; // РџРѕРІРµСЂС‚Р°С”РјРѕ РґРµС„РѕР»С‚РЅРёР№ РіСЂР°РґС–С”РЅС‚
             btnSave.style.color = "";
         }
 
@@ -975,7 +979,7 @@ document.addEventListener("DOMContentLoaded", () => {
             addImpact();
             examState.saved[examState.currentIndex] = true;
             
-            // --- НОВЕ: Додаємо в "Складні питання" якщо відповідь неправильна ---
+            // --- РќРћР’Р•: Р”РѕРґР°С”РјРѕ РІ "РЎРєР»Р°РґРЅС– РїРёС‚Р°РЅРЅСЏ" СЏРєС‰Рѕ РІС–РґРїРѕРІС–РґСЊ РЅРµРїСЂР°РІРёР»СЊРЅР° ---
             const q = examQuestions[examState.currentIndex];
             const selectedAns = examState.answers[examState.currentIndex];
             
@@ -983,16 +987,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 const allSavedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
                 if (!allSavedStates[q.topicId]) allSavedStates[q.topicId] = [];
                 
-                // Записуємо помилку. Вона автоматично з'явиться в розділі "Складні"
+                // Р—Р°РїРёСЃСѓС”РјРѕ РїРѕРјРёР»РєСѓ. Р’РѕРЅР° Р°РІС‚РѕРјР°С‚РёС‡РЅРѕ Р·'СЏРІРёС‚СЊСЃСЏ РІ СЂРѕР·РґС–Р»С– "РЎРєР»Р°РґРЅС–"
                 allSavedStates[q.topicId][q.originalIndex] = { selectedIndex: selectedAns, isCorrect: false };
                 localStorage.setItem('pdr_quiz_states', JSON.stringify(allSavedStates));
                 
-                // Зберігаємо в хмару
+                // Р—Р±РµСЂС–РіР°С”РјРѕ РІ С…РјР°СЂСѓ
                 if (typeof scheduleCloudSave === 'function') scheduleCloudSave(q.topicId);
             }
             // -------------------------------------------------------------------
 
-            // Перевіряємо, чи всі питання збережені
+            // РџРµСЂРµРІС–СЂСЏС”РјРѕ, С‡Рё РІСЃС– РїРёС‚Р°РЅРЅСЏ Р·Р±РµСЂРµР¶РµРЅС–
             const allSaved = examState.saved.every(s => s === true);
             if (allSaved) {
                 finishExam(false);
@@ -1017,15 +1021,15 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     }
 
-    // Дострокове завершення
+    // Р”РѕСЃС‚СЂРѕРєРѕРІРµ Р·Р°РІРµСЂС€РµРЅРЅСЏ
     document.getElementById('btn-exam-finish-early').addEventListener('click', () => {
         showCustomConfirm({
             icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
-            color: '#EF4444', // Червоний
+            color: '#EF4444', // Р§РµСЂРІРѕРЅРёР№
             bgColor: 'rgba(239, 68, 68, 0.15)',
-            title: 'Завершити достроково?',
-            desc: 'Ви впевнені, що хочете завершити іспит? Не всі відповіді збережені.',
-            okText: 'Завершити',
+            title: 'Р—Р°РІРµСЂС€РёС‚Рё РґРѕСЃС‚СЂРѕРєРѕРІРѕ?',
+            desc: 'Р’Рё РІРїРµРІРЅРµРЅС–, С‰Рѕ С…РѕС‡РµС‚Рµ Р·Р°РІРµСЂС€РёС‚Рё С–СЃРїРёС‚? РќРµ РІСЃС– РІС–РґРїРѕРІС–РґС– Р·Р±РµСЂРµР¶РµРЅС–.',
+            okText: 'Р—Р°РІРµСЂС€РёС‚Рё',
             isDanger: true,
             onConfirm: () => finishExam(false)
         });
@@ -1040,7 +1044,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let wrongCount = 0;
         let unansweredCount = 0;
 
-        // --- НОВЕ: Формуємо список тем для повторення (тільки якщо іспит пройдено повністю) ---
+        // --- РќРћР’Р•: Р¤РѕСЂРјСѓС”РјРѕ СЃРїРёСЃРѕРє С‚РµРј РґР»СЏ РїРѕРІС‚РѕСЂРµРЅРЅСЏ (С‚С–Р»СЊРєРё СЏРєС‰Рѕ С–СЃРїРёС‚ РїСЂРѕР№РґРµРЅРѕ РїРѕРІРЅС–СЃС‚СЋ) ---
         if (!isTimeout) {
             const weakTopicsSet = new Set();
             examQuestions.forEach((q, i) => {
@@ -1048,7 +1052,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     weakTopicsSet.add(q.topicId);
                 }
             });
-            // Зберігаємо унікальні ID тем, де були помилки
+            // Р—Р±РµСЂС–РіР°С”РјРѕ СѓРЅС–РєР°Р»СЊРЅС– ID С‚РµРј, РґРµ Р±СѓР»Рё РїРѕРјРёР»РєРё
             localStorage.setItem('pdr_exam_weak_topics', JSON.stringify(Array.from(weakTopicsSet)));
         }
         // --------------------------------------------------------------------------------------
@@ -1056,7 +1060,7 @@ document.addEventListener("DOMContentLoaded", () => {
         examQuestions.forEach((q, i) => {
             if (!examState.saved[i] || examState.answers[i] === null) {
                 unansweredCount++;
-                wrongCount++; // Незбережена відповідь = помилка
+                wrongCount++; // РќРµР·Р±РµСЂРµР¶РµРЅР° РІС–РґРїРѕРІС–РґСЊ = РїРѕРјРёР»РєР°
             } else if (examState.answers[i] === q.correctIndex) {
                 correctCount++;
             } else {
@@ -1066,11 +1070,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const isPassed = wrongCount <= 2;
 
-        // Збереження статистики іспитів
+        // Р—Р±РµСЂРµР¶РµРЅРЅСЏ СЃС‚Р°С‚РёСЃС‚РёРєРё С–СЃРїРёС‚С–РІ
         const examStats = JSON.parse(localStorage.getItem('pdr_exam_stats') || '{"total":0, "passed":0, "lastWrong":0}');
         examStats.total += 1;
         if (isPassed && !isTimeout) examStats.passed += 1;
-        examStats.lastWrong = isTimeout ? 20 : wrongCount; // Якщо час вийшов, вважаємо що все погано
+        examStats.lastWrong = isTimeout ? 20 : wrongCount; // РЇРєС‰Рѕ С‡Р°СЃ РІРёР№С€РѕРІ, РІРІР°Р¶Р°С”РјРѕ С‰Рѕ РІСЃРµ РїРѕРіР°РЅРѕ
         localStorage.setItem('pdr_exam_stats', JSON.stringify(examStats));
 
         const modal = document.getElementById('exam-result-modal');
@@ -1082,23 +1086,23 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('exam-res-wrong').innerText = wrongCount;
 
         if (isTimeout) {
-            iconEl.innerText = "⏱";
-            titleEl.innerText = "Час вийшов!";
+            iconEl.innerText = "вЏ±";
+            titleEl.innerText = "Р§Р°СЃ РІРёР№С€РѕРІ!";
             titleEl.style.color = "var(--c-danger)";
-            descEl.innerText = "Іспит не складено. Ви не встигли дати відповіді на всі питання.";
+            descEl.innerText = "Р†СЃРїРёС‚ РЅРµ СЃРєР»Р°РґРµРЅРѕ. Р’Рё РЅРµ РІСЃС‚РёРіР»Рё РґР°С‚Рё РІС–РґРїРѕРІС–РґС– РЅР° РІСЃС– РїРёС‚Р°РЅРЅСЏ.";
         } else if (isPassed) {
-            iconEl.innerText = "🏆";
-            titleEl.innerText = "Іспит складено!";
+            iconEl.innerText = "рџЏ†";
+            titleEl.innerText = "Р†СЃРїРёС‚ СЃРєР»Р°РґРµРЅРѕ!";
             titleEl.style.color = "var(--c-success)";
-            descEl.innerText = "Вітаємо! Ви успішно пройшли тестування.";
+            descEl.innerText = "Р’С–С‚Р°С”РјРѕ! Р’Рё СѓСЃРїС–С€РЅРѕ РїСЂРѕР№С€Р»Рё С‚РµСЃС‚СѓРІР°РЅРЅСЏ.";
             
-            // Запускаємо конфетті, якщо є підтримка в ТГ
+            // Р—Р°РїСѓСЃРєР°С”РјРѕ РєРѕРЅС„РµС‚С‚С–, СЏРєС‰Рѕ С” РїС–РґС‚СЂРёРјРєР° РІ РўР“
             if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         } else {
-            iconEl.innerText = "🛑";
-            titleEl.innerText = "Іспит не складено";
+            iconEl.innerText = "рџ›‘";
+            titleEl.innerText = "Р†СЃРїРёС‚ РЅРµ СЃРєР»Р°РґРµРЅРѕ";
             titleEl.style.color = "var(--c-danger)";
-            descEl.innerText = `Ви допустили ${wrongCount} помилок. Допускається не більше 2.`;
+            descEl.innerText = `Р’Рё РґРѕРїСѓСЃС‚РёР»Рё ${wrongCount} РїРѕРјРёР»РѕРє. Р”РѕРїСѓСЃРєР°С”С‚СЊСЃСЏ РЅРµ Р±С–Р»СЊС€Рµ 2.`;
             if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
         }
 
@@ -1110,18 +1114,18 @@ document.addEventListener("DOMContentLoaded", () => {
         showScreen(homeScreen, 'home');
     });
 
-    // --- МОДИФІКАЦІЯ ФУНКЦІЇ goBack() ---
-    // Знайди свою існуючу функцію goBack() і додай туди перевірку на іспит:
+    // --- РњРћР”РР¤Р†РљРђР¦Р†РЇ Р¤РЈРќРљР¦Р†Р‡ goBack() ---
+    // Р—РЅР°Р№РґРё СЃРІРѕСЋ С–СЃРЅСѓСЋС‡Сѓ С„СѓРЅРєС†С–СЋ goBack() С– РґРѕРґР°Р№ С‚СѓРґРё РїРµСЂРµРІС–СЂРєСѓ РЅР° С–СЃРїРёС‚:
     const originalGoBack = goBack;
     goBack = function() {
         if (currentScreenName === 'exam' && examState.isActive) {
             showCustomConfirm({
                 icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>`,
-                color: '#F59E0B', // Оранжевий
+                color: '#F59E0B', // РћСЂР°РЅР¶РµРІРёР№
                 bgColor: 'rgba(245, 158, 11, 0.15)',
-                title: 'Перервати іспит?',
-                desc: 'Ваш прогрес буде втрачено, а іспит вважатиметься нескладеним.',
-                okText: 'Перервати',
+                title: 'РџРµСЂРµСЂРІР°С‚Рё С–СЃРїРёС‚?',
+                desc: 'Р’Р°С€ РїСЂРѕРіСЂРµСЃ Р±СѓРґРµ РІС‚СЂР°С‡РµРЅРѕ, Р° С–СЃРїРёС‚ РІРІР°Р¶Р°С‚РёРјРµС‚СЊСЃСЏ РЅРµСЃРєР»Р°РґРµРЅРёРј.',
+                okText: 'РџРµСЂРµСЂРІР°С‚Рё',
                 isDanger: true,
                 onConfirm: () => {
                     examState.isActive = false;
@@ -1132,8 +1136,8 @@ document.addEventListener("DOMContentLoaded", () => {
             return; 
         }
         
-        // Виклик оригінальної логіки для інших екранів
-        // (Тут просто встав код зі своєї старої функції goBack, або залиш як є, якщо використовуєш перевизначення)
+        // Р’РёРєР»РёРє РѕСЂРёРіС–РЅР°Р»СЊРЅРѕС— Р»РѕРіС–РєРё РґР»СЏ С–РЅС€РёС… РµРєСЂР°РЅС–РІ
+        // (РўСѓС‚ РїСЂРѕСЃС‚Рѕ РІСЃС‚Р°РІ РєРѕРґ Р·С– СЃРІРѕС”С— СЃС‚Р°СЂРѕС— С„СѓРЅРєС†С–С— goBack, Р°Р±Рѕ Р·Р°Р»РёС€ СЏРє С”, СЏРєС‰Рѕ РІРёРєРѕСЂРёСЃС‚РѕРІСѓС”С€ РїРµСЂРµРІРёР·РЅР°С‡РµРЅРЅСЏ)
         
         addImpact();
         const profileModal = document.getElementById('profile-modal');
@@ -1158,12 +1162,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // --- 5. ЛОГИКА ТЕСТА (LAZY LOADING) ---
+    // --- 5. Р›РћР“РРљРђ РўР•РЎРўРђ (LAZY LOADING) ---
     const CHUNK_SIZE = 25; 
 
-    // --- РЕЖИМ "СКЛАДНІ ПИТАННЯ" (ВИРТУАЛЬНИЙ РОЗДІЛ) ---
+    // --- Р Р•Р–РРњ "РЎРљР›РђР”РќР† РџРРўРђРќРќРЇ" (Р’РР РўРЈРђР›Р¬РќРР™ Р РћР—Р”Р†Р›) ---
     async function startHardMode() {
-        updateBottomNav('hard'); // Підсвічуємо вкладку "Складні"
+        updateBottomNav('hard'); // РџС–РґСЃРІС–С‡СѓС”РјРѕ РІРєР»Р°РґРєСѓ "РЎРєР»Р°РґРЅС–"
         
         let hardRefs = [];
         const savedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
@@ -1180,8 +1184,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (hardRefs.length === 0) {
             const emptyIcon = `
                 <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
-                    <div style="font-size: 3rem;">🎉</div>
-                    <div style="line-height: 1.4; font-size: 1.15rem;">У вас немає складних питань!<br>Ви відповідаєте ідеально.</div>
+                    <div style="font-size: 3rem;">рџЋ‰</div>
+                    <div style="line-height: 1.4; font-size: 1.15rem;">РЈ РІР°СЃ РЅРµРјР°С” СЃРєР»Р°РґРЅРёС… РїРёС‚Р°РЅСЊ!<br>Р’Рё РІС–РґРїРѕРІС–РґР°С”С‚Рµ С–РґРµР°Р»СЊРЅРѕ.</div>
                 </div>
             `;
             showToast(emptyIcon);
@@ -1190,7 +1194,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         currentTopic = {
             id: 'hard_mode',
-            title: 'Складні питання',
+            title: 'РЎРєР»Р°РґРЅС– РїРёС‚Р°РЅРЅСЏ',
             isVirtual: true,
             totalQuestions: hardRefs.length,
             refs: hardRefs 
@@ -1205,9 +1209,9 @@ document.addEventListener("DOMContentLoaded", () => {
         renderQuestion();
     }
 
-    // --- ЛОГІКА "ОБРАНЕ" ---
+    // --- Р›РћР“Р†РљРђ "РћР‘Р РђРќР•" ---
     
-    // Отримуємо реальні координати питання (навіть якщо ми у віртуальному розділі)
+    // РћС‚СЂРёРјСѓС”РјРѕ СЂРµР°Р»СЊРЅС– РєРѕРѕСЂРґРёРЅР°С‚Рё РїРёС‚Р°РЅРЅСЏ (РЅР°РІС–С‚СЊ СЏРєС‰Рѕ РјРё Сѓ РІС–СЂС‚СѓР°Р»СЊРЅРѕРјСѓ СЂРѕР·РґС–Р»С–)
     function getRealQuestionRef() {
         if (!currentTopic) return null;
         if (currentTopic.isVirtual) {
@@ -1216,7 +1220,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return { topicId: currentTopic.id, originalIndex: currentQuestionIndex };
     }
 
-    // Оновлення візуалу кнопки закладки
+    // РћРЅРѕРІР»РµРЅРЅСЏ РІС–Р·СѓР°Р»Сѓ РєРЅРѕРїРєРё Р·Р°РєР»Р°РґРєРё
     function updateBookmarkUI() {
         const btn = document.getElementById('btn-bookmark');
         if (!btn) return;
@@ -1234,7 +1238,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Клік по закладці
+    // РљР»С–Рє РїРѕ Р·Р°РєР»Р°РґС†С–
     const btnBookmark = document.getElementById('btn-bookmark');
     if (btnBookmark) {
         btnBookmark.addEventListener('click', () => {
@@ -1248,12 +1252,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const indexInArray = favs[ref.topicId].indexOf(ref.originalIndex);
             
             if (indexInArray === -1) {
-                // Додаємо
+                // Р”РѕРґР°С”РјРѕ
                 favs[ref.topicId].push(ref.originalIndex);
-                favs[ref.topicId].sort((a, b) => a - b); // Сортуємо по порядку
+                favs[ref.topicId].sort((a, b) => a - b); // РЎРѕСЂС‚СѓС”РјРѕ РїРѕ РїРѕСЂСЏРґРєСѓ
                 btnBookmark.classList.add('active');
             } else {
-                // Видаляємо
+                // Р’РёРґР°Р»СЏС”РјРѕ
                 favs[ref.topicId].splice(indexInArray, 1);
                 if (favs[ref.topicId].length === 0) delete favs[ref.topicId];
                 btnBookmark.classList.remove('active');
@@ -1261,17 +1265,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
             localStorage.setItem('pdr_favorites', JSON.stringify(favs));
             
-            // Зберігаємо в хмару Telegram з дебаунсом (захист від спаму кліками)
+            // Р—Р±РµСЂС–РіР°С”РјРѕ РІ С…РјР°СЂСѓ Telegram Р· РґРµР±Р°СѓРЅСЃРѕРј (Р·Р°С…РёСЃС‚ РІС–Рґ СЃРїР°РјСѓ РєР»С–РєР°РјРё)
             if (tg && tg.CloudStorage) {
                 if (window.favCloudSaveTimeout) clearTimeout(window.favCloudSaveTimeout);
                 window.favCloudSaveTimeout = setTimeout(() => {
                     tg.CloudStorage.setItem('pdr_favorites', JSON.stringify(favs));
-                }, 1500); // Відправляємо в хмару тільки через 1.5 сек після останнього кліку
+                }, 1500); // Р’С–РґРїСЂР°РІР»СЏС”РјРѕ РІ С…РјР°СЂСѓ С‚С–Р»СЊРєРё С‡РµСЂРµР· 1.5 СЃРµРє РїС–СЃР»СЏ РѕСЃС‚Р°РЅРЅСЊРѕРіРѕ РєР»С–РєСѓ
             }
         });
     }
 
-    // Відмальовка екрану з розділами Обраного
+    // Р’С–РґРјР°Р»СЊРѕРІРєР° РµРєСЂР°РЅСѓ Р· СЂРѕР·РґС–Р»Р°РјРё РћР±СЂР°РЅРѕРіРѕ
     function renderFavoriteTopics() {
         const favs = JSON.parse(localStorage.getItem('pdr_favorites') || "{}");
         const favTopicIds = Object.keys(favs);
@@ -1282,7 +1286,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <div style="width: 72px; height: 72px; border-radius: 50%; background: rgba(236, 72, 153, 0.12); display: flex; align-items: center; justify-content: center; color: #EC4899;">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
                     </div>
-                    <div style="line-height: 1.4; font-size: 1.15rem;">У вас поки немає<br>збережених питань</div>
+                    <div style="line-height: 1.4; font-size: 1.15rem;">РЈ РІР°СЃ РїРѕРєРё РЅРµРјР°С”<br>Р·Р±РµСЂРµР¶РµРЅРёС… РїРёС‚Р°РЅСЊ</div>
                 </div>
             `;
             showToast(emptyIcon);
@@ -1292,15 +1296,15 @@ document.addEventListener("DOMContentLoaded", () => {
         const grid = document.getElementById('topics-grid');
         grid.innerHTML = ""; 
         
-        // Змінюємо заголовки екрану
-        document.querySelector('#topics-screen .section-title').innerText = "Ваші обрані питання";
-        document.querySelector('#topics-screen .screen-subtitle').innerText = "Згруповані за розділами ПДР";
+        // Р—РјС–РЅСЋС”РјРѕ Р·Р°РіРѕР»РѕРІРєРё РµРєСЂР°РЅСѓ
+        document.querySelector('#topics-screen .section-title').innerText = "Р’Р°С€С– РѕР±СЂР°РЅС– РїРёС‚Р°РЅРЅСЏ";
+        document.querySelector('#topics-screen .screen-subtitle').innerText = "Р—РіСЂСѓРїРѕРІР°РЅС– Р·Р° СЂРѕР·РґС–Р»Р°РјРё РџР”Р ";
         
-       // Ховаємо пошук, він тут не потрібен
+       // РҐРѕРІР°С”РјРѕ РїРѕС€СѓРє, РІС–РЅ С‚СѓС‚ РЅРµ РїРѕС‚СЂС–Р±РµРЅ
        const searchContainer = document.getElementById('search-container-block');
        if(searchContainer) searchContainer.style.display = 'none';
        
-       updateBottomNav('favorites'); // Підсвічуємо вкладку "Обрані"
+       updateBottomNav('favorites'); // РџС–РґСЃРІС–С‡СѓС”РјРѕ РІРєР»Р°РґРєСѓ "РћР±СЂР°РЅС–"
 
         favTopicIds.forEach((topicId, index) => {
             const topic = globalTopics.find(t => t.id === topicId);
@@ -1308,7 +1312,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const questionsCount = favs[topicId].length;
             const colorClass = `c${(index % 6) + 1}`;
-            const iconHtml = modernIcons[topic.id] || `<span style="font-size: 1.5rem;">${topic.icon || "🔖"}</span>`;
+            const iconHtml = modernIcons[topic.id] || `<span style="font-size: 1.5rem;">${topic.icon || "рџ”–"}</span>`;
 
             const isProTopic = PRO_TOPICS.includes(topic.id);
             const proBadgeHtml = (isProTopic && !isUserPro) 
@@ -1330,7 +1334,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
                 <div class="topic-title">${topic.title}</div>
                 <div class="topic-info">
-                    <span style="font-weight: 600;">Збережено питань: ${questionsCount}</span>
+                    <span style="font-weight: 600;">Р—Р±РµСЂРµР¶РµРЅРѕ РїРёС‚Р°РЅСЊ: ${questionsCount}</span>
                 </div>
             `;
             
@@ -1345,24 +1349,24 @@ document.addEventListener("DOMContentLoaded", () => {
         showScreen(topicsScreen, 'favorites_list');
     }
 
-    // Запуск тесту по обраним питанням конкретного розділу
+    // Р—Р°РїСѓСЃРє С‚РµСЃС‚Сѓ РїРѕ РѕР±СЂР°РЅРёРј РїРёС‚Р°РЅРЅСЏРј РєРѕРЅРєСЂРµС‚РЅРѕРіРѕ СЂРѕР·РґС–Р»Сѓ
     function startFavoritesQuiz(originalTopic, questionIndexes) {
         let refs = questionIndexes.map(idx => ({ topicId: originalTopic.id, originalIndex: idx }));
 
         currentTopic = {
             id: 'favorites_mode',
-            title: 'Обране: ' + originalTopic.title,
+            title: 'РћР±СЂР°РЅРµ: ' + originalTopic.title,
             isVirtual: true,
             totalQuestions: refs.length,
             refs: refs 
         };
 
         currentQuestions = Array(refs.length).fill(null); 
-        // Для обраного ми не зберігаємо прогрес відповідей, просто даємо тренуватись
+        // Р”Р»СЏ РѕР±СЂР°РЅРѕРіРѕ РјРё РЅРµ Р·Р±РµСЂС–РіР°С”РјРѕ РїСЂРѕРіСЂРµСЃ РІС–РґРїРѕРІС–РґРµР№, РїСЂРѕСЃС‚Рѕ РґР°С”РјРѕ С‚СЂРµРЅСѓРІР°С‚РёСЃСЊ
         questionStates = Array(refs.length).fill(null).map(() => ({ selectedIndex: null, isCorrect: null }));
         currentQuestionIndex = 0;
 
-        document.getElementById('quiz-topic-name').innerText = "Обране";
+        document.getElementById('quiz-topic-name').innerText = "РћР±СЂР°РЅРµ";
         showScreen(quizScreen, 'quiz');
         renderQuestion();
     }
@@ -1375,7 +1379,7 @@ document.addEventListener("DOMContentLoaded", () => {
         noMoreQuestionsOnServer = false; 
         const total = topic.totalQuestions || 79;
         
-        // questionStates — для всіх запланованих питань, щоб уникнути помилок при кліку
+        // questionStates вЂ” РґР»СЏ РІСЃС–С… Р·Р°РїР»Р°РЅРѕРІР°РЅРёС… РїРёС‚Р°РЅСЊ, С‰РѕР± СѓРЅРёРєРЅСѓС‚Рё РїРѕРјРёР»РѕРє РїСЂРё РєР»С–РєСѓ
         questionStates = Array(total).fill(null).map(() => ({ selectedIndex: null, isCorrect: null }));
         
         const savedStates = JSON.parse(localStorage.getItem('pdr_quiz_states') || "{}");
@@ -1391,7 +1395,7 @@ document.addEventListener("DOMContentLoaded", () => {
         currentQuestionIndex = firstUnanswered !== -1 ? firstUnanswered : 0;
         
         showScreen(quizScreen, 'quiz');
-        document.getElementById('quiz-question-text').innerText = "Завантаження питань...";
+        document.getElementById('quiz-question-text').innerText = "Р—Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ РїРёС‚Р°РЅСЊ...";
         document.getElementById('quiz-options').innerHTML = "";
         
         const limitToFetch = currentQuestionIndex + 20;
@@ -1405,7 +1409,7 @@ document.addEventListener("DOMContentLoaded", () => {
         isLoadingQuestions = true;
 
         try {
-            const response = await fetch(`https://pdrua.duckdns.org/api/questions?topicId=${topicId}&user_id=${userId}&offset=${offset}&limit=${limit}`);
+            const response = await fetch(`${API_BASE}/api/questions?topicId=${topicId}&user_id=${userId}&offset=${offset}&limit=${limit}`);
             const newQuestions = await response.json();
             
             if (newQuestions.length === 0) {
@@ -1420,7 +1424,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             }
         } catch (error) {
-            console.error("Помилка завантаження питань:", error);
+            console.error("РџРѕРјРёР»РєР° Р·Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ РїРёС‚Р°РЅСЊ:", error);
         } finally {
             isLoadingQuestions = false;
         }
@@ -1431,7 +1435,7 @@ document.addEventListener("DOMContentLoaded", () => {
         navBar.innerHTML = '';
 
         const total = currentTopic.totalQuestions || 79;
-        const actualTotal = currentTopic.actualQuestions || total; // скільки реально є в БД
+        const actualTotal = currentTopic.actualQuestions || total; // СЃРєС–Р»СЊРєРё СЂРµР°Р»СЊРЅРѕ С” РІ Р‘Р”
 
         for (let i = 0; i < total; i++) {
             const btn = document.createElement('button');
@@ -1447,7 +1451,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             
             if (!currentTopic.isVirtual && i >= actualTotal) {
-                // Питання ще не додано в БД — напівпрозоре, некліктабельне
+                // РџРёС‚Р°РЅРЅСЏ С‰Рµ РЅРµ РґРѕРґР°РЅРѕ РІ Р‘Р” вЂ” РЅР°РїС–РІРїСЂРѕР·РѕСЂРµ, РЅРµРєР»С–РєС‚Р°Р±РµР»СЊРЅРµ
                 btn.classList.add('empty');
                 btn.style.pointerEvents = 'none';
             } else {
@@ -1474,7 +1478,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function renderQuestion() {
 
         const total = currentTopic.totalQuestions || 79;
-        const actualTotal = currentTopic.actualQuestions || total; // реальна кількість в БД
+        const actualTotal = currentTopic.actualQuestions || total; // СЂРµР°Р»СЊРЅР° РєС–Р»СЊРєС–СЃС‚СЊ РІ Р‘Р”
         const q = currentQuestions[currentQuestionIndex];
 
         if (!currentQuestions[currentQuestionIndex + 5] && (currentQuestionIndex + 5) < actualTotal) {
@@ -1488,13 +1492,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!q) {
             if (noMoreQuestionsOnServer && !currentTopic.isVirtual) {
                 currentQuestionIndex = currentQuestions.length - 1;
-                const coneIcon = `<div style="display: flex; flex-direction: column; align-items: center; gap: 16px;"><div style="width: 72px; height: 72px; border-radius: 50%; background: rgba(245, 158, 11, 0.12); display: flex; align-items: center; justify-content: center;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none"><path d="M4 20H20" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 3L5.5 20H18.5L12 3Z" fill="#F59E0B" fill-opacity="0.2" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 12H15.5" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 16H17" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div style="line-height: 1.4; font-size: 1.15rem;">Ой! Наступні питання<br>будуть додані пізніше</div></div>`;
+                const coneIcon = `<div style="display: flex; flex-direction: column; align-items: center; gap: 16px;"><div style="width: 72px; height: 72px; border-radius: 50%; background: rgba(245, 158, 11, 0.12); display: flex; align-items: center; justify-content: center;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none"><path d="M4 20H20" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 3L5.5 20H18.5L12 3Z" fill="#F59E0B" fill-opacity="0.2" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 12H15.5" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 16H17" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div style="line-height: 1.4; font-size: 1.15rem;">РћР№! РќР°СЃС‚СѓРїРЅС– РїРёС‚Р°РЅРЅСЏ<br>Р±СѓРґСѓС‚СЊ РґРѕРґР°РЅС– РїС–Р·РЅС–С€Рµ</div></div>`;
                 showToast(coneIcon);
                 renderQuestion();
                 return;
             }
             
-            document.getElementById('quiz-question-text').innerText = "Завантаження питання...";
+            document.getElementById('quiz-question-text').innerText = "Р—Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ РїРёС‚Р°РЅРЅСЏ...";
             document.getElementById('quiz-options').innerHTML = "";
             const imgEl = document.getElementById('quiz-image');
             if (imgEl && imgEl.parentElement) imgEl.parentElement.style.display = 'none';
@@ -1507,19 +1511,19 @@ document.addEventListener("DOMContentLoaded", () => {
             else if (currentTopic.isVirtual && !isLoadingQuestions) {
                 isLoadingQuestions = true;
                 const ref = currentTopic.refs[currentQuestionIndex];
-                fetch(`https://pdrua.duckdns.org/api/questions?topicId=${ref.topicId}&user_id=${userId}&offset=${ref.originalIndex}&limit=1`)
+                fetch(`${API_BASE}/api/questions?topicId=${ref.topicId}&user_id=${userId}&offset=${ref.originalIndex}&limit=1`)
                     .then(res => res.json())
                     .then(data => {
                         if (data && data.length > 0) {
                             currentQuestions[currentQuestionIndex] = data[0];
                         } else {
-                            currentQuestions[currentQuestionIndex] = { text: "Помилка: Питання не знайдено", options: ["Далі"], correctIndex: 0 };
+                            currentQuestions[currentQuestionIndex] = { text: "РџРѕРјРёР»РєР°: РџРёС‚Р°РЅРЅСЏ РЅРµ Р·РЅР°Р№РґРµРЅРѕ", options: ["Р”Р°Р»С–"], correctIndex: 0 };
                         }
                         isLoadingQuestions = false;
                         renderQuestion();
                     })
                     .catch(err => { 
-                        console.error("Помилка мережі:", err); 
+                        console.error("РџРѕРјРёР»РєР° РјРµСЂРµР¶С–:", err); 
                         isLoadingQuestions = false; 
                     });
             }
@@ -1546,7 +1550,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const optionsContainer = document.getElementById('quiz-options');
-        updateBookmarkUI(); // Оновлюємо стан закладки для поточного питання
+        updateBookmarkUI(); // РћРЅРѕРІР»СЋС”РјРѕ СЃС‚Р°РЅ Р·Р°РєР»Р°РґРєРё РґР»СЏ РїРѕС‚РѕС‡РЅРѕРіРѕ РїРёС‚Р°РЅРЅСЏ
         optionsContainer.innerHTML = '';
 
         q.options.forEach((optionText, index) => {
@@ -1569,15 +1573,15 @@ document.addEventListener("DOMContentLoaded", () => {
         nextBtn.style.display = 'block';
 
         if (currentQuestionIndex < total - 1) {
-            nextBtn.innerText = 'Наступне питання →';
+            nextBtn.innerText = 'РќР°СЃС‚СѓРїРЅРµ РїРёС‚Р°РЅРЅСЏ в†’';
             nextBtn.onclick = () => {
                 addImpact();
                 currentQuestionIndex++;
                 renderQuestion();
-                window.scrollTo(0, 70); // Возвращаем экран в верх
+                window.scrollTo(0, 70); // Р’РѕР·РІСЂР°С‰Р°РµРј СЌРєСЂР°РЅ РІ РІРµСЂС…
             };
         } else {
-            nextBtn.innerText = 'Завершити розділ';
+            nextBtn.innerText = 'Р—Р°РІРµСЂС€РёС‚Рё СЂРѕР·РґС–Р»';
             nextBtn.onclick = () => {
                 addImpact();
                 if (currentQuestionIndex < total - 1) {
@@ -1589,7 +1593,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     <path d="M22 4L12 14.01L9 11.01" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                             </div>
-                            <div style="line-height: 1.4; font-size: 1.15rem;">Ви пройшли всі доступні<br>на даний момент питання</div>
+                            <div style="line-height: 1.4; font-size: 1.15rem;">Р’Рё РїСЂРѕР№С€Р»Рё РІСЃС– РґРѕСЃС‚СѓРїРЅС–<br>РЅР° РґР°РЅРёР№ РјРѕРјРµРЅС‚ РїРёС‚Р°РЅРЅСЏ</div>
                         </div>
                     `;
                     showToast(successIcon);
@@ -1605,7 +1609,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const explanationWrapper = document.getElementById('quiz-explanation-wrapper');
         
-        // Учитываем все возможные форматы названий полей, которые может прислать бекенд
+        // РЈС‡РёС‚С‹РІР°РµРј РІСЃРµ РІРѕР·РјРѕР¶РЅС‹Рµ С„РѕСЂРјР°С‚С‹ РЅР°Р·РІР°РЅРёР№ РїРѕР»РµР№, РєРѕС‚РѕСЂС‹Рµ РјРѕР¶РµС‚ РїСЂРёСЃР»Р°С‚СЊ Р±РµРєРµРЅРґ
         const currentRuleText = q.ruleText || q.rule_text || q.rule;
         const currentExpText = q.explanationText || q.explanation_text || q.explanation;
 
@@ -1613,7 +1617,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const detailsRule = document.getElementById('details-rule');
             const detailsExplanation = document.getElementById('details-explanation');
             
-            // Включаем отображение (flex-direction: column ставим чтобы кнопки красиво шли друг под другом)
+            // Р’РєР»СЋС‡Р°РµРј РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ (flex-direction: column СЃС‚Р°РІРёРј С‡С‚РѕР±С‹ РєРЅРѕРїРєРё РєСЂР°СЃРёРІРѕ С€Р»Рё РґСЂСѓРі РїРѕРґ РґСЂСѓРіРѕРј)
             explanationWrapper.style.display = 'flex';
             explanationWrapper.style.flexDirection = 'column';
             explanationWrapper.style.gap = '12px';
@@ -1642,22 +1646,22 @@ document.addEventListener("DOMContentLoaded", () => {
         addImpact(); 
 
         if (totalAnswersGiven >= FREE_ANSWERS_LIMIT && !isUserPro) {
-            // Якщо перевірка зараз іде у фоні — чекаємо її завершення
+            // РЇРєС‰Рѕ РїРµСЂРµРІС–СЂРєР° Р·Р°СЂР°Р· С–РґРµ Сѓ С„РѕРЅС– вЂ” С‡РµРєР°С”РјРѕ С—С— Р·Р°РІРµСЂС€РµРЅРЅСЏ
             while (isCheckingNow) {
                 await new Promise(r => setTimeout(r, 100));
             }
 
-            // Якщо ми досі не знаємо статус (наприклад, фонова перевірка не спрацювала) — перевіряємо прямо зараз
+            // РЇРєС‰Рѕ РјРё РґРѕСЃС– РЅРµ Р·РЅР°С”РјРѕ СЃС‚Р°С‚СѓСЃ (РЅР°РїСЂРёРєР»Р°Рґ, С„РѕРЅРѕРІР° РїРµСЂРµРІС–СЂРєР° РЅРµ СЃРїСЂР°С†СЋРІР°Р»Р°) вЂ” РїРµСЂРµРІС–СЂСЏС”РјРѕ РїСЂСЏРјРѕ Р·Р°СЂР°Р·
             if (!isUserVerified) {
                 await runSilentVerification();
             }
 
-            // Якщо після всього цього підписки дійсно немає — показуємо вікно
+            // РЇРєС‰Рѕ РїС–СЃР»СЏ РІСЃСЊРѕРіРѕ С†СЊРѕРіРѕ РїС–РґРїРёСЃРєРё РґС–Р№СЃРЅРѕ РЅРµРјР°С” вЂ” РїРѕРєР°Р·СѓС”РјРѕ РІС–РєРЅРѕ
             if (!isUserVerified) {
                 document.getElementById('sub-modal').classList.add('active');
                 return; 
             } else if (totalAnswersGiven > 0 && totalAnswersGiven % 10 === 0) {
-                // Кожні 10 відповідей тихо перевіряємо підписку у фоні
+                // РљРѕР¶РЅС– 10 РІС–РґРїРѕРІС–РґРµР№ С‚РёС…Рѕ РїРµСЂРµРІС–СЂСЏС”РјРѕ РїС–РґРїРёСЃРєСѓ Сѓ С„РѕРЅС–
                 runSilentVerification();
             }
         }
@@ -1700,7 +1704,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (totalAnswersGiven < FREE_ANSWERS_LIMIT && !isUserVerified) {
-            fetch('https://pdrua.duckdns.org/api/record-answer', {
+            fetch(`${API_BASE}/api/record-answer', {
                 method: 'POST'
             })
             .then(res => res.json())
@@ -1712,7 +1716,7 @@ document.addEventListener("DOMContentLoaded", () => {
             totalAnswersGiven++;
         }
 
-        // Запускаємо тихе збереження у хмару Телеграм.
+        // Р—Р°РїСѓСЃРєР°С”РјРѕ С‚РёС…Рµ Р·Р±РµСЂРµР¶РµРЅРЅСЏ Сѓ С…РјР°СЂСѓ РўРµР»РµРіСЂР°Рј.
         if (currentTopic.isVirtual) {
             scheduleCloudSave(currentTopic.refs[currentQuestionIndex].topicId);
         } else {
@@ -1742,32 +1746,32 @@ document.addEventListener("DOMContentLoaded", () => {
             proModal.innerHTML = `
                 <div class="modal-content" style="max-width: 350px; padding: 24px;">
                     <div style="text-align: center; margin-bottom: 20px;">
-                        <div style="font-size: 3.5rem; margin-bottom: 10px;">⭐️</div>
-                        <h3 style="font-size: 1.6rem; margin-bottom: 8px; font-weight: 800;">PRO Доступ</h3>
-                        <p style="color: var(--c-text-soft); font-size: 0.95rem; line-height: 1.4;">Відкрийте всі преміум-розділи та детальні пояснення до питань.</p>
+                        <div style="font-size: 3.5rem; margin-bottom: 10px;">в­ђпёЏ</div>
+                        <h3 style="font-size: 1.6rem; margin-bottom: 8px; font-weight: 800;">PRO Р”РѕСЃС‚СѓРї</h3>
+                        <p style="color: var(--c-text-soft); font-size: 0.95rem; line-height: 1.4;">Р’С–РґРєСЂРёР№С‚Рµ РІСЃС– РїСЂРµРјС–СѓРј-СЂРѕР·РґС–Р»Рё С‚Р° РґРµС‚Р°Р»СЊРЅС– РїРѕСЏСЃРЅРµРЅРЅСЏ РґРѕ РїРёС‚Р°РЅСЊ.</p>
                     </div>
                     
                     <div style="display: flex; flex-direction: column; gap: 12px;">
                         <button class="btn-primary" onclick="buyPro('1_month')" style="display: flex; justify-content: space-between; width: 100%; padding: 16px 20px; background: var(--c-surface); color: var(--c-text); border: 1px solid var(--c-border-soft);">
-                            <span style="font-weight: 600;">1 місяць</span> <span style="font-weight: 800; color: #F59E0B;">⭐️ 50 (SALE)</span>
+                            <span style="font-weight: 600;">1 РјС–СЃСЏС†СЊ</span> <span style="font-weight: 800; color: #F59E0B;">в­ђпёЏ 50 (SALE)</span>
                         </button>
                         <button class="btn-primary" onclick="buyPro('3_months')" style="display: flex; justify-content: space-between; width: 100%; padding: 16px 20px; background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); border: none; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);">
-                            <span style="font-weight: 700;">3 місяці (Вигідно)</span> <span style="font-weight: 800;">⭐️ 250</span>
+                            <span style="font-weight: 700;">3 РјС–СЃСЏС†С– (Р’РёРіС–РґРЅРѕ)</span> <span style="font-weight: 800;">в­ђпёЏ 250</span>
                         </button>
                         <button class="btn-primary" onclick="buyPro('12_months')" style="display: flex; justify-content: space-between; width: 100%; padding: 16px 20px; background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%); border: none; box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);">
-                            <span style="font-weight: 700;">1 рік (Максимум)</span> <span style="font-weight: 800;">⭐️ 750</span>
+                            <span style="font-weight: 700;">1 СЂС–Рє (РњР°РєСЃРёРјСѓРј)</span> <span style="font-weight: 800;">в­ђпёЏ 750</span>
                         </button>
                     </div>
 
-                    <!-- НОВЫЙ БЛОК С ПОДСКАЗКОЙ -->
+                    <!-- РќРћР’Р«Р™ Р‘Р›РћРљ РЎ РџРћР”РЎРљРђР—РљРћР™ -->
                     <div style="margin-top: 20px; padding: 14px; background: rgba(66, 133, 244, 0.1); border: 1px solid rgba(66, 133, 244, 0.2); border-radius: 12px; text-align: left;">
                         <div style="font-size: 0.85rem; color: var(--c-text-soft); line-height: 1.4;">
-                            <span style="font-weight: 700; color: var(--c-primary); display: block; margin-bottom: 4px;">💡 Як поповнити зірки?</span>
-                            Якщо при оплаті виникає помилка - придбайте зірки через офіційного бота Telegram <a href="https://t.me/PremiumBot" target="_blank" style="color: var(--c-primary); text-decoration: none; font-weight: 600;">@PremiumBot</a> або в налаштуваннях Telegram.
+                            <span style="font-weight: 700; color: var(--c-primary); display: block; margin-bottom: 4px;">рџ’Ў РЇРє РїРѕРїРѕРІРЅРёС‚Рё Р·С–СЂРєРё?</span>
+                            РЇРєС‰Рѕ РїСЂРё РѕРїР»Р°С‚С– РІРёРЅРёРєР°С” РїРѕРјРёР»РєР° - РїСЂРёРґР±Р°Р№С‚Рµ Р·С–СЂРєРё С‡РµСЂРµР· РѕС„С–С†С–Р№РЅРѕРіРѕ Р±РѕС‚Р° Telegram <a href="https://t.me/PremiumBot" target="_blank" style="color: var(--c-primary); text-decoration: none; font-weight: 600;">@PremiumBot</a> Р°Р±Рѕ РІ РЅР°Р»Р°С€С‚СѓРІР°РЅРЅСЏС… Telegram.
                         </div>
                     </div>
 
-                    <button class="btn-danger-outline" onclick="document.getElementById('pro-modal').classList.remove('active')" style="width: 100%; margin-top: 16px; border: none; color: var(--c-text-soft);">Скасувати</button>
+                    <button class="btn-danger-outline" onclick="document.getElementById('pro-modal').classList.remove('active')" style="width: 100%; margin-top: 16px; border: none; color: var(--c-text-soft);">РЎРєР°СЃСѓРІР°С‚Рё</button>
                 </div>
             `;
             document.body.appendChild(proModal);
@@ -1775,16 +1779,16 @@ document.addEventListener("DOMContentLoaded", () => {
         proModal.classList.add('active');
     }
 
-    // Глобальная функция для вызова из HTML
+    // Р“Р»РѕР±Р°Р»СЊРЅР°СЏ С„СѓРЅРєС†РёСЏ РґР»СЏ РІС‹Р·РѕРІР° РёР· HTML
     window.buyPro = async function(tierId) {
         addImpact();
         const btn = event.currentTarget;
         const originalText = btn.innerHTML;
-        btn.innerHTML = `<span style="margin: 0 auto;">Завантаження...</span>`;
+        btn.innerHTML = `<span style="margin: 0 auto;">Р—Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ...</span>`;
         btn.disabled = true;
 
         try {
-            const res = await fetch('https://pdrua.duckdns.org/api/create-invoice', {
+            const res = await fetch(`${API_BASE}/api/create-invoice', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ user_id: userId, tier_id: tierId })
@@ -1792,33 +1796,33 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await res.json();
             
             if (data.invoice_url) {
-                // Вызываем нативное окно оплаты Telegram
+                // Р’С‹Р·С‹РІР°РµРј РЅР°С‚РёРІРЅРѕРµ РѕРєРЅРѕ РѕРїР»Р°С‚С‹ Telegram
                 tg.openInvoice(data.invoice_url, (status) => {
                     if (status === 'paid') {
                         document.getElementById('pro-modal').classList.remove('active');
                         isUserPro = true;
-                        renderTopics(); // Перерисовываем меню, чтобы убрать плашки PRO
-                        updateHomeScreenProBadges(); // <--- ДОДАЛИ: прибираємо плашки з головного екрану
+                        renderTopics(); // РџРµСЂРµСЂРёСЃРѕРІС‹РІР°РµРј РјРµРЅСЋ, С‡С‚РѕР±С‹ СѓР±СЂР°С‚СЊ РїР»Р°С€РєРё PRO
+                        updateHomeScreenProBadges(); // <--- Р”РћР”РђР›Р: РїСЂРёР±РёСЂР°С”РјРѕ РїР»Р°С€РєРё Р· РіРѕР»РѕРІРЅРѕРіРѕ РµРєСЂР°РЅСѓ
                         if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
                         showCustomConfirm({
-                            icon: '🎉', color: '#10B981', bgColor: 'rgba(16, 185, 129, 0.15)',
-                            title: 'Оплата успішна!', desc: 'Дякуємо! PRO доступ активовано. Всі розділи відкрито.',
-                            okText: 'Супер!', isDanger: false
+                            icon: 'рџЋ‰', color: '#10B981', bgColor: 'rgba(16, 185, 129, 0.15)',
+                            title: 'РћРїР»Р°С‚Р° СѓСЃРїС–С€РЅР°!', desc: 'Р”СЏРєСѓС”РјРѕ! PRO РґРѕСЃС‚СѓРї Р°РєС‚РёРІРѕРІР°РЅРѕ. Р’СЃС– СЂРѕР·РґС–Р»Рё РІС–РґРєСЂРёС‚Рѕ.',
+                            okText: 'РЎСѓРїРµСЂ!', isDanger: false
                         });
                     }
                 });
             } else {
-                alert("Помилка створення рахунку: " + data.error);
+                alert("РџРѕРјРёР»РєР° СЃС‚РІРѕСЂРµРЅРЅСЏ СЂР°С…СѓРЅРєСѓ: " + data.error);
             }
         } catch (e) {
-            alert("Помилка з'єднання з сервером");
+            alert("РџРѕРјРёР»РєР° Р·'С”РґРЅР°РЅРЅСЏ Р· СЃРµСЂРІРµСЂРѕРј");
         } finally {
             btn.innerHTML = originalText;
             btn.disabled = false;
         }
     }
 
-    // --- ПРОФІЛЬ ТА СТАТИСТИКА ---
+    // --- РџР РћР¤Р†Р›Р¬ РўРђ РЎРўРђРўРРЎРўРРљРђ ---
     const profileModal = document.getElementById('profile-modal');
     const btnCloseProfile = document.getElementById('btn-close-profile');
     const btnResetProgress = document.getElementById('btn-reset-progress');
@@ -1832,7 +1836,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let totalExpected = 0;
         let totalAnswered = 0;
         let totalCorrect = 0;
-        let totalIncorrect = 0; // Добавили счетчик ошибок
+        let totalIncorrect = 0; // Р”РѕР±Р°РІРёР»Рё СЃС‡РµС‚С‡РёРє РѕС€РёР±РѕРє
 
         globalTopics.forEach(topic => {
             totalExpected += (topic.totalQuestions || 0);
@@ -1844,7 +1848,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (state.isCorrect) {
                         totalCorrect++;
                     } else {
-                        totalIncorrect++; // Считаем ошибки
+                        totalIncorrect++; // РЎС‡РёС‚Р°РµРј РѕС€РёР±РєРё
                     }
                 }
             });
@@ -1853,7 +1857,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const successRate = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
         const completionRate = totalExpected > 0 ? (totalAnswered / totalExpected) : 0;
 
-        // Возвращаем расширенный объект со статистикой
+        // Р’РѕР·РІСЂР°С‰Р°РµРј СЂР°СЃС€РёСЂРµРЅРЅС‹Р№ РѕР±СЉРµРєС‚ СЃРѕ СЃС‚Р°С‚РёСЃС‚РёРєРѕР№
         return { 
             successRate, 
             answered: totalAnswered, 
@@ -1874,23 +1878,23 @@ document.addEventListener("DOMContentLoaded", () => {
         let isMax = false;
 
         if (successRate <= 20) {
-            text = "Схоже, правила поки що<br>керують вами 😅";
-            iconLeft = "🚨"; iconRight = "⚠️";
+            text = "РЎС…РѕР¶Рµ, РїСЂР°РІРёР»Р° РїРѕРєРё С‰Рѕ<br>РєРµСЂСѓСЋС‚СЊ РІР°РјРё рџ…";
+            iconLeft = "рџљЁ"; iconRight = "вљ пёЏ";
         } else if (successRate <= 40) {
-            text = "Ви вже розумієте, що «головна дорога» —<br>це не життєва позиція";
-            iconLeft = "🛣️"; iconRight = "🤔";
+            text = "Р’Рё РІР¶Рµ СЂРѕР·СѓРјС–С”С‚Рµ, С‰Рѕ В«РіРѕР»РѕРІРЅР° РґРѕСЂРѕРіР°В» вЂ”<br>С†Рµ РЅРµ Р¶РёС‚С‚С”РІР° РїРѕР·РёС†С–СЏ";
+            iconLeft = "рџ›ЈпёЏ"; iconRight = "рџ¤”";
         } else if (successRate <= 60) {
-            text = "Дорожні знаки<br>починають вас поважати";
-            iconLeft = "🚸"; iconRight = "😎";
+            text = "Р”РѕСЂРѕР¶РЅС– Р·РЅР°РєРё<br>РїРѕС‡РёРЅР°СЋС‚СЊ РІР°СЃ РїРѕРІР°Р¶Р°С‚Рё";
+            iconLeft = "рџљё"; iconRight = "рџЋ";
         } else if (successRate <= 80) {
-            text = "Навігатор більше не переживає<br>за ваше майбутнє";
-            iconLeft = "📱"; iconRight = "😌";
+            text = "РќР°РІС–РіР°С‚РѕСЂ Р±С–Р»СЊС€Рµ РЅРµ РїРµСЂРµР¶РёРІР°С”<br>Р·Р° РІР°С€Рµ РјР°Р№Р±СѓС‚РЅС”";
+            iconLeft = "рџ“±"; iconRight = "рџЊ";
         } else if (successRate <= 99) {
-            text = "Ще трохи — і вас почнуть<br>пропускати навіть маршрутки";
-            iconLeft = "🚐"; iconRight = "👑";
+            text = "Р©Рµ С‚СЂРѕС…Рё вЂ” С– РІР°СЃ РїРѕС‡РЅСѓС‚СЊ<br>РїСЂРѕРїСѓСЃРєР°С‚Рё РЅР°РІС–С‚СЊ РјР°СЂС€СЂСѓС‚РєРё";
+            iconLeft = "рџљђ"; iconRight = "рџ‘‘";
         } else {
-            text = "Світлофор бачить вас —<br>і перемикається на <span style='color: var(--c-success); font-weight: 800;'>зелений</span>";
-            iconLeft = "🏆"; iconRight = "🚦";
+            text = "РЎРІС–С‚Р»РѕС„РѕСЂ Р±Р°С‡РёС‚СЊ РІР°СЃ вЂ”<br>С– РїРµСЂРµРјРёРєР°С”С‚СЊСЃСЏ РЅР° <span style='color: var(--c-success); font-weight: 800;'>Р·РµР»РµРЅРёР№</span>";
+            iconLeft = "рџЏ†"; iconRight = "рџљ¦";
             isMax = true;
         }
 
@@ -1937,7 +1941,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             if (globalTopics.length === 0) {
                 try {
-                    const response = await fetch('https://pdrua.duckdns.org/api/topics');
+                    const response = await fetch(`${API_BASE}/api/topics');
                     globalTopics = await response.json();
                 } catch (e) { console.error(e); }
             }
@@ -1955,29 +1959,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
             updateHumorBanner(stats.successRate);
 
-            // Вивід статистики іспитів
+            // Р’РёРІС–Рґ СЃС‚Р°С‚РёСЃС‚РёРєРё С–СЃРїРёС‚С–РІ
             const examStats = JSON.parse(localStorage.getItem('pdr_exam_stats') || '{"total":0, "passed":0, "lastWrong":0}');
             document.getElementById('stat-exam-passed').innerText = examStats.passed;
             document.getElementById('stat-exam-total').innerText = examStats.total;
             
             const lastScoreEl = document.getElementById('stat-exam-last');
             if (examStats.total > 0) {
-                lastScoreEl.innerText = `${examStats.lastWrong} пом.`;
-                // Якщо помилок <= 2 (здав) - зелений, інакше - червоний
+                lastScoreEl.innerText = `${examStats.lastWrong} РїРѕРј.`;
+                // РЇРєС‰Рѕ РїРѕРјРёР»РѕРє <= 2 (Р·РґР°РІ) - Р·РµР»РµРЅРёР№, С–РЅР°РєС€Рµ - С‡РµСЂРІРѕРЅРёР№
                 lastScoreEl.style.color = examStats.lastWrong <= 2 ? 'var(--c-success)' : 'var(--c-danger)';
             } else {
                 lastScoreEl.innerText = '-';
                 lastScoreEl.style.color = 'var(--c-text)';
             }
 
-            // --- НОВЕ: Вивід тем для повторення ---
+            // --- РќРћР’Р•: Р’РёРІС–Рґ С‚РµРј РґР»СЏ РїРѕРІС‚РѕСЂРµРЅРЅСЏ ---
             const weakTopicsContainer = document.getElementById('weak-topics-container');
             if (weakTopicsContainer) {
                 const weakTopics = JSON.parse(localStorage.getItem('pdr_exam_weak_topics') || "[]");
                 
                 if (weakTopics.length > 0) {
                     let html = `<div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--c-border-soft);">
-                                    <h4 style="font-size: 0.85rem; color: var(--c-text-soft); margin-bottom: 10px; font-weight: 600;">Рекомендуємо повторити:</h4>
+                                    <h4 style="font-size: 0.85rem; color: var(--c-text-soft); margin-bottom: 10px; font-weight: 600;">Р РµРєРѕРјРµРЅРґСѓС”РјРѕ РїРѕРІС‚РѕСЂРёС‚Рё:</h4>
                                     <div style="display: flex; flex-direction: column; gap: 8px;">`;
                     
                     weakTopics.forEach(tId => {
@@ -1991,15 +1995,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     weakTopicsContainer.innerHTML = html;
                     weakTopicsContainer.style.display = 'block';
                     
-                    // Додаємо кліки по темам
+                    // Р”РѕРґР°С”РјРѕ РєР»С–РєРё РїРѕ С‚РµРјР°Рј
                     weakTopicsContainer.querySelectorAll('.weak-topic-chip').forEach(chip => {
                         chip.addEventListener('click', () => {
                             addImpact();
                             const tId = chip.getAttribute('data-topic');
                             const topicObj = globalTopics.find(t => t.id === tId);
                             if (topicObj) {
-                                profileModal.classList.remove('active'); // Закриваємо профіль
-                                startQuiz(topicObj); // Запускаємо вибрану тему
+                                profileModal.classList.remove('active'); // Р—Р°РєСЂРёРІР°С”РјРѕ РїСЂРѕС„С–Р»СЊ
+                                startQuiz(topicObj); // Р—Р°РїСѓСЃРєР°С”РјРѕ РІРёР±СЂР°РЅСѓ С‚РµРјСѓ
                             }
                         });
                     });
@@ -2026,11 +2030,11 @@ document.addEventListener("DOMContentLoaded", () => {
             addImpact();
             showCustomConfirm({
                 icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>`,
-                color: '#EF4444', // Червоний
+                color: '#EF4444', // Р§РµСЂРІРѕРЅРёР№
                 bgColor: 'rgba(239, 68, 68, 0.15)',
-                title: 'Обнулити дані?',
-                desc: 'Ви впевнені, що хочете скинути поточну статистику? Весь прогрес буде втрачено назавжди!',
-                okText: 'Обнулити',
+                title: 'РћР±РЅСѓР»РёС‚Рё РґР°РЅС–?',
+                desc: 'Р’Рё РІРїРµРІРЅРµРЅС–, С‰Рѕ С…РѕС‡РµС‚Рµ СЃРєРёРЅСѓС‚Рё РїРѕС‚РѕС‡РЅСѓ СЃС‚Р°С‚РёСЃС‚РёРєСѓ? Р’РµСЃСЊ РїСЂРѕРіСЂРµСЃ Р±СѓРґРµ РІС‚СЂР°С‡РµРЅРѕ РЅР°Р·Р°РІР¶РґРё!',
+                okText: 'РћР±РЅСѓР»РёС‚Рё',
                 isDanger: true,
                 onConfirm: () => executeReset()
             });
@@ -2041,7 +2045,7 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.removeItem('pdr_topic_stats');
         localStorage.removeItem('pdr_quiz_states');
         
-        // ОЧИЩАЄМО ХМАРУ ТЕЛЕГРАМ ПРИ ОБНУЛЕННІ
+        // РћР§РР©РђР„РњРћ РҐРњРђР РЈ РўР•Р›Р•Р“Р РђРњ РџР Р РћР‘РќРЈР›Р•РќРќР†
         if (tg && tg.CloudStorage) {
             tg.CloudStorage.getKeys((err, keys) => {
                 if (!err && keys) {
@@ -2056,9 +2060,9 @@ document.addEventListener("DOMContentLoaded", () => {
         showScreen(topicsScreen, 'topics');
         
         if (tg && tg.showAlert) {
-            tg.showAlert("Дані успішно обнулено!");
+            tg.showAlert("Р”Р°РЅС– СѓСЃРїС–С€РЅРѕ РѕР±РЅСѓР»РµРЅРѕ!");
         } else {
-            alert("Дані успішно обнулено!");
+            alert("Р”Р°РЅС– СѓСЃРїС–С€РЅРѕ РѕР±РЅСѓР»РµРЅРѕ!");
         }
 
         localStorage.removeItem('pdr_exam_stats');
@@ -2114,24 +2118,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // CLOUD STORAGE (СИНХРОНІЗАЦІЯ ПРОГРЕСУ)
+    // CLOUD STORAGE (РЎРРќРҐР РћРќР†Р—РђР¦Р†РЇ РџР РћР“Р Р•РЎРЈ)
     // ==========================================
     
-    // 1. Архіватор даних (стискаємо об'єкти в малі масиви)
+    // 1. РђСЂС…С–РІР°С‚РѕСЂ РґР°РЅРёС… (СЃС‚РёСЃРєР°С”РјРѕ РѕР±'С”РєС‚Рё РІ РјР°Р»С– РјР°СЃРёРІРё)
     function packState(stateArray) {
         return JSON.stringify(stateArray.map(s => {
-            // Якщо питання ще не пройдене, зберігаємо просто null (економимо пам'ять хмари!)
+            // РЇРєС‰Рѕ РїРёС‚Р°РЅРЅСЏ С‰Рµ РЅРµ РїСЂРѕР№РґРµРЅРµ, Р·Р±РµСЂС–РіР°С”РјРѕ РїСЂРѕСЃС‚Рѕ null (РµРєРѕРЅРѕРјРёРјРѕ РїР°Рј'СЏС‚СЊ С…РјР°СЂРё!)
             if (!s || s.selectedIndex === null) return null;
             return[s.selectedIndex, s.isCorrect ? 1 : 0];
         }));
     }
 
-    // 2. Розархіватор (з лікуванням битих даних)
+    // 2. Р РѕР·Р°СЂС…С–РІР°С‚РѕСЂ (Р· Р»С–РєСѓРІР°РЅРЅСЏРј Р±РёС‚РёС… РґР°РЅРёС…)
     function unpackState(packedStr) {
         try {
             const arr = JSON.parse(packedStr);
             return arr.map(item => {
-                // Якщо з хмари прилетів мусор типу [null, 0] — стираємо його повністю
+                // РЇРєС‰Рѕ Р· С…РјР°СЂРё РїСЂРёР»РµС‚С–РІ РјСѓСЃРѕСЂ С‚РёРїСѓ [null, 0] вЂ” СЃС‚РёСЂР°С”РјРѕ Р№РѕРіРѕ РїРѕРІРЅС–СЃС‚СЋ
                 if (!item || item[0] === null) return null;
                 
                 return { selectedIndex: item[0], isCorrect: !!item[1] };
@@ -2141,14 +2145,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // 3. Відновлення при вході
+    // 3. Р’С–РґРЅРѕРІР»РµРЅРЅСЏ РїСЂРё РІС…РѕРґС–
     function syncFromCloud() {
         if (!tg || !tg.CloudStorage) return;
         
-        // --- НОВЕ: Відновлюємо Обране з хмари Telegram ---
+        // --- РќРћР’Р•: Р’С–РґРЅРѕРІР»СЋС”РјРѕ РћР±СЂР°РЅРµ Р· С…РјР°СЂРё Telegram ---
         tg.CloudStorage.getItem('pdr_favorites', (err, value) => {
             if (!err && value) {
-                // Якщо в хмарі є збережені закладки, записуємо їх у локальну пам'ять
+                // РЇРєС‰Рѕ РІ С…РјР°СЂС– С” Р·Р±РµСЂРµР¶РµРЅС– Р·Р°РєР»Р°РґРєРё, Р·Р°РїРёСЃСѓС”РјРѕ С—С… Сѓ Р»РѕРєР°Р»СЊРЅСѓ РїР°Рј'СЏС‚СЊ
                 localStorage.setItem('pdr_favorites', value);
             }
         });
@@ -2171,7 +2175,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         const unpacked = unpackState(values[key]);
                         allSavedStates[key] = unpacked;
 
-                        // Відновлюємо статистику
+                        // Р’С–РґРЅРѕРІР»СЋС”РјРѕ СЃС‚Р°С‚РёСЃС‚РёРєСѓ
                         let correctCount = 0;
                         unpacked.forEach(s => { if (s && s.isCorrect) correctCount++; });
                         stats[key] = correctCount;
@@ -2186,7 +2190,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 4. Тихе збереження (Дебаунс 1 сек)
+    // 4. РўРёС…Рµ Р·Р±РµСЂРµР¶РµРЅРЅСЏ (Р”РµР±Р°СѓРЅСЃ 1 СЃРµРє)
     let cloudSaveTimeouts = {};
     function scheduleCloudSave(topicId) {
         if (!tg || !tg.CloudStorage || topicId === 'hard_mode') return; 
@@ -2202,11 +2206,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 1000); 
     }
 
-    // Запускаємо відновлення при старті додатку
+    // Р—Р°РїСѓСЃРєР°С”РјРѕ РІС–РґРЅРѕРІР»РµРЅРЅСЏ РїСЂРё СЃС‚Р°СЂС‚С– РґРѕРґР°С‚РєСѓ
     syncFromCloud();
 
 // ==========================================
-    // ЛОГІКА ПОВНОЕКРАННОГО ЗУМУ КАРТИНОК
+    // Р›РћР“Р†РљРђ РџРћР’РќРћР•РљР РђРќРќРћР“Рћ Р—РЈРњРЈ РљРђР РўРРќРћРљ
     // ==========================================
     
     function setupImageZoom(sourceImgId) {
@@ -2224,13 +2228,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 viewerImg.src = sourceImg.src;
                 viewerImg.style.transform = 'scale(1)';
                 viewer.style.display = 'flex';
-                // Невелика затримка для плавного проявлення (fade-in)
+                // РќРµРІРµР»РёРєР° Р·Р°С‚СЂРёРјРєР° РґР»СЏ РїР»Р°РІРЅРѕРіРѕ РїСЂРѕСЏРІР»РµРЅРЅСЏ (fade-in)
                 setTimeout(() => { viewer.style.opacity = '1'; }, 10);
             }
         });
     }
 
-    // Вішаємо кліки на картинки в звичайному тесті та в іспиті
+    // Р’С–С€Р°С”РјРѕ РєР»С–РєРё РЅР° РєР°СЂС‚РёРЅРєРё РІ Р·РІРёС‡Р°Р№РЅРѕРјСѓ С‚РµСЃС‚С– С‚Р° РІ С–СЃРїРёС‚С–
     setupImageZoom('quiz-image');
     setupImageZoom('exam-image');
 
@@ -2239,7 +2243,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const closeBtn = document.getElementById('close-image-viewer');
 
     if (viewer && viewerImg) {
-        // Функція закриття
+        // Р¤СѓРЅРєС†С–СЏ Р·Р°РєСЂРёС‚С‚СЏ
         const closeViewer = () => {
             viewer.style.opacity = '0';
             setTimeout(() => { viewer.style.display = 'none'; }, 200);
@@ -2247,43 +2251,43 @@ document.addEventListener("DOMContentLoaded", () => {
         
         closeBtn.addEventListener('click', closeViewer);
         viewer.addEventListener('click', (e) => {
-            // Закриваємо, якщо клікнули повз саму картинку (на темний фон)
+            // Р—Р°РєСЂРёРІР°С”РјРѕ, СЏРєС‰Рѕ РєР»С–РєРЅСѓР»Рё РїРѕРІР· СЃР°РјСѓ РєР°СЂС‚РёРЅРєСѓ (РЅР° С‚РµРјРЅРёР№ С„РѕРЅ)
             if (e.target === viewer) closeViewer();
         });
 
-        // Логіка жестів (Pinch-to-zoom)
+        // Р›РѕРіС–РєР° Р¶РµСЃС‚С–РІ (Pinch-to-zoom)
         let initialDist = 0;
         let currentScale = 1;
 
         viewer.addEventListener('touchstart', (e) => {
             if (e.touches.length === 2) {
-                // Вираховуємо відстань між двома пальцями
+                // Р’РёСЂР°С…РѕРІСѓС”РјРѕ РІС–РґСЃС‚Р°РЅСЊ РјС–Р¶ РґРІРѕРјР° РїР°Р»СЊС†СЏРјРё
                 initialDist = Math.hypot(
                     e.touches[0].pageX - e.touches[1].pageX,
                     e.touches[0].pageY - e.touches[1].pageY
                 );
-                viewerImg.style.transition = 'none'; // Вимикаємо анімацію для плавності руху
+                viewerImg.style.transition = 'none'; // Р’РёРјРёРєР°С”РјРѕ Р°РЅС–РјР°С†С–СЋ РґР»СЏ РїР»Р°РІРЅРѕСЃС‚С– СЂСѓС…Сѓ
             }
         }, { passive: true });
 
         viewer.addEventListener('touchmove', (e) => {
             if (e.touches.length === 2) {
-                e.preventDefault(); // Блокуємо скрол екрану під час зуму
+                e.preventDefault(); // Р‘Р»РѕРєСѓС”РјРѕ СЃРєСЂРѕР» РµРєСЂР°РЅСѓ РїС–Рґ С‡Р°СЃ Р·СѓРјСѓ
                 const currentDist = Math.hypot(
                     e.touches[0].pageX - e.touches[1].pageX,
                     e.touches[0].pageY - e.touches[1].pageY
                 );
                 
-                // Рахуємо масштаб
+                // Р Р°С…СѓС”РјРѕ РјР°СЃС€С‚Р°Р±
                 const distChange = currentDist / initialDist;
-                currentScale = Math.max(1, Math.min(distChange, 4)); // Обмеження: не менше 1x і не більше 4x
+                currentScale = Math.max(1, Math.min(distChange, 4)); // РћР±РјРµР¶РµРЅРЅСЏ: РЅРµ РјРµРЅС€Рµ 1x С– РЅРµ Р±С–Р»СЊС€Рµ 4x
                 viewerImg.style.transform = `scale(${currentScale})`;
             }
         }, { passive: false });
 
         viewer.addEventListener('touchend', (e) => {
             if (e.touches.length < 2) {
-                // Як в Instagram: коли відпускаєш пальці, картинка "відстрибує" на місце
+                // РЇРє РІ Instagram: РєРѕР»Рё РІС–РґРїСѓСЃРєР°С”С€ РїР°Р»СЊС†С–, РєР°СЂС‚РёРЅРєР° "РІС–РґСЃС‚СЂРёР±СѓС”" РЅР° РјС–СЃС†Рµ
                 viewerImg.style.transition = 'transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)';
                 viewerImg.style.transform = 'scale(1)';
                 currentScale = 1;
@@ -2291,4 +2295,4 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-}); // <-- ВОТ ТА САМАЯ ЗАКРЫВАЮЩАЯ СКОБКА
+}); // <-- Р’РћРў РўРђ РЎРђРњРђРЇ Р—РђРљР Р«Р’РђР®Р©РђРЇ РЎРљРћР‘РљРђ
