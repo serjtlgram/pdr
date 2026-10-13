@@ -42,6 +42,9 @@
 .hero-section {
   position: relative;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
   min-height: 520px;
   display: flex;
   align-items: center;

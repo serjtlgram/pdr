@@ -5,12 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ПДР України 2026</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        (function() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                var twa = window.Telegram.WebApp;
+                try {
+                    twa.ready();
+                    twa.expand();
+                    if (typeof twa.requestFullscreen === 'function') {
+                        twa.requestFullscreen();
+                    }
+                    if (typeof twa.disableVerticalSwipes === 'function') {
+                        twa.disableVerticalSwipes();
+                    }
+                } catch (e) {}
+            }
+        })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/tokens.css?v=6">
-    <link rel="stylesheet" href="styles/base.css?v=6">
-    <link rel="stylesheet" href="styles/layout.css?v=6">
+    <link rel="stylesheet" href="styles/base.css?v=7">
+    <link rel="stylesheet" href="styles/layout.css?v=7">
     <link rel="stylesheet" href="styles/components.css?v=6">
     <link rel="stylesheet" href="styles/themes.css?v=6">
     <link rel="stylesheet" href="styles/responsive.css?v=6">
@@ -535,7 +552,7 @@
     </div>
 
     <!-- ОСЬ ЦІ РЯДКИ БУЛИ ВТРАЧЕНІ -->
-    <script src="app_final.js"></script>
+    <script src="app_final.js?v=7"></script>
 
     <!-- МОДАЛКА ДЛЯ ПОВНОЕКРАННОГО ПЕРЕГЛЯДУ КАРТИНОК -->
     <div id="image-viewer-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(8, 11, 18, 0.95); z-index: 100000; align-items: center; justify-content: center; flex-direction: column; opacity: 0; transition: opacity 0.2s ease;">

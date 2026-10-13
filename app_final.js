@@ -164,6 +164,21 @@ document.addEventListener("DOMContentLoaded", () => {
     if (tg) {
         try { tg.ready(); } catch(e) {}
         try { tg.expand(); } catch(e) {}
+        if (typeof tg.requestFullscreen === 'function') {
+            try { tg.requestFullscreen(); } catch(e) {}
+        }
+        if (typeof tg.disableVerticalSwipes === 'function') {
+            try { tg.disableVerticalSwipes(); } catch(e) {}
+        }
+
+        // Повторный запрос fullscreen на первый клик (на случай, если десктоп блокирует до клика)
+        document.addEventListener('click', () => {
+            try {
+                if (typeof tg.requestFullscreen === 'function' && !tg.isFullscreen) {
+                    tg.requestFullscreen();
+                }
+            } catch(e) {}
+        }, { once: true });
         
         if (typeof tg.setHeaderColor === 'function') {
             try { tg.setHeaderColor('bg_color'); } catch(e) {}

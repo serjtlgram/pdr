@@ -6,17 +6,26 @@
   font-family: var(--font-main);
 }
 
+html {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 body {
   background-color: var(--c-bg);
   color: var(--c-text);
   line-height: 1.4;
   overflow-x: hidden;
+  max-width: 100%;
   transition: background-color var(--tr-mid), color var(--tr-mid);
 }
 
 #app-container {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  box-sizing: border-box;
+  overflow-x: hidden;
   padding: calc(var(--tg-content-safe-area-inset-top, 24px) + 60px) 16px 16px;
 }
 
@@ -550,6 +559,9 @@ body.light-theme .option-btn.wrong {
 .hero-section {
   position: relative;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
   min-height: 520px;
   display: flex;
   align-items: center;
