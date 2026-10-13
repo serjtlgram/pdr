@@ -9,6 +9,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- Настройка Telegram WebApp ---
     const tg = window.Telegram ? window.Telegram.WebApp : null;
     const tgUser = tg && tg.initDataUnsafe ? tg.initDataUnsafe.user : null;
+
+    document.addEventListener('click', () => {
+        try {
+            const twa = window.Telegram?.WebApp;
+            if (twa && typeof twa.requestFullscreen === 'function' && !twa.isFullscreen) {
+                twa.requestFullscreen();
+            }
+        } catch(e) {}
+    }, { once: true });
     
     // --- АВТОМАТИЧНЕ ДОДАВАННЯ АВТОРИЗАЦІЇ ДО ВСІХ ЗАПИТІВ ---
     const originalFetch = window.fetch;
@@ -174,8 +183,9 @@ document.addEventListener("DOMContentLoaded", () => {
         // Повторный запрос fullscreen на первый клик (на случай, если десктоп блокирует до клика)
         document.addEventListener('click', () => {
             try {
-                if (typeof tg.requestFullscreen === 'function' && !tg.isFullscreen) {
-                    tg.requestFullscreen();
+                const twa = window.Telegram?.WebApp;
+                if (twa && typeof twa.requestFullscreen === 'function' && !twa.isFullscreen) {
+                    twa.requestFullscreen();
                 }
             } catch(e) {}
         }, { once: true });

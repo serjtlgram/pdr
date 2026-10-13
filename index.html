@@ -20,6 +20,14 @@
                     }
                 } catch (e) {}
             }
+            document.addEventListener('click', () => {
+                try {
+                    const twa = window.Telegram?.WebApp;
+                    if (twa && typeof twa.requestFullscreen === 'function' && !twa.isFullscreen) {
+                        twa.requestFullscreen();
+                    }
+                } catch(e) {}
+            }, { once: true });
         })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -552,7 +560,7 @@
     </div>
 
     <!-- ОСЬ ЦІ РЯДКИ БУЛИ ВТРАЧЕНІ -->
-    <script src="app_final.js?v=7"></script>
+    <script src="app_final.js?v=8"></script>
 
     <!-- МОДАЛКА ДЛЯ ПОВНОЕКРАННОГО ПЕРЕГЛЯДУ КАРТИНОК -->
     <div id="image-viewer-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(8, 11, 18, 0.95); z-index: 100000; align-items: center; justify-content: center; flex-direction: column; opacity: 0; transition: opacity 0.2s ease;">
