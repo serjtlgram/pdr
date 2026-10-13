@@ -4,7 +4,18 @@
   align-items: center;
   justify-content: space-between;
   position: relative;
-  z-index: 10;
+  z-index: 100;
+}
+
+.top-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.desktop-nav {
+  display: none;
 }
 
 .logo-icon {
@@ -306,4 +317,95 @@ body:not(.light-theme) .topic-progress-bg { background: rgba(255,255,255,0.1); }
 
 .bottom-nav-item:active svg {
   transform: scale(0.9);
+}
+
+/* --- Десктопний режим (ПК) --- */
+@media (min-width: 769px) {
+  .top-bar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--c-bg);
+    padding: 10px 0;
+    margin-bottom: 24px;
+    transition: background-color var(--tr-mid);
+  }
+
+  .desktop-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--c-surface);
+    border: 1px solid var(--c-border-soft);
+    padding: 4px;
+    border-radius: var(--radius-md);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .desktop-nav-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--c-text-soft);
+    font-size: 0.88rem;
+    font-weight: 600;
+    font-family: var(--font-main);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--tr-fast);
+    line-height: 1;
+    white-space: nowrap;
+    user-select: none;
+    outline: none;
+  }
+
+  .desktop-nav-item svg {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+    stroke: currentColor;
+    transition: transform var(--tr-fast), stroke-width var(--tr-fast);
+  }
+
+  .desktop-nav-item:hover {
+    color: var(--c-text);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .desktop-nav-item:active {
+    transform: scale(0.97);
+  }
+
+  .desktop-nav-item.active {
+    background: var(--c-primary-soft);
+    color: var(--c-primary);
+    border-color: rgba(66, 133, 244, 0.25);
+    box-shadow: 0 1px 4px rgba(66, 133, 244, 0.12);
+  }
+
+  .desktop-nav-item.active svg {
+    stroke-width: 2.2;
+    transform: scale(1.05);
+  }
+
+  /* Сховати нижнє меню на ПК */
+  .bottom-nav {
+    display: none !important;
+  }
+
+  /* 4 колонки розділів на ПК */
+  .topics-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    padding-bottom: 30px;
+  }
+
+  .topic-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  }
 }

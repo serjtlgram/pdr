@@ -384,6 +384,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 bottomNav.style.display = 'flex'; // Показуємо на всіх інших
             }
         }
+        if (screenName === 'home') {
+            updateBottomNav('home');
+        }
         // ---------------------------------------
 
         if (tg && tg.BackButton) {
@@ -395,7 +398,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function updateBottomNav(mode) {
-        document.querySelectorAll('.bottom-nav-item').forEach(item => {
+        document.querySelectorAll('.bottom-nav-item, .desktop-nav-item').forEach(item => {
             if (item.getAttribute('data-mode') === mode) {
                 item.classList.add('active');
             } else {
@@ -456,48 +459,56 @@ document.addEventListener("DOMContentLoaded", () => {
     const cardHard = document.getElementById('card-hard');
     const cardFavorites = document.getElementById('card-favorites');
 
-    // --- Кліки по нижній панелі навігації ---
+    // --- Кліки по нижній та десктопній панелі навігації ---
     const navLearning = document.getElementById('nav-learning');
     const navExam = document.getElementById('nav-exam');
     const navHard = document.getElementById('nav-hard');
     const navFavorites = document.getElementById('nav-favorites');
 
-    if (navLearning) {
-        navLearning.addEventListener('click', (e) => {
-            e.preventDefault();
-            addImpact();
-            renderTopics();
-            showScreen(topicsScreen, 'topics');
-        });
-    }
+    const deskNavLearning = document.getElementById('desk-nav-learning');
+    const deskNavExam = document.getElementById('desk-nav-exam');
+    const deskNavHard = document.getElementById('desk-nav-hard');
+    const deskNavFavorites = document.getElementById('desk-nav-favorites');
 
-    if (navHard) {
-        navHard.addEventListener('click', async (e) => {
-            e.preventDefault();
-            addImpact();
-            if (!isUserPro) { showProModal(); return; } // <--- ДОДАЛИ
-            
-            if (globalTopics.length === 0) {
-                if(topicsPromise) globalTopics = await topicsPromise;
-                else {
-                    const res = await fetch(`${API_BASE}/api/topics`);
-                    globalTopics = await res.json();
-                }
+    const handleLearningClick = (e) => {
+        if (e) e.preventDefault();
+        addImpact();
+        renderTopics();
+        showScreen(topicsScreen, 'topics');
+    };
+
+    if (navLearning) navLearning.addEventListener('click', handleLearningClick);
+    if (deskNavLearning) deskNavLearning.addEventListener('click', handleLearningClick);
+
+    const handleHardClick = async (e) => {
+        if (e) e.preventDefault();
+        addImpact();
+        if (!isUserPro) { showProModal(); return; } // <--- ДОДАЛИ
+        
+        if (globalTopics.length === 0) {
+            if (topicsPromise) globalTopics = await topicsPromise;
+            else {
+                const res = await fetch(`${API_BASE}/api/topics`);
+                globalTopics = await res.json();
             }
-            startHardMode();
-        });
-    }
+        }
+        startHardMode();
+    };
 
-    if (navFavorites) {
-        navFavorites.addEventListener('click', (e) => {
-            e.preventDefault();
-            addImpact();
-            if (!isUserPro) { showProModal(); return; } // <--- ДОДАЛИ
-            
-            if (globalTopics.length === 0) return;
-            renderFavoriteTopics();
-        });
-    }
+    if (navHard) navHard.addEventListener('click', handleHardClick);
+    if (deskNavHard) deskNavHard.addEventListener('click', handleHardClick);
+
+    const handleFavoritesClick = (e) => {
+        if (e) e.preventDefault();
+        addImpact();
+        if (!isUserPro) { showProModal(); return; } // <--- ДОДАЛИ
+        
+        if (globalTopics.length === 0) return;
+        renderFavoriteTopics();
+    };
+
+    if (navFavorites) navFavorites.addEventListener('click', handleFavoritesClick);
+    if (deskNavFavorites) deskNavFavorites.addEventListener('click', handleFavoritesClick);
 
     if (cardLearning) {
         cardLearning.addEventListener('click', () => {
@@ -763,13 +774,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const EXAM_DURATION_MS = 20 * 60 * 1000; // 20 хвилин
 
     // Прив'язка кнопок запуску іспиту
-    if (navExam) {
-        navExam.addEventListener('click', (e) => {
-            e.preventDefault();
-            addImpact();
-            startExamMode(); // Запускаем экзамен
-        });
-    }
+    const handleExamClick = (e) => {
+        if (e) e.preventDefault();
+        addImpact();
+        startExamMode(); // Запускаем экзамен
+    };
+
+    if (navExam) navExam.addEventListener('click', handleExamClick);
+    if (deskNavExam) deskNavExam.addEventListener('click', handleExamClick);
     
     if (cardExam) {
         cardExam.addEventListener('click', startExamMode);
@@ -834,6 +846,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function initExam() {
         showScreen(examScreen, 'exam');
+        updateBottomNav('exam');
         document.getElementById('exam-question-text').innerText = "Формування білета...";
         document.getElementById('exam-options').innerHTML = "";
         document.getElementById('exam-image').parentElement.style.display = 'none';

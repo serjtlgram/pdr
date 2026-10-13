@@ -297,6 +297,34 @@ body.cyber-theme .bottom-nav-item.active svg {
     filter: drop-shadow(0 0 5px var(--c-primary));
 }
 
+/* --- Десктопная панель навигации в стиле Cyberpunk --- */
+body.cyber-theme .desktop-nav {
+    background: rgba(14, 18, 29, 0.95);
+    border-color: var(--c-border-soft);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.12);
+}
+
+body.cyber-theme .desktop-nav-item {
+    color: var(--c-text-soft);
+}
+
+body.cyber-theme .desktop-nav-item:hover {
+    color: var(--c-primary);
+    background: rgba(0, 243, 255, 0.08);
+}
+
+body.cyber-theme .desktop-nav-item.active {
+    background: rgba(0, 243, 255, 0.15);
+    color: var(--c-primary);
+    border-color: var(--c-primary);
+    box-shadow: 0 0 12px rgba(0, 243, 255, 0.3);
+    text-shadow: 0 0 6px var(--c-primary);
+}
+
+body.cyber-theme .desktop-nav-item.active svg {
+    filter: drop-shadow(0 0 4px var(--c-primary));
+}
+
 /* --- Круговые графики статистики --- */
 body.cyber-theme .stat-bg {
     stroke: rgba(0, 243, 255, 0.1);

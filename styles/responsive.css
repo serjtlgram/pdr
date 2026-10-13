@@ -8,10 +8,25 @@
   .quiz-options-wrapper {
     flex: 1;
   }
+
+  .bottom-nav {
+    display: none !important;
+  }
+
+  .desktop-nav {
+    display: inline-flex !important;
+  }
+
+  .topics-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 16px;
+    padding-bottom: 30px;
+  }
 }
 
 @media (max-width: 768px) {
-  .desktop-only {
+  .desktop-only,
+  .desktop-nav {
     display: none !important;
   }
 

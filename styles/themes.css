@@ -204,6 +204,33 @@ body.light-theme .bottom-nav {
   border-top-color: #E5E7EB;
 }
 
+/* Десктопна панель на ПК (Світла тема) */
+body.light-theme .desktop-nav {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+body.light-theme .desktop-nav-item {
+  color: #4b5563;
+}
+
+body.light-theme .desktop-nav-item:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+body.light-theme .desktop-nav-item.active {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: rgba(37, 99, 235, 0.2);
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.1);
+}
+
+body.light-theme .topic-card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
 /* --- СТИЛІ ДЛЯ ІСПИТУ --- */
 .exam-sticky-header {
   position: sticky;
