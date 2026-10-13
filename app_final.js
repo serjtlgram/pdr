@@ -10,14 +10,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const tg = window.Telegram ? window.Telegram.WebApp : null;
     const tgUser = tg && tg.initDataUnsafe ? tg.initDataUnsafe.user : null;
 
-    document.addEventListener('click', () => {
+    function triggerFullscreen() {
         try {
             const twa = window.Telegram?.WebApp;
-            if (twa && typeof twa.requestFullscreen === 'function' && !twa.isFullscreen) {
-                twa.requestFullscreen();
+            if (twa) {
+                twa.ready();
+                twa.expand();
+                if (typeof twa.requestFullscreen === 'function' && !twa.isFullscreen) {
+                    twa.requestFullscreen();
+                }
+                if (typeof twa.disableVerticalSwipes === 'function') {
+                    twa.disableVerticalSwipes();
+                }
             }
         } catch(e) {}
-    }, { once: true });
+    }
+
+    triggerFullscreen();
+    [50, 150, 300, 600, 1000, 1500, 2500].forEach(ms => setTimeout(triggerFullscreen, ms));
+    ['click', 'touchstart', 'pointerdown'].forEach(ev => {
+        document.addEventListener(ev, triggerFullscreen, { once: true });
+    });
     
     // --- АВТОМАТИЧНЕ ДОДАВАННЯ АВТОРИЗАЦІЇ ДО ВСІХ ЗАПИТІВ ---
     const originalFetch = window.fetch;
@@ -171,24 +184,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Настройки Telegram UI ---
     if (tg) {
-        try { tg.ready(); } catch(e) {}
-        try { tg.expand(); } catch(e) {}
-        if (typeof tg.requestFullscreen === 'function') {
-            try { tg.requestFullscreen(); } catch(e) {}
+        triggerFullscreen();
+        if (typeof tg.onEvent === 'function') {
+            try { tg.onEvent('viewportChanged', triggerFullscreen); } catch(e) {}
         }
-        if (typeof tg.disableVerticalSwipes === 'function') {
-            try { tg.disableVerticalSwipes(); } catch(e) {}
-        }
-
-        // Повторный запрос fullscreen на первый клик (на случай, если десктоп блокирует до клика)
-        document.addEventListener('click', () => {
-            try {
-                const twa = window.Telegram?.WebApp;
-                if (twa && typeof twa.requestFullscreen === 'function' && !twa.isFullscreen) {
-                    twa.requestFullscreen();
-                }
-            } catch(e) {}
-        }, { once: true });
         
         if (typeof tg.setHeaderColor === 'function') {
             try { tg.setHeaderColor('bg_color'); } catch(e) {}

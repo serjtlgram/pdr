@@ -24,6 +24,9 @@
     align-items: center;
     margin: -10px -16px 20px;
     width: calc(100% + 32px);
+    max-width: calc(100% + 32px);
+    box-sizing: border-box;
+    overflow: hidden;
     padding: 20px 16px;
   }
 

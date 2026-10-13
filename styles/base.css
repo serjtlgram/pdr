@@ -674,7 +674,7 @@ body.light-theme .option-btn.wrong {
 /* --- Новая сетка разделов --- */
 .topics-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   padding-bottom: 100px;
 }
@@ -687,6 +687,7 @@ body.light-theme .option-btn.wrong {
   flex-direction: column;
   justify-content: space-between;
   min-height: 150px;
+  min-width: 0;
   border: 1px solid rgba(0,0,0,0.05);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   overflow: hidden;

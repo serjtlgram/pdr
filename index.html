@@ -7,39 +7,53 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         (function() {
-            if (window.Telegram && window.Telegram.WebApp) {
-                var twa = window.Telegram.WebApp;
+            function activateFullscreen() {
                 try {
-                    twa.ready();
-                    twa.expand();
-                    if (typeof twa.requestFullscreen === 'function') {
-                        twa.requestFullscreen();
-                    }
-                    if (typeof twa.disableVerticalSwipes === 'function') {
-                        twa.disableVerticalSwipes();
+                    var twa = window.Telegram && window.Telegram.WebApp;
+                    if (twa) {
+                        twa.ready();
+                        twa.expand();
+                        if (typeof twa.requestFullscreen === 'function' && !twa.isFullscreen) {
+                            twa.requestFullscreen();
+                        }
+                        if (typeof twa.disableVerticalSwipes === 'function') {
+                            twa.disableVerticalSwipes();
+                        }
                     }
                 } catch (e) {}
             }
-            document.addEventListener('click', () => {
-                try {
-                    const twa = window.Telegram?.WebApp;
-                    if (twa && typeof twa.requestFullscreen === 'function' && !twa.isFullscreen) {
-                        twa.requestFullscreen();
-                    }
-                } catch(e) {}
-            }, { once: true });
+
+            // 1. Немедленный вызов при загрузке скрипта
+            activateFullscreen();
+
+            // 2. Каскадный опрос с таймерами (для перехвата момента, когда Telegram Desktop готов развернуть окно)
+            [50, 150, 300, 600, 1000, 1500, 2500].forEach(function(delay) {
+                setTimeout(activateFullscreen, delay);
+            });
+
+            // 3. Реакция на изменение viewport Telegram
+            try {
+                if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.onEvent === 'function') {
+                    window.Telegram.WebApp.onEvent('viewportChanged', activateFullscreen);
+                }
+            } catch (e) {}
+
+            // 4. Гарантированный переход в полный экран по первому клику/касанию
+            ['click', 'touchstart', 'pointerdown'].forEach(function(ev) {
+                document.addEventListener(ev, activateFullscreen, { once: true });
+            });
         })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles/tokens.css?v=6">
-    <link rel="stylesheet" href="styles/base.css?v=7">
-    <link rel="stylesheet" href="styles/layout.css?v=7">
-    <link rel="stylesheet" href="styles/components.css?v=6">
-    <link rel="stylesheet" href="styles/themes.css?v=6">
-    <link rel="stylesheet" href="styles/responsive.css?v=6">
-    <link rel="stylesheet" href="styles/cyberpunk.css?v=1">
+    <link rel="stylesheet" href="styles/tokens.css?v=9">
+    <link rel="stylesheet" href="styles/base.css?v=9">
+    <link rel="stylesheet" href="styles/layout.css?v=9">
+    <link rel="stylesheet" href="styles/components.css?v=9">
+    <link rel="stylesheet" href="styles/themes.css?v=9">
+    <link rel="stylesheet" href="styles/responsive.css?v=9">
+    <link rel="stylesheet" href="styles/cyberpunk.css?v=9">
 </head>
 <body>
     <div id="not-tg-blocker" class="modal-overlay" style="display: none; background: #080B12; z-index: 99999;">
@@ -560,7 +574,7 @@
     </div>
 
     <!-- ОСЬ ЦІ РЯДКИ БУЛИ ВТРАЧЕНІ -->
-    <script src="app_final.js?v=8"></script>
+    <script src="app_final.js?v=9"></script>
 
     <!-- МОДАЛКА ДЛЯ ПОВНОЕКРАННОГО ПЕРЕГЛЯДУ КАРТИНОК -->
     <div id="image-viewer-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(8, 11, 18, 0.95); z-index: 100000; align-items: center; justify-content: center; flex-direction: column; opacity: 0; transition: opacity 0.2s ease;">
