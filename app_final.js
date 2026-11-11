@@ -95,6 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- ИНИЦИАЛИЗАЦИЯ ПОЛЬЗОВАТЕЛЯ НА СЕРВЕРЕ ---
     if (tgUser) {
+        const tgStartParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param || new URLSearchParams(window.location.search).get('tgWebAppStartParam') || '';
         fetch(`${API_BASE}/init-user`, {
             method: 'POST',
             headers: {
@@ -106,7 +107,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 first_name: tgUser.first_name || null,
                 last_name: tgUser.last_name || null,
                 language_code: tgUser.language_code || null,
-                is_premium: tgUser.is_premium || false
+                is_premium: tgUser.is_premium || false,
+                start_param: tgStartParam || null
             })
         })
         .then(res => res.json())
